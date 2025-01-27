@@ -34,11 +34,12 @@
 			}
 		});
 	});
-
-	const update = () => {
+	$effect(() => {
 		localStorage.setItem(keys.js, components.js);
 		localStorage.setItem(keys.html, components.html);
 		localStorage.setItem(keys.css, components.css);
+	});
+	const update = () => {
 		source = `
 		<html lang="en">
 		<head>
@@ -61,14 +62,15 @@
 
 		setTimeout(() => check(iframe), waitTime);
 	};
+
 </script>
 
 <Splitpanes class="default-theme">
 	<Pane minSize={15}
-		><CodeMirror bind:value={components.js} lang={javascript()} /></Pane
+		><div class="heading">JavaScript</div><CodeMirror bind:value={components.js} lang={javascript()} /></Pane
 	>
-	<Pane><CodeMirror bind:value={components.css} lang={css()} /></Pane>
-	<Pane><CodeMirror bind:value={components.html} lang={html({})} /></Pane>
+	<Pane><div class="heading">CSS</div><CodeMirror bind:value={components.css} lang={css()} /></Pane>
+	<Pane><div class="heading">HTML</div><CodeMirror bind:value={components.html} lang={html({})} /></Pane>
 </Splitpanes>
 <button onclick={update}>Update</button>
 
@@ -87,5 +89,8 @@
 	iframe {
 		width: 100%;
 		height: 100%;
+	}
+	.heading {
+		padding: 5px;
 	}
 </style>
