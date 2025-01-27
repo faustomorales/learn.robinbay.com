@@ -35,18 +35,23 @@
             },
         },
         {
-            description: "Create thead and tbody elements inside the table.",
+            description: `Create thead and tbody elements inside the table. 
+            The thead element should have elements for first name and last name. The first name
+            header should have class <em>first</em> and the last name header should have
+            class <em>last</em>.`,
             verify: (iframe: HTMLIFrameElement) => {
                 let table = iframe.contentDocument?.querySelector(".my-table");
                 let thead = table?.querySelector("thead");
                 let tbody = table?.querySelector("tbody");
-                if (thead && tbody) {
+                let firstHeader = thead?.querySelector(".first");
+                let lastHeader = thead?.querySelector(".last");
+                if (thead && tbody && firstHeader && lastHeader) {
                     return { passed: true, comment: "" };
                 } else {
                     return {
                         passed: false,
                         comment:
-                            "I found a table but it's missing either thead or tbody.",
+                            "I found a table but it's missing either thead or tbody or the first or last headers.",
                     };
                 }
             },
@@ -235,11 +240,11 @@
                             comment:
                                 "The table is not sorted according to the initial order when sortKey is unset.",
                         };
-                    } 
+                    }
                     populate(names, "first");
                     if (
                         table?.querySelector("td")?.textContent !=
-                        names.map((n: any) => n.first).toSorted()[0]
+                        sort(names, "first")[0].first
                     ) {
                         return {
                             passed: false,
@@ -263,13 +268,60 @@
                         passed: true,
                         comment: "",
                     };
-                    
                 } else {
                     return {
                         passed: false,
                         comment: "The populate function is missing.",
                     };
                 }
+            },
+        },
+        {
+            description: `Add a click event listener to the table headers. You can do this by:
+            <ul>
+                <li>
+                    Adding functions called <em>sortByFirstName</em> and <em>sortByLastName</em>
+                    that call the <em>populate</em> function with the names list appropriate sort key.
+                </li>
+                <li>Adding event listeners to the first and last name headers (using <em>document.querySelector</em>
+                to get the element and <em>addEventListener</em> to listen to the click event) that call the
+                appropriate sort function when triggered.</li>
+            </ul>`,
+            verify: (iframe: HTMLIFrameElement) => {
+                let table = iframe.contentDocument?.querySelector(".my-table");
+                let tbody = table?.querySelector("tbody");
+                let firstHeader = table?.querySelector(".first");
+                let lastHeader = table?.querySelector(".last");
+                let names = (iframe.contentWindow as any)?.names;
+                let sort = (iframe.contentWindow as any)?.sort;
+
+                (firstHeader as HTMLButtonElement)?.click();
+                console.log("firstHeader", firstHeader);
+                if (
+                    tbody?.querySelector("td")?.textContent !=
+                    sort(names, "first")[0].first
+                ) {
+                    return {
+                        passed: false,
+                        comment:
+                            "The table is not sorted according to the first name when the first name header is clicked.",
+                    };
+                }
+                (lastHeader as HTMLButtonElement)?.click();
+                if (
+                    tbody?.querySelector("td")?.textContent !=
+                    sort(names, "last")[0].first
+                ) {
+                    return {
+                        passed: false,
+                        comment:
+                            "The table is not sorted according to the last name when the last name header is clicked.",
+                    };
+                }
+                return {
+                    passed: true,
+                    comment: "",
+                };
             },
         },
     ]);
@@ -300,6 +352,12 @@
     <title>Sortable Table</title>
 </svelte:head>
 
+<h1>Sortable Table</h1>
+<p>
+    The goal of this exercise is to demonstrate how one can create a table that
+    can be sorted by the user according to different columns. Follow the steps
+    below and use the check button to verify your work.
+</p>
 <ol class="checks">
     {#each steps as step, i}
         <li>

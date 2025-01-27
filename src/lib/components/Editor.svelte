@@ -72,7 +72,7 @@
 	<Pane><div class="heading">CSS</div><CodeMirror bind:value={components.css} lang={css()} /></Pane>
 	<Pane><div class="heading">HTML</div><CodeMirror bind:value={components.html} lang={html({})} /></Pane>
 </Splitpanes>
-<button onclick={update}>Update</button>
+<button onclick={update}>Check</button>
 
 <iframe
 	srcdoc={source}
