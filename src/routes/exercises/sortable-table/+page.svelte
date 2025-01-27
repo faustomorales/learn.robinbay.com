@@ -361,7 +361,7 @@
 <ol class="checks">
     {#each steps as step, i}
         <li>
-            {step.response?.passed ? "✅" : "🟩"}
+            {step.response?.passed ? "✅" : "🔲"}
             {@html step.description}
             <em class="comment">{@html step.response?.comment}</em>
         </li>
