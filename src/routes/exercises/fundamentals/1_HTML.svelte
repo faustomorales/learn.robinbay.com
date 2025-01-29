@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { Popover } from "flowbite-svelte";
     import Step from "$lib/components/Step.svelte";
     import type { Verifier } from "$lib/verifications";
     import { fail } from "$lib/common";

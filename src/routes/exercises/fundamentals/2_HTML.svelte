@@ -9,7 +9,7 @@
         if (!em) {
             fail("No em elements were found. Did you use a div element?");
         } else if (em.textContent !== "Hello, World!") {
-            fail("The em element should contain the text 'Hello, World!'");
+            fail("The em element should contain the text 'Hello, World!' (no quotes).");
         } else if (em.parentElement?.tagName !== "DIV") {
             fail("The em element should be a child of a div element.");
         }
