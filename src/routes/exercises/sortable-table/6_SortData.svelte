@@ -2,12 +2,13 @@
     import Step from "$lib/components/Step.svelte";
     import type { Verifier } from "$lib/verifications";
     import { ensureFunctionExists } from "$lib/verifications";
+    import { fail } from "$lib/common"
     let { step = $bindable() }: { step: Step } = $props()
     export const title = "Add a function to sort the table data";
     const verifier: Verifier = (iframe) => {
         let sort = ensureFunctionExists(iframe, "sort");
         if (sort([{ x: "b" }, { x: "a" }], "x")[0].x !== "a") {
-            throw "The sort function doesn't sort the array correctly.";
+            fail("The sort function doesn't sort the array correctly.");
         }
     };
 </script>

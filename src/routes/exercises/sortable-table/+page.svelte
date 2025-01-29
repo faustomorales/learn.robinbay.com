@@ -12,27 +12,23 @@
     import Final from "./Final.svelte";
 </script>
 
-{#snippet description()}
-    <div class="flex">
+<Exercise
+    title="Sortable Table"
+    stateId="/exercises/sortable-table"
+    steps={[Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8, Step9]}
+    ><div class="flex">
         <div class="w-3/4">
             <p class="mb-2">
                 The goal of this exercise is to demonstrate how one can create a
                 table that can be sorted by the user according to different
                 columns. Follow the steps below and use the check button to
-                verify your work. Ultimately, your work should like the
-                example to the right (click on the first and last name headers to see the
-                table re-sort).
+                verify your work. Ultimately, your work should like the example
+                to the right (click on the first and last name headers to see
+                the table re-sort).
             </p>
         </div>
         <div class="w-1/4">
             <Final />
         </div>
-    </div>
-{/snippet}
-
-<Exercise
-    title="Sortable Table"
-    {description}
-    stateId="/exercises/sortable-table"
-    steps={[Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8, Step9]}
-></Exercise>
+    </div></Exercise
+>

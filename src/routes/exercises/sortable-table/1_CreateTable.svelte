@@ -1,5 +1,6 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
+    import { fail } from "$lib/common"
     import type { Verifier } from "$lib/verifications";
     let { step = $bindable() }: { step: Step } = $props()
     const title = "Create a table";
@@ -8,9 +9,9 @@
         if (!table) {
             let otherTable = iframe.contentDocument?.querySelector("table");
             if (otherTable) {
-                throw "I found a table but not one with the correct class.";
+                fail("I found a table but not one with the correct class.");
             } else {
-                throw "No tables were found. Did you use a table element?";
+                fail("No tables were found. Did you use a table element?");
             }
         }
     };

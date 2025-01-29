@@ -1,12 +1,13 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
     import type { Verifier } from "$lib/verifications";
+    import { fail } from "$lib/common"
     let { step = $bindable() }: { step: Step } = $props()
     const title = "Create an array of names";
     const verifier: Verifier = (iframe) => {
         let data = (iframe.contentWindow as any)?.names;
         if (!data) {
-            throw "The data array is missing.";
+            fail("The data array is missing.");
         } else if (
             !(
                 Array.isArray(data) &&
@@ -15,7 +16,7 @@
                 data[0].last
             )
         ) {
-            throw "The data array doesn't have the correct structure.";
+            fail("The data array doesn't have the correct structure.");
         }
     };
 </script>

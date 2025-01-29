@@ -3,6 +3,7 @@
 	import JsLogo from "virtual:icons/vscode-icons/file-type-js-official";
 	import CssLogo from "virtual:icons/vscode-icons/file-type-style";
 	import HtmlLogo from "virtual:icons/ic/baseline-code";
+	import { type PrependedCode, defaultPrependedCode } from "$lib/common";
 	import { onMount } from "svelte";
 	import { browser } from "$app/environment";
 	import { Pane, Splitpanes } from "svelte-splitpanes";
@@ -13,8 +14,10 @@
 	let {
 		stateId,
 		check,
+		prepend = { js: "", css: "", html: "" },
 	}: {
 		stateId: string;
+		prepend?: PrependedCode;
 		check: (iframe: HTMLIFrameElement) => void;
 	} = $props();
 	let iframe: HTMLIFrameElement;
@@ -43,6 +46,7 @@
 		localStorage.setItem(keys.html, components.html);
 		localStorage.setItem(keys.css, components.css);
 	});
+	// TODO: Enable logging.
 	const update = () => {
 		source = `
 		<html lang="en">
@@ -53,15 +57,24 @@
 		</head>
 		<script>
 			const internal = console.log;
-			const external = (...args) => {
+			/* const external = (...args) => {
 				parent.window.postMessage({ type: 'log', args: args }, '*')
 				internal(...args)
 			}
-			console.log = external;
+			console.log = external; */
 		<\/script>
-		<body>${components.html}</body>
-		<style>${components.css}</style>
-		<script>${components.js}<\/script>
+		<body>
+			${prepend.html}
+			${components.html}
+		</body>
+		<style>
+			${prepend.css}
+			${components.css}
+		</style>
+		<script>
+			${prepend.js}
+			${components.js}
+		<\/script>
 		</html>`;
 		setTimeout(() => check(iframe), 100);
 	};
@@ -106,13 +119,14 @@
 <style>
 	iframe {
 		width: 100%;
-		height: 100%;
+		height: 640px;
 	}
 	.heading {
 		padding: 5px;
 	}
 
-	:global(.cm-editor), :global(.codemirror-wrapper) {
+	:global(.cm-editor),
+	:global(.codemirror-wrapper) {
 		height: 100%;
 	}
 </style>

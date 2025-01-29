@@ -1,6 +1,7 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
     import { ensureFunctionExists, type Verifier } from "$lib/verifications";
+    import { fail } from "$lib/common"
 
     let { step = $bindable() }: { step: Step } = $props()
     const title = "Make the table support sorting";
@@ -11,21 +12,21 @@
         let table = iframe.contentDocument?.querySelector(".my-table tbody");
         populate(names, "");
         if (table?.querySelector("td")?.textContent != names[0].first) {
-            throw "The table is not sorted according to the initial order when sortKey is unset.";
+            fail("The table is not sorted according to the initial order when sortKey is unset.");
         }
         populate(names, "first");
         if (
             table?.querySelector("td")?.textContent !=
             sort(names, "first")[0].first
         ) {
-            throw "The table is not sorted according to the first name when sortKey is set to 'first'.";
+            fail("The table is not sorted according to the first name when sortKey is set to 'first'.");
         }
         populate(names, "last");
         if (
             table?.querySelector("td")?.textContent !=
             sort(names, "last")[0].first
         ) {
-            throw "The table is not sorted according to the last name when sortKey is set to 'last'.";
+            fail("The table is not sorted according to the last name when sortKey is set to 'last'.");
         }
         populate(names);
     };

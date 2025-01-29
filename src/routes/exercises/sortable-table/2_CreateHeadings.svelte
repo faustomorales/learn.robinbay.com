@@ -1,6 +1,7 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
     import type { Verifier } from "$lib/verifications";
+    import { fail } from "$lib/common"
     let { step = $bindable() }: { step: Step } = $props()
     const title = "Create table heading and body";
     const verifier: Verifier = (iframe) => {
@@ -10,7 +11,7 @@
         let firstHeader = thead?.querySelector(".first");
         let lastHeader = thead?.querySelector(".last");
         if (!thead || !tbody || !firstHeader || !lastHeader) {
-            throw "I found a table but it's missing either thead or tbody or the first or last headers.";
+            fail("I found a table but it's missing either thead or tbody or the first or last headers.");
         }
     };
 </script>

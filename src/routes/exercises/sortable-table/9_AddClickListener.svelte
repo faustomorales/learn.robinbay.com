@@ -1,6 +1,7 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
     import type { Verifier } from "$lib/verifications";
+    import { fail } from "$lib/common"
 
     let { step = $bindable() }: { step: Step } = $props();
     const title = "Add a click event listener to the table headers";
@@ -17,14 +18,14 @@
             tbody?.querySelector("td")?.textContent !=
             sort(names, "first")[0].first
         ) {
-            throw "The table is not sorted according to the first name when the first name header is clicked.";
+            fail("The table is not sorted according to the first name when the first name header is clicked.");
         }
         (lastHeader as HTMLButtonElement)?.click();
         if (
             tbody?.querySelector("td")?.textContent !=
             sort(names, "last")[0].first
         ) {
-            throw "The table is not sorted according to the last name when the last name header is clicked.";
+            fail("The table is not sorted according to the last name when the last name header is clicked.");
         }
     };
 </script>

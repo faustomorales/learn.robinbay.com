@@ -1,0 +1,23 @@
+#game {
+    position: relative;
+    padding-top: 25px;
+  }
+  .x, .o, #robot {
+    width: 25px;
+    height: 25px;
+  }
+  .row {
+    display: flex;
+  }
+  .o {
+    background-color: green;
+  }
+  .x {
+    background-color: black;
+  }
+  #robot {
+    background-color: yellow;
+    position: absolute;
+    top: 0px;
+    left: 25px;
+  }

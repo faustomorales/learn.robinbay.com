@@ -1,5 +1,6 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
+    import { fail } from "$lib/common"
     import type { Verifier } from "$lib/verifications";
 
     let { step = $bindable() }: { step: Step } = $props()
@@ -8,7 +9,7 @@
         let table = iframe.contentDocument?.querySelector(".my-table tbody");
         let rowCount = table!.querySelectorAll("tr").length > 0;
         if (!rowCount) {
-            throw "The table is empty. Did you add rows?";
+            fail("The table is empty. Did you add rows?");
         }
     };
 </script>

@@ -2,6 +2,7 @@
     import Step from "$lib/components/Step.svelte";
     import type { Verifier } from "$lib/verifications";
     import { ensureFunctionExists } from "$lib/verifications";
+    import { fail } from "$lib/common"
     let { step = $bindable() }: { step: Step } = $props()
     export const title = "Create a function to generate the table body";
     const verifier: Verifier = (iframe) => {
@@ -13,9 +14,9 @@
             { first: "Jack", last: "Smith" },
         ]);
         if (!body) {
-            throw "The toBody function doesn't return anything.";
+            fail("The toBody function doesn't return anything.");
         } else if (body !== expected) {
-            throw `The toBody function doesn't return a properly formatted body. Expected "${expected}" but got "${body}"".`;
+            fail(`The toBody function doesn't return a properly formatted body. Expected "${expected}" but got "${body}"".`);
         }
     };
 </script>

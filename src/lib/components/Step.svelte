@@ -38,5 +38,5 @@
         <span class="p-1">{title}</span>
     </div>
     {@render children()}
-    <em class="comment">{@html verified.comment}</em>
+    <div class="text-red-500 p-2 font-bold">{@html verified.comment}</div>
 </AccordionItem>

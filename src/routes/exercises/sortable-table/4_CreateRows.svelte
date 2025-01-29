@@ -1,6 +1,7 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
     import type { Verifier } from "$lib/verifications";
+    import { fail } from "$lib/common"
     import { ensureFunctionExists } from "$lib/verifications";
     let { step = $bindable() }: { step: Step } = $props()
     const title = "Create a function to generate rows";
@@ -8,9 +9,9 @@
         let toRow = ensureFunctionExists(iframe, "toRow");
         let row = toRow({ first: "John", last: "Doe" });
         if (!row) {
-            throw "The toRow function doesn't return anything.";
+            fail("The toRow function doesn't return anything.");
         } else if (!(row == "<tr><td>John</td><td>Doe</td></tr>")) {
-            throw "The toRow function doesn't return a properly formatted row.";
+            fail("The toRow function doesn't return a properly formatted row.");
         }
     };
 </script>

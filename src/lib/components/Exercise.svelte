@@ -2,17 +2,19 @@
     import Step from "./Step.svelte";
     import Editor from "./Editor.svelte";
     import { Accordion } from "flowbite-svelte";
-    import type { Component, Snippet } from "svelte";
+    import { defaultPrependedCode, type PrependedCode } from "$lib/common";
     let {
         steps,
-        description,
         stateId,
         title,
+        children,
+        prepend = defaultPrependedCode,
     }: {
         steps: any[]; // TODO: Make this work with Component<{step: Step}> (also see above)
         stateId: string;
-        description: Snippet;
         title: string;
+        children: () => any;
+        prepend?: PrependedCode;
     } = $props();
     let states: {
         component: any;
@@ -33,7 +35,7 @@
     <title>{title}</title>
 </svelte:head>
 
-<div class="flex">
+<div class="flex p-2">
     <div class="w-1/4">
         <Accordion>
             {#each states as state}
@@ -41,9 +43,9 @@
             {/each}
         </Accordion>
     </div>
-    <div class="w-3/4 p-2">
+    <div class="w-3/4 p-4">
         <h1 class="text-3xl mb-2">{title}</h1>
-        {@render description()}
-        <Editor {check} {stateId} />
+        {@render children()}
+        <div class="mt-2"><Editor {check} {stateId} {prepend} /></div>
     </div>
 </div>
