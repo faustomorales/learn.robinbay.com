@@ -1,24 +1,27 @@
 <script lang="ts">
+	import { Button } from "flowbite-svelte";
+	import JsLogo from "virtual:icons/vscode-icons/file-type-js-official";
+	import CssLogo from "virtual:icons/vscode-icons/file-type-style";
+	import HtmlLogo from "virtual:icons/ic/baseline-code";
 	import { onMount } from "svelte";
 	import { browser } from "$app/environment";
-	import { page } from "$app/state";
 	import { Pane, Splitpanes } from "svelte-splitpanes";
 	import CodeMirror from "svelte-codemirror-editor";
 	import { javascript } from "@codemirror/lang-javascript";
 	import { html } from "@codemirror/lang-html";
 	import { css } from "@codemirror/lang-css";
 	let {
+		stateId,
 		check,
-		waitTime = 100,
 	}: {
+		stateId: string;
 		check: (iframe: HTMLIFrameElement) => void;
-		waitTime?: number;
 	} = $props();
 	let iframe: HTMLIFrameElement;
 	let keys = {
-		js: `${page.url.pathname}:js`,
-		css: `${page.url.pathname}:css`,
-		html: `${page.url.pathname}:html`,
+		js: `${stateId}:js`,
+		css: `${stateId}:css`,
+		html: `${stateId}:html`,
 	};
 	let components = $state({
 		js: (browser && localStorage.getItem(keys.js)) || "",
@@ -27,10 +30,11 @@
 	});
 
 	let source = $state("");
+	let messages: MessageEvent[] = $state([]);
 	onMount(() => {
 		window.addEventListener("message", (message) => {
 			if (message.data.type === "log") {
-				console.log(...message.data.args);
+				messages.push(message);
 			}
 		});
 	});
@@ -59,20 +63,34 @@
 		<style>${components.css}</style>
 		<script>${components.js}<\/script>
 		</html>`;
-
-		setTimeout(() => check(iframe), waitTime);
+		setTimeout(() => check(iframe), 100);
 	};
-
 </script>
 
-<Splitpanes class="default-theme">
-	<Pane minSize={15}
-		><div class="heading">JavaScript</div><CodeMirror bind:value={components.js} lang={javascript()} /></Pane
-	>
-	<Pane><div class="heading">CSS</div><CodeMirror bind:value={components.css} lang={css()} /></Pane>
-	<Pane><div class="heading">HTML</div><CodeMirror bind:value={components.html} lang={html({})} /></Pane>
-</Splitpanes>
-<button onclick={update}>Check</button>
+<div class="h-128">
+	<Splitpanes>
+		<Pane
+			><div class="heading flex items-center">
+				<JsLogo /><span class="p-1">JavaScript</span>
+			</div>
+			<CodeMirror bind:value={components.js} lang={javascript()} /></Pane
+		>
+		<Pane
+			><div class="heading flex items-center">
+				<CssLogo /><span class="p-1">CSS</span>
+			</div>
+			<CodeMirror bind:value={components.css} lang={css()} /></Pane
+		>
+		<Pane
+			><div class="heading flex items-center">
+				<HtmlLogo /><span class="p-1">HTML</span>
+			</div>
+			<CodeMirror bind:value={components.html} lang={html({})} /></Pane
+		>
+	</Splitpanes>
+</div>
+<Button class="w-full mt-2" color="blue" onclick={update}>Check</Button>
+<hr class="mb-2 mt-2" />
 
 <iframe
 	srcdoc={source}
@@ -92,5 +110,9 @@
 	}
 	.heading {
 		padding: 5px;
+	}
+
+	:global(.cm-editor), :global(.codemirror-wrapper) {
+		height: 100%;
 	}
 </style>
