@@ -1,6 +1,7 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
     import type { Verifier } from "$lib/verifications";
+    import List from "$lib/components/List.svelte";
     import { fail } from "$lib/common"
     let { step = $bindable() }: { step: Step } = $props()
     const title = "Create an array of names";
@@ -23,7 +24,7 @@
 
 <Step bind:this={step} {title} {verifier}>
     <p>Create a JavaScript array of objects containing names.</p>
-    <ul class="list-disc list-outside ml-4">
+    <List>
         <li>The array's name should be <em>names</em>.</li>
         <li>
             Please declare the variable using <em>var</em> instead of
@@ -33,5 +34,5 @@
             Each object should have <em>first</em> and <em>last</em>
             properties.
         </li>
-    </ul>
+    </List>
 </Step>

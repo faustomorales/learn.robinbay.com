@@ -1,5 +1,6 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
+    import List from "$lib/components/List.svelte";
     import { fail } from "$lib/common"
     import type { Verifier } from "$lib/verifications";
 
@@ -19,7 +20,7 @@
         Create a function that populates the table with a string of rows. To do
         this,
     </p>
-    <ul>
+    <List>
         <li>
             Create a function called <em>populate</em> that takes an array of items.
         </li>
@@ -31,5 +32,5 @@
             To initially populate the table, call the populate function when
             your page launches using <em>populate(names)</em>.
         </li>
-    </ul>
+    </List>
 </Step>

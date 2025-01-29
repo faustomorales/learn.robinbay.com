@@ -14,10 +14,12 @@
 	let {
 		stateId,
 		check,
-		prepend = { js: "", css: "", html: "" },
+		prepend = defaultPrependedCode,
+		initial = defaultPrependedCode
 	}: {
 		stateId: string;
 		prepend?: PrependedCode;
+		initial?: PrependedCode;
 		check: (iframe: HTMLIFrameElement) => void;
 	} = $props();
 	let iframe: HTMLIFrameElement;
@@ -27,9 +29,9 @@
 		html: `${stateId}:html`,
 	};
 	let components = $state({
-		js: (browser && localStorage.getItem(keys.js)) || "",
-		html: (browser && localStorage.getItem(keys.html)) || "",
-		css: (browser && localStorage.getItem(keys.css)) || "",
+		js: (browser && localStorage.getItem(keys.js)) || initial.js,
+		html: (browser && localStorage.getItem(keys.html)) || initial.html,
+		css: (browser && localStorage.getItem(keys.css)) || initial.css,
 	});
 
 	let source = $state("");

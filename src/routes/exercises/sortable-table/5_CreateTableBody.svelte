@@ -1,9 +1,10 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
+    import List from "$lib/components/List.svelte";
     import type { Verifier } from "$lib/verifications";
     import { ensureFunctionExists } from "$lib/verifications";
-    import { fail } from "$lib/common"
-    let { step = $bindable() }: { step: Step } = $props()
+    import { fail } from "$lib/common";
+    let { step = $bindable() }: { step: Step } = $props();
     export const title = "Create a function to generate the table body";
     const verifier: Verifier = (iframe) => {
         let toBody = ensureFunctionExists(iframe, "toBody");
@@ -16,7 +17,9 @@
         if (!body) {
             fail("The toBody function doesn't return anything.");
         } else if (body !== expected) {
-            fail(`The toBody function doesn't return a properly formatted body. Expected "${expected}" but got "${body}"".`);
+            fail(
+                `The toBody function doesn't return a properly formatted body. Expected "${expected}" but got "${body}"".`,
+            );
         }
     };
 </script>
@@ -26,12 +29,12 @@
         Create a function that converts an array of items into the syntax for an
         HTML table body element.
     </p>
-    <ul>
+    <List>
         <li>It should be called <em>toBody</em>.</li>
         <li>It should accept an array of items as an argument.</li>
         <li>
             It should return a string of table rows. You can do this by:
-            <ul>
+            <List>
                 <li>
                     Calling the <em>map()</em> method on the array and passing
                     the <em>toRow</em> function as the argument.
@@ -40,7 +43,7 @@
                     Joining the resulting array of strings into a single string
                     using the <em>join()</em> method.
                 </li>
-            </ul>
+            </List>
         </li>
-    </ul></Step
+    </List></Step
 >

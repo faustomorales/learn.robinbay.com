@@ -1,9 +1,10 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
+    import List from "$lib/components/List.svelte";
     import { ensureFunctionExists, type Verifier } from "$lib/verifications";
-    import { fail } from "$lib/common"
+    import { fail } from "$lib/common";
 
-    let { step = $bindable() }: { step: Step } = $props()
+    let { step = $bindable() }: { step: Step } = $props();
     const title = "Make the table support sorting";
     const verifier: Verifier = (iframe) => {
         let populate = ensureFunctionExists(iframe, "populate");
@@ -12,21 +13,27 @@
         let table = iframe.contentDocument?.querySelector(".my-table tbody");
         populate(names, "");
         if (table?.querySelector("td")?.textContent != names[0].first) {
-            fail("The table is not sorted according to the initial order when sortKey is unset.");
+            fail(
+                "The table is not sorted according to the initial order when sortKey is unset.",
+            );
         }
         populate(names, "first");
         if (
             table?.querySelector("td")?.textContent !=
             sort(names, "first")[0].first
         ) {
-            fail("The table is not sorted according to the first name when sortKey is set to 'first'.");
+            fail(
+                "The table is not sorted according to the first name when sortKey is set to 'first'.",
+            );
         }
         populate(names, "last");
         if (
             table?.querySelector("td")?.textContent !=
             sort(names, "last")[0].first
         ) {
-            fail("The table is not sorted according to the last name when sortKey is set to 'last'.");
+            fail(
+                "The table is not sorted according to the last name when sortKey is set to 'last'.",
+            );
         }
         populate(names);
     };
@@ -34,7 +41,7 @@
 
 <Step {title} {verifier} bind:this={step}>
     <p>Make your application support sorting. To do this,</p>
-    <ul>
+    <List>
         <li>
             Add a <em>sortKey</em> parameter to the
             <em>populate</em>
@@ -42,7 +49,7 @@
         <li>
             Use an if statement to choose whether to set the innerHTML of the
             table to one of the following:
-            <ul>
+            <List>
                 <li>
                     <em>toBody(sort(names, "first"))</em> if the sortKey parameter
                     is "first"
@@ -54,7 +61,7 @@
                 <li>
                     <em>toBody(names)</em> if the sortKey parameter is not set
                 </li>
-            </ul>
+            </List>
         </li>
-    </ul>
+    </List>
 </Step>

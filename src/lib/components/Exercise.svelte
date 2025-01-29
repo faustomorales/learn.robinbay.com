@@ -8,11 +8,13 @@
         stateId,
         title,
         children,
+        initial = defaultPrependedCode,
         prepend = defaultPrependedCode,
     }: {
         steps: any[]; // TODO: Make this work with Component<{step: Step}> (also see above)
         stateId: string;
         title: string;
+        initial?: PrependedCode;
         children: () => any;
         prepend?: PrependedCode;
     } = $props();
@@ -36,16 +38,19 @@
 </svelte:head>
 
 <div class="flex p-2">
-    <div class="w-1/4">
-        <Accordion>
-            {#each states as state}
-                <state.component bind:step={state.step}></state.component>
-            {/each}
-        </Accordion>
-    </div>
-    <div class="w-3/4 p-4">
+
+    {#if states.length > 0}
+        <div class="w-1/4">
+            <Accordion>
+                {#each states as state}
+                    <state.component bind:step={state.step}></state.component>
+                {/each}
+            </Accordion>
+        </div>
+    {/if}
+    <div class="{states.length > 0 ? 'w-3/4' : ''} p-4">
         <h1 class="text-3xl mb-2">{title}</h1>
         {@render children()}
-        <div class="mt-2"><Editor {check} {stateId} {prepend} /></div>
+        <div class="mt-2"><Editor {check} {stateId} {prepend} {initial} /></div>
     </div>
 </div>

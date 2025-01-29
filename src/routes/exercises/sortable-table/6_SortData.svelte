@@ -1,5 +1,6 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
+    import List from "$lib/components/List.svelte";
     import type { Verifier } from "$lib/verifications";
     import { ensureFunctionExists } from "$lib/verifications";
     import { fail } from "$lib/common"
@@ -16,7 +17,7 @@
 <Step {title} {verifier} bind:this={step}
     >Create a function that creates a sorted version of the array on the basis
     of one of the attributes. To do this,
-    <ul>
+    <List>
         <li>
             Create a function called <em>sort</em> that takes two arguments:
             <em>items</em>
@@ -32,5 +33,5 @@
             function that compares pairs of items and returns a number indicating
             their order.
         </li>
-    </ul></Step
+    </List></Step
 >

@@ -11,4 +11,9 @@ export default defineConfig({
     optimizeDeps: {
         exclude: ["svelte-codemirror-editor", "codemirror", "@codemirror/language-javascript" /* ... */],
     },
+    server: {
+        host: true,
+        port: 80,
+        allowedHosts: ["mrmorales.local"]
+    }
 });

@@ -1,5 +1,7 @@
 <script lang="ts">
     import Exercise from "$lib/components/Exercise.svelte";
+    import Step1 from "./1_CreateMazePlaceholders.svelte"
+    import Step2 from "./2_Run.svelte"
     import prependJavaScript from "./prepend.js?raw";
     import prependCss from "./prepend.css?raw";
     let prepend = {
@@ -9,7 +11,7 @@
     };
 </script>
 
-<Exercise stateId="/exercises/maze" title="Maze" steps={[]} {prepend}>
+<Exercise stateId="/exercises/maze" title="Maze" steps={[Step1, Step2]} {prepend}>
     <p class="pb-2">
         Make a robot run through a maze! In the JavaScript below, there is a <span
             class="font-mono">run</span

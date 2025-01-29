@@ -2,8 +2,10 @@
 let stepSize = 25;
 let stepDuration = 500;
 let defaultGrid = `xoxxxxxx,xooooxxx,xxxxoxxx,xxxxooox,xxxxxxox,xxxxxxox,xxxxxxox,xxxxxxox,xxxxxxox`
+var executed = false;
 
 function run(commands, grid) {
+    executed = true;
     if (!grid) {
         grid = defaultGrid
     }
