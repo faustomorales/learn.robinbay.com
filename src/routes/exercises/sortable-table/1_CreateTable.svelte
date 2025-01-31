@@ -19,6 +19,6 @@
 
 <Step bind:this={step} {title} {verifier}>
     <p>
-        Create a table element with class <em>my-class</em>.
+        Create a table element with class <em>my-table</em>.
     </p>
 </Step>

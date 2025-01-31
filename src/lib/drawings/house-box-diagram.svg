@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="62.929626mm"
+   height="67.361603mm"
+   viewBox="0 0 62.929628 67.361603"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25)"
+   sodipodi:docname="house-box-diagram.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="1.8337172"
+     inkscape:cx="66.258853"
+     inkscape:cy="91.07184"
+     inkscape:window-width="1312"
+     inkscape:window-height="733"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-33.209623,-57.648635)">
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:0.189633;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3"
+       width="62.739994"
+       height="61.617474"
+       x="33.30444"
+       y="63.297947" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.42471px;font-family:helvetica;-inkscape-font-specification:helvetica;text-align:center;word-spacing:0px;text-anchor:middle;fill:#ff0000;stroke-width:0.159993;stroke-dasharray:none"
+       x="38.99995"
+       y="65.251694"
+       id="text2-0"
+       transform="scale(1.0641603,0.93970809)"><tspan
+         sodipodi:role="line"
+         id="tspan2-0"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.42471px;font-family:helvetica;-inkscape-font-specification:helvetica;fill:#ff0000;stroke-width:0.159993;stroke-dasharray:none"
+         x="38.99995"
+         y="65.251694">house</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.42471px;font-family:helvetica;-inkscape-font-specification:helvetica;text-align:center;word-spacing:0px;text-anchor:middle;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:0.159993;stroke-dasharray:none;stroke-opacity:1"
+       x="42.810928"
+       y="97.098236"
+       id="text2-8"
+       transform="scale(1.0641603,0.93970809)"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.42471px;font-family:helvetica;-inkscape-font-specification:helvetica;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:0.159993;stroke-dasharray:none;stroke-opacity:1"
+         x="42.810928"
+         y="97.098236"
+         id="tspan10">room</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.42471px;font-family:helvetica;-inkscape-font-specification:helvetica;text-align:center;word-spacing:0px;text-anchor:middle;fill:#1aff1a;fill-opacity:1;stroke:none;stroke-width:0.159993;stroke-dasharray:none;stroke-opacity:1"
+       x="39.997822"
+       y="72.793823"
+       id="text2-8-02"
+       transform="scale(1.0641603,0.93970809)"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.42471px;font-family:helvetica;-inkscape-font-specification:helvetica;fill:#1aff1a;fill-opacity:1;stroke:none;stroke-width:0.159993;stroke-dasharray:none;stroke-opacity:1"
+         x="39.997822"
+         y="72.793823"
+         id="tspan10-4">roof</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.42471px;font-family:helvetica;-inkscape-font-specification:helvetica;text-align:center;word-spacing:0px;text-anchor:middle;fill:#ff7e07;fill-opacity:1;stroke:none;stroke-width:0.159993;stroke-dasharray:none;stroke-opacity:1"
+       x="47.272995"
+       y="118.82681"
+       id="text2-8-02-4"
+       transform="scale(1.0641603,0.93970809)"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.42471px;font-family:helvetica;-inkscape-font-specification:helvetica;fill:#ff7e07;fill-opacity:1;stroke:none;stroke-width:0.159993;stroke-dasharray:none;stroke-opacity:1"
+         x="47.272995"
+         y="118.82681"
+         id="tspan10-4-9">foundation</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.42471px;font-family:helvetica;-inkscape-font-specification:helvetica;text-align:center;word-spacing:0px;text-anchor:middle;fill:#076266;fill-opacity:1;stroke-width:0.159993;stroke-dasharray:none"
+       x="43.061405"
+       y="89.257347"
+       id="text2-8-02-4-8"
+       transform="scale(1.0641603,0.93970809)"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.42471px;font-family:helvetica;-inkscape-font-specification:helvetica;fill:#076266;fill-opacity:1;stroke-width:0.159993;stroke-dasharray:none"
+         x="43.061405"
+         y="89.257347"
+         id="tspan10-4-9-8">interior</tspan></text>
+    <rect
+       style="fill:none;stroke:#00ff00;stroke-width:0.166502;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4"
+       width="55.41909"
+       height="8.7294521"
+       x="37.474941"
+       y="69.600487" />
+    <rect
+       style="fill:none;stroke:#0000ff;stroke-width:0.159993;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4-4"
+       width="15.589168"
+       height="8.9241753"
+       x="38.987774"
+       y="93.13694" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.42471px;font-family:helvetica;-inkscape-font-specification:helvetica;text-align:center;word-spacing:0px;text-anchor:middle;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:0.159993;stroke-dasharray:none;stroke-opacity:1"
+       x="60.057755"
+       y="97.397972"
+       id="text2-8-0"
+       transform="scale(1.0641603,0.93970809)"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.42471px;font-family:helvetica;-inkscape-font-specification:helvetica;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:0.159993;stroke-dasharray:none;stroke-opacity:1"
+         x="60.057755"
+         y="97.397972"
+         id="tspan10-6">room</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.42471px;font-family:helvetica;-inkscape-font-specification:helvetica;text-align:center;word-spacing:0px;text-anchor:middle;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:0.159993;stroke-dasharray:none;stroke-opacity:1"
+       x="75.946838"
+       y="97.164383"
+       id="text2-8-0-3"
+       transform="scale(1.0641603,0.93970809)"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.42471px;font-family:helvetica;-inkscape-font-specification:helvetica;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:0.159993;stroke-dasharray:none;stroke-opacity:1"
+         x="75.946838"
+         y="97.164383"
+         id="tspan10-6-5">room</tspan></text>
+    <rect
+       style="fill:none;stroke:#0000ff;stroke-width:0.159993;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4-4-0"
+       width="15.589168"
+       height="8.9241753"
+       x="57.341171"
+       y="93.13694" />
+    <rect
+       style="fill:none;stroke:#0000ff;stroke-width:0.159993;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4-4-0-5"
+       width="15.589168"
+       height="8.9241753"
+       x="74.186592"
+       y="93.13694" />
+    <rect
+       style="fill:none;stroke:#ff7e07;stroke-width:0.166066;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4-8"
+       width="55.893074"
+       height="8.7269745"
+       x="36.746414"
+       y="113.01801" />
+    <rect
+       style="fill:none;stroke:#076266;stroke-width:0.179017;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4-8-8"
+       width="55.940552"
+       height="18.853298"
+       x="36.699577"
+       y="85.315514" />
+  </g>
+</svg>

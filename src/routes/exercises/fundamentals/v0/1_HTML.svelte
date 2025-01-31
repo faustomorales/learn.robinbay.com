@@ -1,19 +1,19 @@
 <script lang="ts">
-    import { Popover } from "flowbite-svelte";
     import Step from "$lib/components/Step.svelte";
-    import type { Verifier } from "$lib/verifications";
     import { fail } from "$lib/common";
     let { step = $bindable() }: { step: Step } = $props();
-    const title = "Define an HTML Element";
-    const verifier: Verifier = (iframe) => {
+</script>
+
+<Step
+    bind:this={step}
+    title="Define an HTML Element"
+    verifier={(iframe) => {
         let div = iframe.contentDocument?.querySelector("div");
         if (!div) {
             fail("No div elements were found. Did you use a div element?");
         }
-    };
-</script>
-
-<Step bind:this={step} {title} {verifier}>
+    }}
+>
     <p>
         It all starts with HTML! HTML describes the structure of a web page.
         HTML elements always take the form of an opening tag and a closing tag.

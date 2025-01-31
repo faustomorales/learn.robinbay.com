@@ -1,10 +1,13 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
-    import type { Verifier } from "$lib/verifications";
     import { fail } from "$lib/common";
     let { step = $bindable() }: { step: Step } = $props();
-    const title = "HTML Attributes";
-    const verifier: Verifier = (iframe) => {
+</script>
+
+<Step
+    bind:this={step}
+    title="HTML Attributes"
+    verifier={(iframe) => {
         let possible = [
             ...(iframe.contentDocument?.querySelectorAll("span") || []),
         ];
@@ -15,10 +18,8 @@
         ) {
             fail("No span elements were found. Did you use a span element?");
         }
-    };
-</script>
-
-<Step bind:this={step} {title} {verifier}>
+    }}
+>
     <p>
         HTML elements can have someting called attributes which change the
         behavior of the element. Note that the attribute is defined by
@@ -46,7 +47,7 @@
         that the separator between propreties is a semicolon.
     </p>
     <p>
-        Please add a new span (<span class="font-mono">span</span>) element
-        to the page. Use the style attribute to make the text bold and red.
+        Please add a new span (<span class="font-mono">span</span>) element to
+        the page. Use the style attribute to make the text bold and red.
     </p>
 </Step>

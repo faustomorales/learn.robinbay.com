@@ -1,22 +1,25 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
-    import type { Verifier } from "$lib/verifications";
     let { step = $bindable() }: { step: Step } = $props();
     import { fail } from "$lib/common";
-    const title = "HTML Parent and Child Elements";
-    const verifier: Verifier = (iframe) => {
+</script>
+
+<Step
+    bind:this={step}
+    title={"HTML Parent and Child Elements"}
+    verifier={(iframe) => {
         let em = iframe.contentDocument?.querySelector("em");
         if (!em) {
             fail("No em elements were found. Did you use a div element?");
         } else if (em.textContent !== "Hello, World!") {
-            fail("The em element should contain the text 'Hello, World!' (no quotes).");
+            fail(
+                "The em element should contain the text 'Hello, World!' (no quotes).",
+            );
         } else if (em.parentElement?.tagName !== "DIV") {
             fail("The em element should be a child of a div element.");
         }
-    };
-</script>
-
-<Step bind:this={step} {title} {verifier}>
+    }}
+>
     <p>
         We can put HTML elements inside of other HTML elements. This is called <span
             class="font-mono">nesting</span

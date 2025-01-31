@@ -1,6 +1,9 @@
 <script lang="ts">
-    import { AccordionItem, Indicator } from "flowbite-svelte";
+    import { getContext } from "svelte";
+    import { Indicator } from "flowbite-svelte";
+    import BasicAccordion from "./BasicAccordion.svelte";
     import type { Verifier } from "$lib/verifications";
+    import type { ExerciseContext } from "$lib/common";
     let {
         verifier,
         title = "",
@@ -10,23 +13,28 @@
         title?: string;
         children: () => any;
     } = $props();
+    let isOpen = $state(false);
     export const reset = () => {
         verified = { passed: false, comment: "" };
     };
-    export const verify = (iframe: HTMLIFrameElement) => {
+    export const setOpen = (targetState: boolean) => {
+        isOpen = targetState;
+    };
+    const exerciseContext = getContext<ExerciseContext>("exercise");
+    export const verify = (iframe: HTMLIFrameElement, initial = false) => {
         try {
             verifier(iframe);
             verified = { passed: true, comment: "" };
             return true;
         } catch (e: any) {
-            verified = { passed: false, comment: e.message };
+            verified = { passed: false, comment: initial ? "" : e.message };
             return false;
         }
     };
     let verified = $state({ passed: false, comment: "" });
 </script>
 
-<AccordionItem>
+<BasicAccordion bind:open={isOpen}>
     <div slot="header" class="flex items-center">
         <span>
             {#if verified.passed}
@@ -39,4 +47,10 @@
     </div>
     {@render children()}
     <div class="text-red-500 p-2 font-bold">{@html verified.comment}</div>
-</AccordionItem>
+    <button
+        onclick={exerciseContext.update}
+        class={`bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded ${verified.passed ? 'bg-green-500 hover:bg-green-700' : ''}`}
+    >
+        Check my work!
+    </button>
+</BasicAccordion>

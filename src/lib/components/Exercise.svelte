@@ -1,13 +1,14 @@
 <script lang="ts">
+    import type { ExerciseContext } from "$lib/common";
+
     import Step from "./Step.svelte";
     import Editor from "./Editor.svelte";
-    import { Accordion } from "flowbite-svelte";
+    import { onMount, setContext } from "svelte";
     import { defaultPrependedCode, type PrependedCode } from "$lib/common";
     let {
         steps,
         stateId,
         title,
-        children,
         initial = defaultPrependedCode,
         prepend = defaultPrependedCode,
     }: {
@@ -15,42 +16,51 @@
         stateId: string;
         title: string;
         initial?: PrependedCode;
-        children: () => any;
         prepend?: PrependedCode;
     } = $props();
+    let editor: Editor;
     let states: {
         component: any;
         step?: Step;
     }[] = $state(steps.map((component) => ({ component })));
-    let check = (iframe: HTMLIFrameElement) =>
-        states.reduce((previous, step) => {
-            if (previous && step.step) {
-                return step.step.verify(iframe);
-            } else if (step.step) {
-                step.step.reset();
-            }
-            return false;
-        }, true);
+    let check = (iframe: HTMLIFrameElement, initial = false) => {
+        let result = states.reduce(
+            (previous, step, index) => {
+                if (previous.passed && step.step) {
+                    let passedCurrent = step.step.verify(iframe, initial);
+                    return {
+                        passed: passedCurrent,
+                        last: passedCurrent ? index : previous.last,
+                    };
+                } else if (step.step) {
+                    step.step.reset();
+                }
+                return { passed: false, last: previous.last };
+            },
+            { passed: true, last: -1 },
+        );
+        let open = Math.min(result.last + 1, states.length - 1);
+        states.forEach((state, index) => state.step?.setOpen(index === open));
+    };
+    setContext<ExerciseContext>("exercise", { update: () => editor.update() });
+    onMount(() => {
+        setTimeout(editor.update, 100);
+    });
 </script>
 
 <svelte:head>
     <title>{title}</title>
 </svelte:head>
 
-<div class="flex p-2">
-
-    {#if states.length > 0}
-        <div class="w-1/4">
-            <Accordion>
-                {#each states as state}
-                    <state.component bind:step={state.step}></state.component>
-                {/each}
-            </Accordion>
+<div class="p-4">
+    <div class="flex gap-2">
+        <div class="w-1/2">
+            {#each states as state}
+                <state.component bind:step={state.step}></state.component>
+            {/each}
         </div>
-    {/if}
-    <div class="{states.length > 0 ? 'w-3/4' : ''} p-4">
-        <h1 class="text-3xl mb-2">{title}</h1>
-        {@render children()}
-        <div class="mt-2"><Editor {check} {stateId} {prepend} {initial} /></div>
+        <div class="w-1/2">
+            <Editor {check} {stateId} {prepend} {initial} bind:this={editor} />
+        </div>
     </div>
 </div>
