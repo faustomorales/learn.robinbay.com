@@ -2,6 +2,7 @@
     import Step from "$lib/components/Step.svelte";
     import Question from "$lib/components/Question.svelte";
     import AnatomyDiagram from "$lib/drawings/html-element.svg?raw";
+    import Link from "$lib/components/Link.svelte";
     import AnatomyDiagramNested from "$lib/drawings/html-element-nested.svg?raw";
     import { fail } from "$lib/common";
     import List from "$lib/components/List.svelte";
@@ -29,11 +30,23 @@
         Example 1: Plain HTML Element
     </div>
     <p class="mt-4 mb-4">
-        Example 1 is of a single HTML element. But HTML elements can be nested
-        within each other, creating child and parent relationships. In example
-        2, we have a <span class="font-mono">p</span> element nested within a
-        <span class="font-mono">div</span> element. You could also refer to the child
-        element as the content of the parent element.
+        Example 1 is of a single HTML <span class="font-mono">p</span> element, which
+        is normally (as in this example) used to contain a paragraph of text.
+    </p>
+    <p class="mb-4">
+        HTML elements can be nested within each other, creating child and parent
+        relationships. In example 2, we have a
+        <Link href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/p"
+            ><span class="font-mono">p</span></Link
+        >
+        element nested within a
+        <Link
+            href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div"
+            ><span class="font-mono">div</span></Link
+        > element. You could also refer to the child element as the content of the
+        parent element. You might do this to group text content with other content.
+        Note that elements are allowed to be empty (i.e., for the closing tag to
+        come immediately after the opening tag).
     </p>
     <div class="flex justify-around mt-2">
         {@html AnatomyDiagramNested}
@@ -42,12 +55,26 @@
         Example 2: Nested HTML Element
     </div>
     <p class="mt-4 mb-4">
-        The above also shows examples of setting attributes on elements. HTML
-        attributes change the behavior of that element. There are many different
-        kinds of elements. There are elements for different types of text,
-        images, videos, and page layouts. Some of those elements have special
-        attributes that change the way they behave. But for this lesson you will
-        only need:
+        Both example 1 and example 2 show how we set element <span
+            class="font-mono">attributes</span
+        >. HTML attributes change the behavior of that element and different
+        elements support different combinations of attributes (<span
+            class="font-mono">class</span
+        >
+        and <span class="font-mono">style</span> are examples of
+        <Link
+            href="https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes"
+            >global attributes</Link
+        >
+        supported by all element types). For example, the
+        <Link
+            href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video"
+            ><span class="font-mono">video</span></Link
+        >
+        element has an optional <span class="font-mono">autoplay</span> attribute
+        that indicates whether the video should immediately play. Some of those elements
+        have special attributes that change the way they behave. But for this lesson
+        you will only need:
     </p>
     <List>
         <li>
@@ -99,13 +126,11 @@
             </p>
             <p>
                 3. Open the
-                <a
-                    class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+                <Link
                     href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element"
-                    target="_blank"
                     >official reference on HTML elements
-                </a> and review a few of the sections. What questions come to mind?
-                How might you go about answering them?
+                </Link> and review a few of the sections. What questions come to
+                mind? How might you go about answering them?
             </p>
         </div>
     </div>

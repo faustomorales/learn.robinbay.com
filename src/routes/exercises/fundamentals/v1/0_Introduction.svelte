@@ -20,7 +20,7 @@
         },
         {
             component: `<span class="font-bold">JavaScript</span>`,
-            provides: `<span class="italic">interactivity</span> of
+            provides: `<span class="italic">interaction</span> with
                             the house (e.g., make switches turn on lights)`,
             consists: `JavaScript <span class="italic"
                                 >variables</span
