@@ -8,6 +8,7 @@
     import JSObject from "$lib/drawings/javascript-variable-object.svg?raw";
     import JSFunction1 from "$lib/drawings/javascript-variable-function-1.svg?raw";
     import JSFunction2 from "$lib/drawings/javascript-variable-function-2.svg?raw";
+    import JSArray from "$lib/drawings/javascript-variable-array.svg?raw";
     let heading = `mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 text-lg dark:text-white`;
     let headingSize = "w-1/3 pr-4";
     let itemClass = "flex p-2";
@@ -41,6 +42,10 @@
 <div class={itemClass}>
     <div class={headingSize}><h2 class={heading}>JavaScript Object</h2></div>
     <div>{@html JSObject}</div>
+</div>
+<div class={itemClass}>
+    <div class={headingSize}><h2 class={heading}>JavaScript Array</h2></div>
+    <div>{@html JSArray}</div>
 </div>
 <div class={itemClass}>
     <div class={headingSize}><h2 class={heading}>JavaScript Function</h2></div>

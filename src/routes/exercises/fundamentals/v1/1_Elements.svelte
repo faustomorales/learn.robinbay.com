@@ -2,11 +2,13 @@
     import Step from "$lib/components/Step.svelte";
     import Question from "$lib/components/Question.svelte";
     import AnatomyDiagram from "$lib/drawings/html-element.svg?raw";
+    import Hint from "$lib/components/Hint.svelte";
     import Link from "$lib/components/Link.svelte";
     import AnatomyDiagramNested from "$lib/drawings/html-element-nested.svg?raw";
     import { fail } from "$lib/common";
     import List from "$lib/components/List.svelte";
     let { step = $bindable() }: { step: Step } = $props();
+    let divHint = $state("");
     let questions: Question[] = $state([]);
 </script>
 
@@ -15,8 +17,10 @@
     title="HTML: Elements Introduction"
     verifier={(iframe) => {
         questions.map((q) => q.verify());
-        iframe.contentDocument?.querySelector(".example") ||
-            fail("The example element is missing.");
+        if (!iframe.contentDocument?.querySelector(".example")) {
+            divHint = `You need to add a div element with the class "example".`;
+            fail("");
+        }
     }}
 >
     <p>
@@ -124,6 +128,7 @@
                 2. Add a <span class="font-mono">div</span> element to the HTML code
                 window on the right. Give it a class attribute with the value "example".
             </p>
+            <Hint hint={divHint} />
             <p>
                 3. Open the
                 <Link

@@ -13,7 +13,5 @@ export default defineConfig({
     },
     server: {
         host: true,
-        port: 80,
-        allowedHosts: ["mrmorales.local"]
     }
 });

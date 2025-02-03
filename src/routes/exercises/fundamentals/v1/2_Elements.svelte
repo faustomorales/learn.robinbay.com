@@ -37,6 +37,22 @@
         }
     }}
 >
+    {#snippet solution()}
+        <div class="mt-4 flex justify-around">
+            <pre>
+{`<div class="example"></div>
+<div class="house">
+    <div class="roof">Roof</div>
+    <div class="interior">
+        <div class="room">Room</div>
+        <div class="room">Room</div>
+        <div class="room">Room</div>
+    </div>
+    <div class="foundation">Foundation</div>
+</div>
+`}</pre>
+        </div>
+    {/snippet}
     <p class="mb-4">
         For this next step, <span class="font-bold"
             >you will go ahead and build out the main structure for the house.</span

@@ -1,6 +1,10 @@
 <script lang="ts">
     import { onMount } from "svelte";
-
+    var roomWidth = 50;
+    var roomColor = "yellow";
+    var increaseRoomWidth = () => {
+        roomWidth = roomWidth + 1;
+    }
     onMount(() => {
         const rooms = document.querySelectorAll(".room");
         rooms.forEach((room: any) => {
@@ -11,6 +15,7 @@
     });
 </script>
 
+<div class="example"></div>
 <div class="house">
     <div class="roof">Roof</div>
     <div class="interior">

@@ -1,6 +1,9 @@
 <script lang="ts">
     import type { Snippet } from "svelte";
+    import PassFailIndicator from "./PassFailIndicator.svelte";
+    import Hint from "./Hint.svelte";
     import { browser } from "$app/environment";
+
     import { fail } from "$lib/common";
     let {
         children,
@@ -13,16 +16,6 @@
         stateId: string;
         options: { text: string; hint: string; correct: boolean }[];
     } = $props();
-    let getInitialSelections = () => {
-        let initial = options.map(() => false);
-        if (browser) {
-            let stored = JSON.parse(localStorage.getItem(stateId) || "[]");
-            if (stored.length === initial.length) {
-                initial = stored;
-            }
-        }
-        return initial;
-    };
     let selected = $state(
         browser &&
             JSON.parse(
@@ -30,19 +23,21 @@
                     JSON.stringify(options.map(() => false)),
             ),
     );
-    $effect(() => {
-        localStorage.setItem(stateId, JSON.stringify(selected));
-    });
+    $effect(() => localStorage.setItem(stateId, JSON.stringify(selected)));
+    let hint = $state("");
+    let passed = $state(false);
     export const verify = () => {
         let snapshot = $state.snapshot(selected);
         let incorrect = options.filter(
             (option, i) => snapshot[i] !== option.correct,
         );
         if (incorrect.length) {
-            fail(
-                "One of the answers is incorrect. " +
-                    incorrect.map((option) => option.hint).join(" "),
-            );
+            hint = incorrect.map((option) => option.hint).join(" ");
+            passed = false;
+            fail("");
+        } else {
+            hint = "";
+            passed = true;
         }
     };
 </script>
@@ -65,4 +60,16 @@
             </li>
         {/each}
     </ul>
+    <Hint hint={hint} />
+    {#if passed}
+        <PassFailIndicator passed={true} />
+    {/if}
 </div>
+
+<style>
+    .passed-icon {
+        color: green;
+        width: 30px;
+        height: 30px;
+    }
+</style>
