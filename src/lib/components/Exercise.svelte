@@ -52,14 +52,14 @@
     <title>{title}</title>
 </svelte:head>
 
-<div class="p-4">
+<div class="p-4 h-screen">
     <div class="flex gap-2">
-        <div class="w-1/2">
+        <div class="w-1/2 max-h-screen overflow-y-auto pb-6">
             {#each states as state}
                 <state.component bind:step={state.step}></state.component>
             {/each}
         </div>
-        <div class="w-1/2">
+        <div class="w-1/2 h-full max-h-screen">
             <Editor {check} {stateId} {prepend} {initial} bind:this={editor} />
         </div>
     </div>
