@@ -2,7 +2,6 @@
     import Table from "$lib/components/Table.svelte";
     import Step from "$lib/components/Step.svelte";
     import HouseBoxDiagram from "$lib/drawings/house-box-diagram.svg?raw";
-    import Question from "$lib/components/Question.svelte";
     import { fail } from "$lib/common";
     let { step = $bindable() }: { step: Step } = $props();
 </script>

@@ -81,9 +81,11 @@
     </p>
     <p>
         For this next step, you should replace the styling from the last step
-        with a CSS rule. Add a CSS rule that selects elements with <span
-            class="font-mono">class</span
+        with a CSS rule (which means you should no longer have <span
+            class="font-mono">style</span
         >
+        attributes set in your HTML). Add a CSS rule that selects elements with
+        <span class="font-mono">class</span>
         room (i.e., <span class="font-mono">.room</span>) and sets the width,
         height, and background-color properties to the same values as last time.
         Don't forget to refer to the required syntax above (especially the curly

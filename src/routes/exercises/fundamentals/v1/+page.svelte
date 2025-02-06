@@ -8,13 +8,14 @@
     import Step6 from "./6_JavaScript.svelte"
     import Step7 from "./7_JavaScript.svelte"
     import Step8 from "./8_JavaScript.svelte"
+    import Step9 from "./9_HTMLJavaScript.svelte"
     import Exercise from "$lib/components/Exercise.svelte";
 </script>
 
 <Exercise
     title="HTML Fundamentals"
     stateId="/exercises/fundamentals/html/v1"
-    steps={[Step0, Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8]}
+    steps={[Step0, Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8, Step9]}
 ></Exercise>
 
 <style>
