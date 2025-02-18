@@ -7,6 +7,7 @@
 	import { onMount } from "svelte";
 	import { browser } from "$app/environment";
 	import CodeMirror from "svelte-codemirror-editor";
+	import { oneDark } from "@codemirror/theme-one-dark";
 	import { javascript } from "@codemirror/lang-javascript";
 	import { html } from "@codemirror/lang-html";
 	import { css } from "@codemirror/lang-css";
@@ -23,6 +24,21 @@
 		initial?: PrependedCode;
 		check: (iframe: HTMLIFrameElement, initial?: boolean) => void;
 	} = $props();
+	let isDarkMode = $state(false);
+	onMount(() => {
+		const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+		isDarkMode = mediaQuery.matches;
+
+		const listener = (event: any) => {
+			isDarkMode = event.matches;
+		};
+
+		mediaQuery.addEventListener("change", listener);
+
+		return () => {
+			mediaQuery.removeEventListener("change", listener);
+		};
+	});
 	let keys = {
 		js: `${stateId}:js`,
 		css: `${stateId}:css`,
@@ -63,6 +79,7 @@
 		<\/script>
 		</html>`);
 	let messages: MessageEvent[] = $state([]);
+	let theme = $derived(isDarkMode ? oneDark : undefined);
 	onMount(() => {
 		window.addEventListener("message", (message) => {
 			if (message.data.type === "log") {
@@ -82,13 +99,17 @@
 </script>
 
 <div>
-	<Tabs>
+	<Tabs contentClass={"bg-gray-50 dark:bg-gray-800 border-b-solid border-b-1 border-r-1 border-l-1 border-gray-200 dark:border-gray-700"}>
 		<TabItem open>
 			<div slot="title" class="heading flex items-center">
 				<HtmlLogo /><span class="p-1">HTML</span>
 			</div>
 			<div class="pane">
-				<CodeMirror bind:value={components.html} lang={html({})} />
+				<CodeMirror
+					bind:value={components.html}
+					{theme}
+					lang={html({})}
+				/>
 			</div>
 		</TabItem>
 		<TabItem>
@@ -96,7 +117,7 @@
 				<CssLogo /><span class="p-1">CSS</span>
 			</div>
 			<div class="pane">
-				<CodeMirror bind:value={components.css} lang={css()} />
+				<CodeMirror bind:value={components.css} lang={css()} {theme} />
 			</div>
 		</TabItem>
 		<TabItem>
@@ -104,7 +125,11 @@
 				<JsLogo /><span class="p-1">JavaScript</span>
 			</div>
 			<div class="pane">
-				<CodeMirror bind:value={components.js} lang={javascript()} />
+				<CodeMirror
+					bind:value={components.js}
+					lang={javascript()}
+					{theme}
+				/>
 			</div>
 		</TabItem>
 	</Tabs>
@@ -118,8 +143,8 @@
 	sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-downloads allow-presentation"
 	title="output"
 	frameborder="0"
-	class="mt-2"
 	bind:this={iframe}
+	class="border-solid border-1 border-gray-200 dark:border-gray-700 mt-2"
 ></iframe>
 
 <style>
@@ -127,13 +152,9 @@
 		width: 100%;
 		height: 480px;
 	}
-
 	:global(.cm-editor),
 	:global(.codemirror-wrapper) {
 		height: 100%;
-	}
-	iframe {
-		border: 1px solid black;
 	}
 	.pane {
 		height: 320px;
