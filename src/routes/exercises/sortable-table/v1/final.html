@@ -1,2 +1,33 @@
-<ul id="locations"></ul>
-<button id="sort" onclick="handleClick(event)">Sort!</button>
+<table class="food-pantries">
+    <thead>
+        <th>Name</th>
+        <th>Hours</th>
+        <th>Address</th>
+        <th>Phone Number</th>
+        <th>Distance (miles)</th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Bethel Christian Church</td>
+            <td>W, 6-9PM</td>
+            <td>4600 NW 143rd Street, Gainesville, FL 32606</td>
+            <td>(352) 575-6099</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Catholic Charities, Inc.</td>
+            <td>M-Th, 9:30AM–12:30PM and 1PM–3PM</td>
+            <td>1717 NE 9th Street, Gainesville, 32609</td>
+            <td>(352) 372-0294</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Gainesville Community Ministry</td>
+            <td>M-Th 9AM–2:45PM</td>
+            <td>238 SW 4th Avenue, Gainesville, 32601</td>
+            <td>(352) 372-8162</td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+<button onclick="populateByDistance()" class="sort">Sort by Distance</button>

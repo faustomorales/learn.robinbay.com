@@ -1,12 +1,34 @@
 // @ts-nocheck
 
 var locations = [
-    { name: "Washington, D.C.", latitude: 38.913864, longitude: -77.027625 },
-    { name: "Los Angeles", latitude: 34.041663, longitude: -118.106907 },
-    { name: "London", latitude: 51.542194, longitude: -0.105727 }
+    {
+        name: "Bethel Christian Church",
+        hours: "W, 6-9PM",
+        address: "4600 NW 143rd Street, Gainesville, FL 32606",
+        phone: "(352) 575-6099",
+        latitude: 29.698107109108626,
+        longitude: -82.49729218952578
+    },
+    {
+        name: "Catholic Charities, Inc.",
+        hours: "M-Th, 9:30AM–12:30PM and 1PM–3PM",
+        address: "1717 NE 9th Street, Gainesville, FL 32609",
+        phone: "(352) 372-0294",
+        latitude: 29.667624525285582,
+        longitude: -82.31276874534912
+    },
+    {
+        name: "Gainesville Community Ministry",
+        hours: "M-Th 9AM–2:45PM",
+        address: "238 SW 4th Avenue, Gainesville, FL 32601",
+        phone: "(352) 372-8162",
+        latitude: 29.648788135950472,
+        longitude: -82.3278412639733
+    }
 ]
 
-var getLocationsInDistanceOrder = (position) => {
+var populateByDistanceUsingPosition = (position) => {
+    // Add a distance property to each location
     var locationsWithDistance = locations.map((location) => {
         return {
             ...location,
@@ -18,20 +40,29 @@ var getLocationsInDistanceOrder = (position) => {
             )
         }
     })
-    var sortedLocations = locationsWithDistance.sort((a, b) => a.distance - b.distance);
-}
+    // Sort the locations by distance.
+    var locationsInDistanceOrder = locationsWithDistance.sort((a, b) => a.distance - b.distance);
 
-var listLocationsInDistanceOrder = (position) => {
-    var locationsInDistanceOrder = getLocationsInDistanceOrder(position)
-    var list = document.getElementById("locations");
-    list.innerHTML = "";
+    // Get a reference to the tbody element
+    var tbody = document.querySelector(".food-pantries tbody")
+
+    // Clear the contents of the tbody element.
+    tbody.innerHTML = "";
+
+    // Populate the table with the sorted locations.
     locationsInDistanceOrder.forEach((location) => {
-        var li = document.createElement("li");
-        li.textContent = `${location.name} (${location.distance.toFixed()} miles)`;
-        list.appendChild(li);
+        tbody.innerHTML += `
+            <tr>
+                <td>${location.name}</td>
+                <td>${location.hours}</td>
+                <td>${location.address}</td>
+                <td>${location.phone}</td>
+                <td>${location.distance.toFixed()} miles</td>
+            </tr>
+        `
     });
 }
 
-var handleClick = (event) => {
-    navigator.geolocation.getCurrentPosition(listLocationsInDistanceOrder);
+var populateByDistance = () => {
+    navigator.geolocation.getCurrentPosition(populateByDistanceUsingPosition);
 }

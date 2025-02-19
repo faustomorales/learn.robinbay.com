@@ -5,7 +5,7 @@ export type PrependedCode = {
 }
 
 export type ExerciseContext = {
-    update: () => void;
+    check: () => void;
 }
 
 export const defaultPrependedCode = { html: "", js: "", css: "" };

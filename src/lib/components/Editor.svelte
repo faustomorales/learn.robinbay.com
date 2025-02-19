@@ -11,12 +11,11 @@
 	import { javascript } from "@codemirror/lang-javascript";
 	import { html } from "@codemirror/lang-html";
 	import { css } from "@codemirror/lang-css";
-	let iframe: HTMLIFrameElement;
 	let {
 		stateId,
-		check,
 		prepend = defaultPrependedCode,
 		initial = defaultPrependedCode,
+		iframe = $bindable()
 	}: {
 		stateId: string;
 		iframe?: HTMLIFrameElement;
@@ -92,10 +91,6 @@
 		localStorage.setItem(keys.html, components.html);
 		localStorage.setItem(keys.css, components.css);
 	});
-
-	export const update = () => {
-		check(iframe, false);
-	};
 </script>
 
 <div>

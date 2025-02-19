@@ -10,10 +10,12 @@
         options,
         class: className = "",
         stateId,
+        width = "w-48",
     }: {
         children: Snippet;
         class?: string;
         stateId: string;
+        width?: string;
         options: { text: string; hint: string; correct: boolean }[];
     } = $props();
     let selected = $state(
@@ -26,13 +28,15 @@
     $effect(() => localStorage.setItem(stateId, JSON.stringify(selected)));
     let hint = $state("");
     let passed = $state(false);
-    export const verify = () => {
+    export const verify = (initial: boolean = false) => {
         let snapshot = $state.snapshot(selected);
         let incorrect = options.filter(
             (option, i) => snapshot[i] !== option.correct,
         );
         if (incorrect.length) {
-            hint = incorrect.map((option) => option.hint).join(" ");
+            if (!initial) {
+                hint = incorrect.map((option) => option.hint).join(" ");
+            }
             passed = false;
             fail("");
         } else {
@@ -46,7 +50,7 @@
     {@render children()}
 
     <ul
-        class="mt-2 w-48 bg-white rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-600 divide-y divide-gray-200 dark:divide-gray-600"
+        class={`mt-2 ${width} bg-white rounded-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-600 divide-y divide-gray-200 dark:divide-gray-600`}
     >
         {#each options as option, i}
             <li>
@@ -60,9 +64,9 @@
             </li>
         {/each}
     </ul>
-    <Hint hint={hint} />
+    <Hint {hint} />
     {#if passed}
-        <PassFailIndicator passed={true} />
+        <PassFailIndicator status={"pass"} />
     {/if}
 </div>
 

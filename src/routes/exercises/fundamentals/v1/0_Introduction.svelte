@@ -4,7 +4,79 @@
     import Table from "$lib/components/Table.svelte";
     import Final from "./Final.svelte";
     let { step = $bindable() }: { step: Step } = $props();
-    let questions: Question[] = $state([]);
+    let questions: {
+        stateId: string;
+        options: { text: string; correct: boolean; hint: string }[];
+        question?: Question;
+        text: string;
+    }[] = $state([
+        {
+            stateId: "fundamentals-intro-q1",
+            question: undefined,
+            options: [
+                {
+                    text: "HTML",
+                    correct: true,
+                    hint: "What did the introduction say about HTML?",
+                },
+                {
+                    text: "CSS",
+                    correct: false,
+                    hint: "CSS is sometimes used to define sizing and layout, but it is not typically used for structure.",
+                },
+                {
+                    text: "JavaScript",
+                    correct: false,
+                    hint: "JavaScript is used for interactivity.",
+                },
+            ],
+            text: "Which component is responsible for putting the roof above the interior, the interior above the foundation, and the rooms inside the interior?",
+        },
+        {
+            stateId: "fundamentals-intro-q2",
+            question: undefined,
+            options: [
+                {
+                    text: "HTML",
+                    correct: false,
+                    hint: "HTML provides structure, but is not typically where we define colors and fonts.",
+                },
+                {
+                    text: "CSS",
+                    correct: true,
+                    hint: "CSS allows you to set rules for how things should look.",
+                },
+                {
+                    text: "JavaScript",
+                    correct: false,
+                    hint: "JavaScript is used for interactivity.",
+                },
+            ],
+            text: "Which component is most likely responsible for the color and fonts used for the different house elements?",
+        },
+        {
+            stateId: "fundamentals-intro-q3",
+            question: undefined,
+            options: [
+                {
+                    text: "HTML",
+                    correct: false,
+                    hint: "HTML provides structure, but rarely allows you to define interactive behavior.",
+                },
+                {
+                    text: "CSS",
+                    correct: false,
+                    hint: "CSS is sometimes used for hover and animation effects, but its use for interactivity is limited.",
+                },
+                {
+                    text: "JavaScript",
+                    correct: true,
+                    hint: "JavaScript is used for interactivity.",
+                },
+            ],
+            text: "Which component is most likely responsible for the effect of hovering and clicking on the rooms?",
+        },
+    ]);
     let definitions = [
         {
             component: `<span class="font-bold">HTML</span>`,
@@ -33,7 +105,7 @@
     title="Introduction: Components of a Web Page"
     bind:this={step}
     verifier={(iframe) => {
-        questions.map((q) => q.verify());
+        questions.map((q) => q.question?.verify());
     }}
 >
     <div class="lg:flex mb-4">
@@ -70,85 +142,17 @@
     </div>
     <hr class="mb-4 mt-4" />
     <div class="md:flex gap-10">
-        <Question
-            stateId="fundamentals-intro-q1"
-            class="mb-4"
-            bind:this={questions[0]}
-            options={[
-                {
-                    text: "HTML",
-                    correct: true,
-                    hint: "What did the introduction say about HTML?",
-                },
-                {
-                    text: "CSS",
-                    correct: false,
-                    hint: "CSS is sometimes used to define sizing and layout, but it is not typically used for structure.",
-                },
-                {
-                    text: "JavaScript",
-                    correct: false,
-                    hint: "JavaScript is used for interactivity.",
-                },
-            ]}
-            ><p>
-                Which component is responsible for putting the roof above the
-                interior, the interior above the foundation, and the rooms
-                inside the interior?
-            </p></Question
-        >
-        <Question
-            stateId="fundamentals-intro-q2"
-            class="mb-4"
-            bind:this={questions[1]}
-            options={[
-                {
-                    text: "HTML",
-                    correct: false,
-                    hint: "HTML provides structure, but is not typically where we define colors and fonts.",
-                },
-                {
-                    text: "CSS",
-                    correct: true,
-                    hint: "CSS allows you to set rules for how things should look.",
-                },
-                {
-                    text: "JavaScript",
-                    correct: false,
-                    hint: "JavaScript is used for interactivity.",
-                },
-            ]}
-            ><p>
-                Which component is most likely responsible for the color and
-                fonts used for the different house elements?
-            </p></Question
-        >
-        <Question
-            stateId="fundamentals-intro-q3"
-            class="mb-4"
-            bind:this={questions[2]}
-            options={[
-                {
-                    text: "HTML",
-                    correct: false,
-                    hint: "HTML provides structure, but rarely allows you to define interactive behavior.",
-                },
-                {
-                    text: "CSS",
-                    correct: false,
-                    hint: "CSS is sometimes used for hover and animation effects, but its use for interactivity is limited.",
-                },
-                {
-                    text: "JavaScript",
-                    correct: true,
-                    hint: "JavaScript is used for interactivity.",
-                },
-            ]}
-            ><p>
-                Which component is most likely responsible for the effect of
-                hovering and clicking on the rooms?
-            </p></Question
-        >
+        {#each questions as question}
+            <Question
+                stateId={question.stateId}
+                class="mb-4"
+                bind:this={question.question}
+                options={question.options}
+                ><p>
+                    {question.text}
+                </p></Question
+            >
+        {/each}
     </div>
 </Step>
 

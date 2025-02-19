@@ -9,7 +9,7 @@ export let ensureFunctionExists = (iframe: HTMLIFrameElement, name: string): Fun
     return target
 }
 
-export type Verifier = (iframe: HTMLIFrameElement) => void
+export type Verifier = (iframe: HTMLIFrameElement, initial: boolean) => void
 export type StepConfiguration = {
     title: string;
     verifier: Verifier,

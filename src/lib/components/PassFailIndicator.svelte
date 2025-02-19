@@ -1,12 +1,15 @@
 <script lang="ts">
     import { Indicator } from "flowbite-svelte";
-    let { passed }: { passed: boolean } = $props();
+    let { status }: { status: "pass" | "fail" | "unknown" } = $props();
+    let common = { size: "sm" as any, class: "me-1.5" as any };
 </script>
 
 <span>
-    {#if passed}
-        <Indicator size="sm" color="green" class="me-1.5" />
-    {:else}
-        <Indicator size="sm" color="red" class="me-1.5" />
+    {#if status == "pass"}
+        <Indicator {...common} color="green" />
+    {:else if status == "fail"}
+        <Indicator {...common} color="red" />
+    {:else if status == "unknown"}
+        <Indicator {...common} color="gray" />
     {/if}
 </span>

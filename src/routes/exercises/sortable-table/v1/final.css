@@ -1,0 +1,17 @@
+.food-pantries {
+    font-family: sans-serif;
+    border-collapse: collapse;
+    background-color: white;
+}
+
+.food-pantries td,
+.food-pantries th {
+    padding: 5px;
+    border: 1px solid #ccc;
+}
+.sort {
+    background-color: darkblue;
+    color: white;
+    margin-top: 5px;
+    padding: 10px;
+}

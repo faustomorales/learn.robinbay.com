@@ -18,12 +18,16 @@
         initial?: PrependedCode;
         prepend?: PrependedCode;
     } = $props();
+    let iframe: HTMLIFrameElement | undefined = $state();
     let editor: Editor;
     let states: {
         component: any;
         step?: Step;
     }[] = $state(steps.map((component) => ({ component })));
-    let check = (iframe: HTMLIFrameElement, initial = false) => {
+    let check = (iframe: HTMLIFrameElement | undefined, initial = false) => {
+        if (!iframe) {
+            throw new Error("Inline frame not found, cannot conduct check.");
+        }
         let result = states.reduce(
             (previous, step, index) => {
                 if (previous.passed && step.step) {
@@ -40,12 +44,16 @@
             { passed: true, last: -1 },
         );
         let open = Math.min(result.last + 1, states.length - 1);
-        states.forEach((state, index) => state.step?.setOpen(index === open));
+        if (initial) {
+            states.forEach((state, index) =>
+                state.step?.setOpen(index === open),
+            );
+        }
     };
-    setContext<ExerciseContext>("exercise", { update: () => editor.update() });
-    onMount(() => {
-        setTimeout(editor.update, 100);
+    setContext<ExerciseContext>("exercise", {
+        check: () => check(iframe, false),
     });
+    onMount(() => setTimeout(() => check(iframe, true), 100));
 </script>
 
 <svelte:head>
@@ -60,7 +68,14 @@
             {/each}
         </div>
         <div class="w-1/2 h-full max-h-screen">
-            <Editor {check} {stateId} {prepend} {initial} bind:this={editor} />
+            <Editor
+                {check}
+                {stateId}
+                {prepend}
+                {initial}
+                bind:this={editor}
+                bind:iframe
+            />
         </div>
     </div>
 </div>

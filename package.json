@@ -32,6 +32,7 @@
 		"flowbite": "^3.0.0",
 		"flowbite-svelte": "^0.47.4",
 		"svelte-codemirror-editor": "^1.0.0",
+		"svelte-highlight": "^7.8.2",
 		"svelte-splitpanes": "^8.0.9",
 		"tailwindcss": "^4.0.0",
 		"three": "^0.173.0"
