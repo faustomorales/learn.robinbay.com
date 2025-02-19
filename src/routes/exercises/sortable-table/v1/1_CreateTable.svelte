@@ -65,7 +65,7 @@
             ? "✅ Good work! I found a table with the correct class."
             : table
               ? "❌ I found a table but not one with the correct class."
-              : "❌";
+              : "";
         validations[2].message = !pantries
             ? ""
             : pantries.children.length === 2
