@@ -52,3 +52,11 @@
     <div>{@html JSFunction1}<div>{@html JSFunction2}</div></div>
 </div>
 
+<style>
+    :global(body) {
+        background-color: white;
+    }
+    h2 {
+        color: black;
+    }
+</style>
