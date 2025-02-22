@@ -8,7 +8,7 @@
 </script>
 
 <Exercise
-    title="Sortable Table"
+    title="Food Pantry Locator"
     stateId="/exercises/sortable-table/v1"
     steps={[Step0, Step1, Step2, Step3]}
     prepend={{ html: "", css: "", js: prependJavaScript }}
