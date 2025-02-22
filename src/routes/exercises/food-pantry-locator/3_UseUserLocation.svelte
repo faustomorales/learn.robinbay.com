@@ -48,7 +48,13 @@
                         l.latitude &&
                         l.longitude,
                 )
-              ? "✅ The locations variable was created correctly."
+              ? contentWindow.locations.every(
+                    (l: any) =>
+                        typeof l.latitude === "number" &&
+                        typeof l.longitude === "number",
+                )
+                  ? "✅ The locations variable was created correctly."
+                  : "❌ The latitude and longitude propeties must always be numbers."
               : "❌ The locations variable does not have the expected properties.";
         validations[1].message = !contentWindow.populateByDistanceUsingPosition
             ? "❌ The populateByDistanceUsingPosition function was not created."
