@@ -15,13 +15,16 @@
 		stateId,
 		prepend = defaultPrependedCode,
 		initial = defaultPrependedCode,
-		iframe = $bindable()
+		iframe = $bindable(),
+		tabs = { html: true, css: true, js: true },
+		hideIframe = false,
 	}: {
 		stateId: string;
 		iframe?: HTMLIFrameElement;
 		prepend?: PrependedCode;
 		initial?: PrependedCode;
-		check: (iframe: HTMLIFrameElement, initial?: boolean) => void;
+		tabs?: { html?: boolean; css?: boolean; js?: boolean };
+		hideIframe?: boolean;
 	} = $props();
 	let isDarkMode = $state(false);
 	onMount(() => {
@@ -94,39 +97,51 @@
 </script>
 
 <div>
-	<Tabs contentClass={"bg-gray-50 dark:bg-gray-800 border-b-solid border-b-1 border-r-1 border-l-1 border-gray-200 dark:border-gray-700"}>
-		<TabItem open>
-			<div slot="title" class="heading flex items-center">
-				<HtmlLogo /><span class="p-1">HTML</span>
-			</div>
-			<div class="pane">
-				<CodeMirror
-					bind:value={components.html}
-					{theme}
-					lang={html({})}
-				/>
-			</div>
-		</TabItem>
-		<TabItem>
-			<div slot="title" class="heading flex items-center">
-				<CssLogo /><span class="p-1">CSS</span>
-			</div>
-			<div class="pane">
-				<CodeMirror bind:value={components.css} lang={css()} {theme} />
-			</div>
-		</TabItem>
-		<TabItem>
-			<div slot="title" class="heading flex items-center">
-				<JsLogo /><span class="p-1">JavaScript</span>
-			</div>
-			<div class="pane">
-				<CodeMirror
-					bind:value={components.js}
-					lang={javascript()}
-					{theme}
-				/>
-			</div>
-		</TabItem>
+	<Tabs
+		contentClass={"bg-gray-50 dark:bg-gray-800 border-b-solid border-b-1 border-r-1 border-l-1 border-gray-200 dark:border-gray-700"}
+	>
+		{#if tabs.html}
+			<TabItem open>
+				<div slot="title" class="heading flex items-center">
+					<HtmlLogo /><span class="p-1">HTML</span>
+				</div>
+				<div class="pane">
+					<CodeMirror
+						bind:value={components.html}
+						{theme}
+						lang={html({})}
+					/>
+				</div>
+			</TabItem>
+		{/if}
+		{#if tabs.css}
+			<TabItem open={!tabs.html}>
+				<div slot="title" class="heading flex items-center">
+					<CssLogo /><span class="p-1">CSS</span>
+				</div>
+				<div class="pane">
+					<CodeMirror
+						bind:value={components.css}
+						lang={css()}
+						{theme}
+					/>
+				</div>
+			</TabItem>
+		{/if}
+		{#if tabs.js}
+			<TabItem open={!tabs.html && !tabs.css}>
+				<div slot="title" class="heading flex items-center">
+					<JsLogo /><span class="p-1">JavaScript</span>
+				</div>
+				<div class="pane">
+					<CodeMirror
+						bind:value={components.js}
+						lang={javascript()}
+						{theme}
+					/>
+				</div>
+			</TabItem>
+		{/if}
 	</Tabs>
 </div>
 
@@ -139,7 +154,7 @@
 	title="output"
 	frameborder="0"
 	bind:this={iframe}
-	class="border-solid border-1 border-gray-200 dark:border-gray-700 mt-2"
+	class={`border-solid border-1 border-gray-200 dark:border-gray-700 mt-2 ${hideIframe ? "hidden" : ""}`}
 ></iframe>
 
 <style>

@@ -69,7 +69,6 @@
         </div>
         <div class="w-1/2 h-full max-h-screen">
             <Editor
-                {check}
                 {stateId}
                 {prepend}
                 {initial}
