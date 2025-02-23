@@ -1,146 +1,160 @@
+import { create, receive, encodeSpeedAndHeading, type PacketConfiguration, type Packet } from "./packets"
 
-import constants from "./constants"
+const services: { [key: string]: string } = {
+    api: "00010001-574f-4f20-5370-6865726f2121",
+    dfu: "00020001-574f-4f20-5370-6865726f2121",
+    battery: "0000180f-0000-1000-8000-00805f9b34fb",
+};
 
-type CharacteristicName = keyof typeof constants.characteristics
 
-interface PacketConfiguration {
-    cid: number,
-    data: number[],
-    did: number
+const characteristics = {
+    known_unknown1: {
+        "serviceUUID": services.dfu,
+        "characteristicUUID": "00020003-574f-4f20-5370-6865726f2121"
+    },
+    dfu_control: {
+        "serviceUUID": services.dfu,
+        "characteristicUUID": "00020002-574f-4f20-5370-6865726f2121"
+    },
+    dfu_info: {
+        "serviceUUID": services.dfu,
+        "characteristicUUID": "00020004-574f-4f20-5370-6865726f2121"
+    },
+    antidos: {
+        "serviceUUID": services.dfu,
+        "characteristicUUID": "00020005-574f-4f20-5370-6865726f2121"
+    },
+    battery_level: {
+        "serviceUUID": services.battery,
+        "characteristic": "battery_level",
+        "characteristicUUID": "00002a19-0000-1000-8000-00805f9b34fb"
+    },
+    api: {
+        "serviceUUID": services.api,
+        "characteristic": "api",
+        "characteristicUUID": "00010002-574f-4f20-5370-6865726f2121"
+    },
+    known_unknown2: {
+        "serviceUUID": services.api,
+        "characteristic": "known-unknown2",
+        "characteristicUUID": "00010003-574f-4f20-5370-6865726f2121"
+    },
 }
 
-const encode = (value: number) => {
-    if (value < 0 || value > 255) {
-        throw new Error("Value must be between 0 and 255")
-    }
-    // Escape values according to https://sdk.sphero.com/documentation/api-documents#h.e2aai3smjz3b
-    if ([constants.packetCodes.delimiters.sop, constants.packetCodes.delimiters.eop, constants.packetCodes.delimiters.esc].includes(value)) {
-        return [constants.packetCodes.delimiters.esc, value & ~constants.packetCodes.delimiters.mask]
-    }
-    return value
-}
+type CharacteristicName = keyof typeof characteristics
 
-const createPacket = (seq: number, config: PacketConfiguration) => {
-    // https://sdk.sphero.com/documentation/api-documents
-    let flags = constants.packetCodes.flags.resetsInactivityTimeout + constants.packetCodes.flags.requestsResponse
-    let body = [flags, config.did, config.cid, seq, ...config.data].map(encode).flat()
-    let checksum = 0xff - body.reduce((previous, val) => (previous + val) & 0xff, 0)
-    let packet = [constants.packetCodes.delimiters.sop, ...body, checksum, constants.packetCodes.delimiters.eop]
-    return new Uint8Array(packet)
-}
-
-
-class Sphero {
-    public device: BluetoothDevice | null;
-    private server: BluetoothRemoteGATTServer | null;
+export default class Sphero {
     private seq: number;
-    private characteristics: { [key in CharacteristicName]: BluetoothRemoteGATTCharacteristic };
-
+    private characteristics: { [key in CharacteristicName]: {
+        characteristic: BluetoothRemoteGATTCharacteristic;
+        buffer: number[]
+    } };
+    private acknowledgements: { [key: number]: (packet: Packet) => void } = {}
     constructor() {
-        this.server = null
-        this.device = null
         this.seq = 0
-        this.characteristics = {} as { [key in CharacteristicName]: BluetoothRemoteGATTCharacteristic }
+        this.characteristics = {} as any
     }
-
-    private connect = async () => {
-        if (this.server && this.server.connected) {
-            console.log("Server is already connected.")
-            return
+    private log = (message: any, category: string = "Sphero") => console.log(`[${category}] ${message}`)
+    private logApi = (packet: Packet, direction: "TRANSMIT" | "RECEIVE") => this.log(`[API] [${direction}]: ${packet.config.command} (SEQ: ${packet.sequence}, FLAGS: ${packet.config.flags})`)
+    private acknowledge = (packet: Packet) => {
+        let ack = this.acknowledgements[packet.sequence];
+        if (ack) {
+            ack(packet)
+            delete this.acknowledgements[packet.sequence]
         }
-        console.log("Connecting to device server.")
-        this.server = await this.getDevice().gatt!.connect()
-        await this.setupCharacteristics()
     }
+    private receive = (name: CharacteristicName, event: any) => {
+        let value = (event.target.value as DataView).getUint8(0)
+        if (name === "battery_level") {
+            this.log(`[BATTERY] [RECEIVE]: ${value}`)
+        } else if (name === "api") {
+            let packet = receive(this.characteristics[name].buffer, value)
 
-    public async setupCharacteristics() {
-        return await Promise.all((Object.keys(constants.characteristics) as CharacteristicName[]).map(async (name) => {
+            if (packet) {
+                this.acknowledge(packet)
+                this.logApi(packet, "RECEIVE")
+            }
+        } else {
+            this.log(`Received message from ${name}`)
+        }
+    }
+    private connect = async ({ target: device }: { target: BluetoothDevice }) => {
+        this.log("Connecting to device server.")
+        let server = await device.gatt!.connect()
+        await Promise.all((Object.keys(characteristics) as CharacteristicName[]).map(async (name) => {
             try {
-                console.log(`Setting up API notifications for ${name}.`)
-                let characteristic = await this.getServer().then((s) => s.getPrimaryService(constants.characteristics[name].serviceUUID))
-                    .then((service) => service.getCharacteristic(constants.characteristics[name].characteristicUUID))
-                this.characteristics[name as CharacteristicName] = characteristic
-                characteristic = await characteristic.startNotifications()
-                // characteristic.addEventListener("characteristicvaluechanged", (event) => console.log(`characteristic: ${name}, event: ${event}`))
-                characteristic.oncharacteristicvaluechanged = (event) => console.log(`characteristic: ${name}, event: ${event}`)
-                console.log(`Successfully added event listener for ${name}.`)
+                this.log(`Setting up API notifications for ${name}.`)
+                let characteristic = await server.getPrimaryService(characteristics[name].serviceUUID)
+                    .then((service) => service.getCharacteristic(characteristics[name].characteristicUUID))
+                this.characteristics[name as CharacteristicName] = { characteristic, buffer: [] }
+                await characteristic.startNotifications()
+                characteristic.addEventListener("characteristicvaluechanged", (event) => this.receive(name, event))
+                this.log(`Successfully added event listener for ${name}.`)
             } catch (e) {
-                console.error(`Could not set up API notifications for ${name}.`, e)
+                this.log(`Could not set up API notifications for ${name}.`)
             }
         }))
     }
 
+    private getSequence = () => {
+        // Reserve SEQ = 255 for special cases
+        this.seq = (this.seq + 1) % 255
+        // Make sure we aren't already waiting on
+        // a response for this sequence number.
+        if (this.seq in this.acknowledgements) {
+            throw new Error("Attempted to use existing sequence number. This should never happen.")
+        }
+        return this.seq
+    }
+
+    private read = (name: CharacteristicName) =>
+        this.characteristics[name].characteristic.readValue();
+    private write = (name: CharacteristicName, value: Uint8Array) => this.characteristics[name].characteristic.writeValueWithoutResponse(value)
+    private writeToApi = (config: PacketConfiguration, timeout: number = 1000) =>
+        new Promise<Packet>((resolve, reject) => {
+            let packet = create(this.getSequence(), config)
+            let acknowledge = new Promise<Packet>((resolve, reject) => {
+                this.acknowledgements[packet.sequence] = resolve
+                setTimeout(() => {
+                    this.acknowledge(packet)
+                    reject(`Timed out waiting for response to ${packet.config.command} (SEQ: ${packet.sequence})`)
+                }, timeout)
+            })
+            this.logApi(packet, "TRANSMIT")
+            let transmission = new Promise((resolve, reject) => this.write("api", packet.bytes).then(resolve, reject))
+            Promise.all([acknowledge, transmission]).then(([ack, trans]) => {
+                resolve(ack)
+            }, reject)
+        })
     public async setup(bluetooth: Bluetooth) {
         if (!bluetooth) {
             throw new Error("Your browser does not support Web Bluetooth.");
         }
-        console.log("Requesting device.")
-        this.device = await bluetooth.requestDevice({
-            filters: [{ services: [constants.services.api] }],
-            optionalServices: [constants.services.battery, constants.services.dfu],
+        this.log("Requesting device.")
+        let device = await bluetooth.requestDevice({
+            filters: [{ services: [services.api] }],
+            optionalServices: [services.battery, services.dfu],
         })
-        console.log("Connecting to server for the first time.")
-        await this.connect()
-        console.log("Adding server disconnection callback.")
-        this.device.addEventListener("gattserverdisconnected", this.connect)
-
-        console.log("Sending anti-DOS unlock code")
-        await this.getCharacteristic("antidos").writeValueWithoutResponse(new TextEncoder().encode("usetheforce...band"))
+        await this.connect({ target: device })
+        await this.authenticate()
+        device.addEventListener("gattserverdisconnected", this.connect as any)
     }
-
-    private getCharacteristic = (name: CharacteristicName) => {
-        if (this.characteristics[name]) {
-            return this.characteristics[name]
-        }
-        throw new Error(`Characteristic ${name} has not been set up.`)
-
-    }
-
-    private read = (name: CharacteristicName) =>
-        this.getCharacteristic(name).readValue();
-
-    private async write(config: PacketConfiguration, name: CharacteristicName) {
-        let seq = this.seq++;
-        let characteristic = this.getCharacteristic(name)
-        let packet = createPacket(seq, config)
-        console.log(`Writing to ${name}:`, [...packet].map((v) => v.toString(16)))
-        return await characteristic.writeValueWithoutResponse(packet.buffer)
-    }
-
     public setColor = (color: { red: number, green: number, blue: number }) =>
-        this.write(
-            {
-                data: [0x00, 0x0e, color.red, color.green, color.blue],
-                cid: constants.packetCodes.ioCommands.allLEDs,
-                did: constants.packetCodes.deviceInfo.userIO
-            },
-            "api"
-        )
-
-    public wake = () => this.write({ data: [], cid: constants.packetCodes.powerCommands.wake, did: constants.packetCodes.deviceInfo.powerInfo }, "api")
-
-    public sleep = () => this.write({ data: [], cid: constants.packetCodes.powerCommands.sleep, did: constants.packetCodes.deviceInfo.powerInfo }, "api")
-
+        this.writeToApi({
+            data: [0x00, 0x0e, color.red, color.green, color.blue],
+            command: "io:color",
+        })
+    public wake = () => this.writeToApi({ data: [], command: "power:wake" })
+    public sleep = () => this.writeToApi({ data: [], command: "power:sleep" })
+    public resetHeading = () => this.writeToApi({ data: [], command: "driving:resetHeading" })
+    public roll = (speed: number, heading: number) => this.writeToApi({
+        data: encodeSpeedAndHeading(speed, heading),
+        command: "driving:driveWithHeading",
+    })
+    public rollTime = (speed: number, heading: number, time: number) =>
+        new Promise<Packet>((resolve, reject) => this.roll(speed, heading).then(() =>
+            setTimeout(() => this.roll(0, heading).then(resolve, reject), time), reject))
+    public authenticate = () => this.write("antidos", (new TextEncoder()).encode("usetheforce...band"))
     public getBatteryLevel = () => this.read("battery_level").then((value) => value.getUint8(0))
 
-    public getDevice() {
-        if (this.device) {
-            return this.device
-        }
-        throw new Error("The device has not been connected yet.")
-    }
-
-    public async getServer() {
-        if (!this.server) {
-            throw new Error("The server has not been connected yet.")
-        }
-        if (!this.server.connected) {
-            await this.connect()
-        }
-        return this.server
-    }
-
 }
-
-
-export { Sphero }
