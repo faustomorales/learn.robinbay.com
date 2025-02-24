@@ -5,11 +5,9 @@
   import Editor from "$lib/components/Editor.svelte";
   import Sphero from "$lib/sphero/";
 
-  let modal = $state({ open: false, message: "", title: "" });
   let iframe: HTMLIFrameElement | undefined = $state(undefined);
 
   let sphero: Sphero = $state(new Sphero());
-  let connected = $state(false);
 
   const drive = async () => {
     try {
@@ -43,7 +41,7 @@
   <div class="flex gap-8">
     <div class="w-1/2 max-h-screen overflow-y-auto pb-6">
       <h2 class="text-4xl font-bold">Sphero Playground</h2>
-      <p>
+      <p class="mt-2">
         This application allows you to control a Sphero Mini using JavaScript.
         You can do this by providing a JavaScript code snippet that includes a
         function called <span class="font-mono font-bold">drive</span> which will
@@ -51,9 +49,9 @@
       </p>
 
       {#each documentation as { title, description, code }}
-        <h3 class="text-2xl font-bold mt-4 font-mono">{title}</h3>
-        <p class="mt-4">{description}</p>
-        <Highlight class="mt-4" language={javascript} code={code.trim()} />
+        <h3 class="text-2xl font-bold mt-6 font-mono">{title}</h3>
+        <p class="mt-2">{description}</p>
+        <Highlight class="mt-2" language={javascript} code={code.trim()} />
       {/each}
     </div>
 

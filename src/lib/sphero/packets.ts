@@ -106,9 +106,10 @@ export const receive = (buffer: number[], value: number) => {
 }
 
 export const create = (sequence: number, config: PacketConfiguration): Packet => {
+    let packetFlags = config.flags || ["resetsInactivityTimeout", "requestsResponse"]
     // https://sdk.sphero.com/documentation/api-documents
     let body = [
-        (config.flags || ["resetsInactivityTimeout", "requestsResponse"]).reduce((s, f) => s + flags[f], 0),
+        (packetFlags).reduce((s, f) => s + flags[f], 0),
         commands[config.command].did,
         commands[config.command].cid,
         sequence, ...(config.data || [])
@@ -116,7 +117,7 @@ export const create = (sequence: number, config: PacketConfiguration): Packet =>
     let checksum = 0xff - body.reduce((previous, val) => (previous + val) & 0xff, 0)
     let packet = [delimiters.sop, ...body, checksum, delimiters.eop]
     return {
-        config,
+        config: { ...config, flags: packetFlags },
         checksum,
         sequence,
         bytes: (new Uint8Array(packet))

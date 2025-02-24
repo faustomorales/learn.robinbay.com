@@ -147,11 +147,12 @@ export default class Sphero {
             await this.device.gatt!.disconnect()
         }
     }
-    public setColor = (color: { red: number, green: number, blue: number }) =>
+    public setColor = (red: number, green: number, blue: number) =>
         this.writeToApi({
-            data: [0x00, 0x0e, color.red, color.green, color.blue],
+            data: [0x00, 0x0e, red, green, blue],
             command: "io:color",
         })
+    public wait = (time: number) => new Promise((resolve) => setTimeout(resolve, time))
     public wake = () => this.writeToApi({ data: [], command: "power:wake" })
     public sleep = () => this.writeToApi({ data: [], command: "power:sleep" })
     public resetHeading = () => this.writeToApi({ data: [], command: "driving:resetHeading" })
