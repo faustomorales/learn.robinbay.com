@@ -8,18 +8,6 @@ const services: { [key: string]: string } = {
 
 
 const characteristics = {
-    known_unknown1: {
-        "serviceUUID": services.dfu,
-        "characteristicUUID": "00020003-574f-4f20-5370-6865726f2121"
-    },
-    dfu_control: {
-        "serviceUUID": services.dfu,
-        "characteristicUUID": "00020002-574f-4f20-5370-6865726f2121"
-    },
-    dfu_info: {
-        "serviceUUID": services.dfu,
-        "characteristicUUID": "00020004-574f-4f20-5370-6865726f2121"
-    },
     antidos: {
         "serviceUUID": services.dfu,
         "characteristicUUID": "00020005-574f-4f20-5370-6865726f2121"
@@ -33,11 +21,6 @@ const characteristics = {
         "serviceUUID": services.api,
         "characteristic": "api",
         "characteristicUUID": "00010002-574f-4f20-5370-6865726f2121"
-    },
-    known_unknown2: {
-        "serviceUUID": services.api,
-        "characteristic": "known-unknown2",
-        "characteristicUUID": "00010003-574f-4f20-5370-6865726f2121"
     },
 }
 

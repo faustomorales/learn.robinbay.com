@@ -31,7 +31,6 @@
 	onMount(() => {
 		const listener = ({ matches: isDark }: { matches: boolean}) => {
 			theme = isDark ? githubDark : githubLight;
-			console.log("theme", theme)
 		};
 		listener(window.matchMedia("(prefers-color-scheme: dark)"))
 		const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
