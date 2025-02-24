@@ -45,6 +45,7 @@ type CharacteristicName = keyof typeof characteristics
 
 export default class Sphero {
     private seq: number;
+    private device: BluetoothDevice | undefined;
     private characteristics: { [key in CharacteristicName]: {
         characteristic: BluetoothRemoteGATTCharacteristic;
         buffer: number[]
@@ -78,7 +79,8 @@ export default class Sphero {
             this.log(`Received message from ${name}`)
         }
     }
-    private connect = async ({ target: device }: { target: BluetoothDevice }) => {
+
+    private setup = async ({ target: device }: { target: BluetoothDevice }) => {
         this.log("Connecting to device server.")
         let server = await device.gatt!.connect()
         await Promise.all((Object.keys(characteristics) as CharacteristicName[]).map(async (name) => {
@@ -126,18 +128,24 @@ export default class Sphero {
                 resolve(ack)
             }, reject)
         })
-    public async setup(bluetooth: Bluetooth) {
+    public async connect(bluetooth: Bluetooth) {
         if (!bluetooth) {
             throw new Error("Your browser does not support Web Bluetooth.");
         }
         this.log("Requesting device.")
-        let device = await bluetooth.requestDevice({
+        this.device = await bluetooth.requestDevice({
             filters: [{ services: [services.api] }],
             optionalServices: [services.battery, services.dfu],
         })
-        await this.connect({ target: device })
+        await this.setup({ target: this.device })
         await this.authenticate()
-        device.addEventListener("gattserverdisconnected", this.connect as any)
+        this.device.addEventListener("gattserverdisconnected", this.setup as any)
+    }
+    public async disconnect() {
+        if (this.device) {
+            this.device.removeEventListener("gattserverdisconnected", this.setup as any)
+            await this.device.gatt!.disconnect()
+        }
     }
     public setColor = (color: { red: number, green: number, blue: number }) =>
         this.writeToApi({

@@ -7,7 +7,8 @@
 	import { onMount } from "svelte";
 	import { browser } from "$app/environment";
 	import CodeMirror from "svelte-codemirror-editor";
-	import { oneDark } from "@codemirror/theme-one-dark";
+	import { githubDark } from "@fsegurai/codemirror-theme-github-dark";
+	import { githubLight } from "@fsegurai/codemirror-theme-github-light";
 	import { javascript } from "@codemirror/lang-javascript";
 	import { html } from "@codemirror/lang-html";
 	import { css } from "@codemirror/lang-css";
@@ -26,15 +27,14 @@
 		tabs?: { html?: boolean; css?: boolean; js?: boolean };
 		hideIframe?: boolean;
 	} = $props();
-	let isDarkMode = $state(false);
+	let theme = $state(githubDark)
 	onMount(() => {
-		const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-		isDarkMode = mediaQuery.matches;
-
-		const listener = (event: any) => {
-			isDarkMode = event.matches;
+		const listener = ({ matches: isDark }: { matches: boolean}) => {
+			theme = isDark ? githubDark : githubLight;
+			console.log("theme", theme)
 		};
-
+		listener(window.matchMedia("(prefers-color-scheme: dark)"))
+		const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 		mediaQuery.addEventListener("change", listener);
 
 		return () => {
@@ -81,7 +81,6 @@
 		<\/script>
 		</html>`);
 	let messages: MessageEvent[] = $state([]);
-	let theme = $derived(isDarkMode ? oneDark : undefined);
 	onMount(() => {
 		window.addEventListener("message", (message) => {
 			if (message.data.type === "log") {

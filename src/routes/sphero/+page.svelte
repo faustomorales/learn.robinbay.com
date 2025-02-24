@@ -1,63 +1,70 @@
 <script lang="ts">
-  import { Modal, Button } from "flowbite-svelte";
+  import Highlight from "svelte-highlight";
+  import javascript from "svelte-highlight/languages/javascript";
+  import documentation from "./documentation";
   import Editor from "$lib/components/Editor.svelte";
-  import Sphero from "./sphero";
+  import Sphero from "$lib/sphero/";
 
   let modal = $state({ open: false, message: "", title: "" });
+  let iframe: HTMLIFrameElement | undefined = $state(undefined);
 
   let sphero: Sphero = $state(new Sphero());
   let connected = $state(false);
 
-  const connectToDevice = () =>
-    sphero.setup(navigator.bluetooth).then(
-      () => {
-        console.log("Connected to Sphero");
-        connected = true;
-      },
-      (error) =>
-        (modal = {
-          open: true,
-          title: "Connection Failure",
-          message: error.message,
-        }),
-    );
-  let buttons: { text: string; action: () => Promise<{ sequence: number }> }[] =
-    [
-      {
-        text: "Red",
-        action: () => sphero.setColor({ red: 255, green: 0, blue: 0 }),
-      },
-      {
-        text: "Green",
-        action: () => sphero.setColor({ red: 0, green: 255, blue: 0 }),
-      },
-      {
-        text: "Blue",
-        action: () => sphero.setColor({ red: 0, green: 0, blue: 255 }),
-      },
-      { text: "Wake", action: sphero.wake },
-      { text: "Sleep", action: sphero.sleep },
-      {
-        text: "Reset Heading",
-        action: sphero.resetHeading,
-      },
-      { text: "Roll 3s", action: () => sphero.rollTime(200, 0, 3000) },
-    ];
+  const drive = async () => {
+    try {
+      await sphero.connect(navigator.bluetooth);
+      try {
+        if (!iframe) {
+          throw new Error("No iframe found");
+        }
+        let window = iframe.contentWindow! as any;
+        if (typeof window.drive !== "function") {
+          throw new Error("No drive function found");
+        }
+        await window.drive(sphero);
+      } catch (e) {
+        console.error(`Driving Error Occurred: ${e}`);
+      }
+      await sphero.roll(0, 0);
+      await sphero.sleep();
+      await sphero.disconnect();
+    } catch (e) {
+      console.error(`Application Error Occurred: ${e}`);
+    }
+  };
 </script>
 
 <svelte:head>
   <title>Sphero</title>
 </svelte:head>
 
-<Editor stateId={"/sphero"} tabs={{ js: true }} hideIframe />
+<div class="p-6 h-screen">
+  <div class="flex gap-8">
+    <div class="w-1/2 max-h-screen overflow-y-auto pb-6">
+      <h2 class="text-4xl font-bold">Sphero Playground</h2>
+      <p>
+        This application allows you to control a Sphero Mini using JavaScript.
+        You can do this by providing a JavaScript code snippet that includes a
+        function called <span class="font-mono font-bold">drive</span> which will
+        be called with a single argument that represents the Sphero ball.
+      </p>
 
-<Button onclick={connectToDevice}>Connect</Button>
+      {#each documentation as { title, description, code }}
+        <h3 class="text-2xl font-bold mt-4 font-mono">{title}</h3>
+        <p class="mt-4">{description}</p>
+        <Highlight class="mt-4" language={javascript} code={code.trim()} />
+      {/each}
+    </div>
 
-<Modal title={modal.title} bind:open={modal.open} autoclose>
-  <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-    {modal.message}
-  </p>
-  <svelte:fragment slot="footer">
-    <Button>Close</Button>
-  </svelte:fragment>
-</Modal>
+    <div class="w-1/2 h-full max-h-screen">
+      <Editor bind:iframe stateId={"/sphero"} tabs={{ js: true }} hideIframe />
+      <button
+        onclick={drive}
+        class={`mt-4 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded`}
+      >
+        Run on Sphero
+      </button>
+    </div>
+  </div>
+</div>
