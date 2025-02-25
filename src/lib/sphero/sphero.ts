@@ -1,4 +1,4 @@
-import { create, receive, encodeSpeedAndHeading, type PacketConfiguration, type Packet } from "./packets"
+import { parse, create, receive, encodeSpeedAndHeading, toHex, type PacketConfiguration, type Packet } from "./packets"
 
 const services: { [key: string]: string } = {
     api: "00010001-574f-4f20-5370-6865726f2121",
@@ -39,7 +39,8 @@ export default class Sphero {
         this.characteristics = {} as any
     }
     private log = (message: any, category: string = "Sphero") => console.log(`[${category}] ${message}`)
-    private logApi = (packet: Packet, direction: "TRANSMIT" | "RECEIVE") => this.log(`[API] [${direction}]: ${packet.config.command} (SEQ: ${packet.sequence}, FLAGS: ${packet.config.flags})`)
+    private logApi = (packet: Packet, direction: "TRANSMIT" | "RECEIVE") =>
+        this.log(`[API] [${direction}]: ${packet.config.command} (SEQ: ${packet.sequence}, FLAGS: ${packet.config.flags}, BYTES: ${[...packet.bytes].map(toHex).join("-")})`)
     private acknowledge = (packet: Packet) => {
         let ack = this.acknowledgements[packet.sequence];
         if (ack) {
@@ -95,32 +96,49 @@ export default class Sphero {
     private read = (name: CharacteristicName) =>
         this.characteristics[name].characteristic.readValue();
     private write = (name: CharacteristicName, value: Uint8Array) => this.characteristics[name].characteristic.writeValueWithoutResponse(value)
-    private writeToApi = (config: PacketConfiguration, timeout: number = 1000) =>
-        new Promise<Packet>((resolve, reject) => {
-            let packet = create(this.getSequence(), config)
-            let acknowledge = new Promise<Packet>((resolve, reject) => {
-                this.acknowledgements[packet.sequence] = resolve
-                setTimeout(() => {
-                    this.acknowledge(packet)
-                    reject(`Timed out waiting for response to ${packet.config.command} (SEQ: ${packet.sequence})`)
-                }, timeout)
-            })
-            this.logApi(packet, "TRANSMIT")
-            let transmission = new Promise((resolve, reject) => this.write("api", packet.bytes).then(resolve, reject))
-            Promise.all([acknowledge, transmission]).then(([ack, trans]) => {
-                resolve(ack)
-            }, reject)
+    private writeToApi = (config: PacketConfiguration, timeout: number = 1000) => this.writePacketToApi(create(this.getSequence(), config), timeout)
+    private writePacketToApi = (packet: Packet, timeout: number = 1000) => new Promise<Packet>((resolve, reject) => {
+        let acknowledge = new Promise<Packet>((resolve, reject) => {
+            this.acknowledgements[packet.sequence] = resolve
+            setTimeout(() => {
+                this.acknowledge(packet)
+                reject(`Timed out waiting for response to ${packet.config.command} (SEQ: ${packet.sequence})`)
+            }, timeout)
         })
-    public async connect(bluetooth: Bluetooth) {
-        if (!bluetooth) {
-            throw new Error("Your browser does not support Web Bluetooth.");
-        }
+        this.logApi(packet, "TRANSMIT")
+        let transmission = new Promise((resolve, reject) => this.write("api", packet.bytes).then(resolve, reject))
+        Promise.all([acknowledge, transmission]).then(([ack, trans]) => {
+            resolve(ack)
+        }, reject)
+    })
+    public writeToApiRaw = (buffer: number[], timeout: number = 1000) => this.writePacketToApi(parse(buffer), timeout = timeout)
+    private async requestDevice(bluetooth: Bluetooth) {
         this.log("Requesting device.")
         this.device = await bluetooth.requestDevice({
             filters: [{ services: [services.api] }],
             optionalServices: [services.battery, services.dfu],
         })
-        await this.setup({ target: this.device })
+    }
+    public async connect(bluetooth: Bluetooth) {
+        if (!bluetooth) {
+            throw new Error("Your browser does not support Web Bluetooth.");
+        }
+        if (this.device) {
+            try {
+                await this.setup({ target: this.device })
+            } catch (e) {
+                this.log("Device reconnection failed, requesting new device.")
+                this.device = undefined
+            }
+        }
+        if (!this.device) {
+            this.log("Requesting device.")
+            this.device = await bluetooth.requestDevice({
+                filters: [{ services: [services.api] }],
+                optionalServices: [services.battery, services.dfu],
+            })
+            await this.setup({ target: this.device })
+        }
         await this.authenticate()
         this.device.addEventListener("gattserverdisconnected", this.setup as any)
     }
@@ -135,18 +153,36 @@ export default class Sphero {
             data: [0x00, 0x0e, red, green, blue],
             command: "io:color",
         })
-    public wait = (time: number) => new Promise((resolve) => setTimeout(resolve, time))
+    public setBackLed = (brightness: number) => this.writeToApi({ data: [0x00, 0x01, brightness], command: "io:rearLightBrightness" })
+    public delay = (time: number) => new Promise((resolve) => setTimeout(resolve, time))
     public wake = () => this.writeToApi({ data: [], command: "power:wake" })
     public sleep = () => this.writeToApi({ data: [], command: "power:sleep" })
-    public resetHeading = () => this.writeToApi({ data: [], command: "driving:resetHeading" })
+    public resetAim = () => this.writeToApi({ data: [], command: "driving:resetAim" })
     public roll = (speed: number, heading: number) => this.writeToApi({
         data: encodeSpeedAndHeading(speed, heading),
         command: "driving:driveWithHeading",
     })
+    public setStabilization = (enable: boolean) => this.writeToApi({ data: [enable === true ? 1 : 0], command: "driving:setStabilization" })
     public rollTime = (speed: number, heading: number, time: number) =>
         new Promise<Packet>((resolve, reject) => this.roll(speed, heading).then(() =>
             setTimeout(() => this.roll(0, heading).then(resolve, reject), time), reject))
     public authenticate = () => this.write("antidos", (new TextEncoder()).encode("usetheforce...band"))
     public getBatteryLevel = () => this.read("battery_level").then((value) => value.getUint8(0))
+    public aim = async (duration: number = 5000) => {
+        await this.wake()
+        await this.delay(1000)
+        await this.setColor(0, 0, 0)
+        await this.setBackLed(255)
+        await this.delay(1000)
+        await this.setStabilization(false)
+        console.log("[SPHERO] [AIM] Aim to set heading.")
+        await this.delay(duration)
+        await this.resetAim()
+        console.log("[SPHERO] [AIM] Completed aiming.")
+        await this.setStabilization(true)
+        await this.setColor(255, 0, 0)
+        await this.setBackLed(0)
+        await this.delay(3000)
+    }
 
 }

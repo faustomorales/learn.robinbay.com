@@ -28,8 +28,10 @@ const commands = {
     "power:wake": { did: 0x13, cid: 0x0D },
     "power:sleep": { did: 0x13, cid: 0x01 },
     "io:color": { did: 0x1a, cid: 0x0E },
-    "driving:resetHeading": { did: 0x16, cid: 0x06 },
+    "io:rearLightBrightness": { did: 0x1a, cid: 0x0E },
+    "driving:resetAim": { did: 0x16, cid: 0x06 },
     "driving:driveWithHeading": { did: 0x16, cid: 0x07 },
+    "driving:setStabilization": { did: 0x16, cid: 0x0C },
 }
 
 const delimiters = {
@@ -71,7 +73,7 @@ const escape = (value: number) => {
     return value
 }
 
-const toHex = (value: number) => value.toString(16).padStart(2, "0")
+export const toHex = (value: number) => value.toString(16).padStart(2, "0").toUpperCase()
 
 export const parse = (buffer: number[]): Packet => {
     if (buffer[0] !== delimiters.sop) {
@@ -88,7 +90,7 @@ export const parse = (buffer: number[]): Packet => {
             flags: packetFlags,
             command: (
                 (Object.keys(commands) as Array<keyof typeof commands>).find((c) => commands[c].did === buffer[2] && commands[c].cid === buffer[3]) ||
-                `unknown (cid: ${toHex(buffer[2])}, did: ${toHex(buffer[3])}, flags: ${packetFlags.join("|")}, raw: ${buffer.map(toHex).join(",")})`
+                `unknown`
             ) as keyof typeof commands,
             response: packetFlags.includes("isResponse"),
             data: buffer.slice(8, buffer.length - 2),

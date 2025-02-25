@@ -19,7 +19,7 @@ await sphero.roll(100, 180)
     {
         title: "rollTime(speed, direction, duration)",
         description:
-            "Make Sphero roll at a specific speed (-255 - 255) in a specific direction (0° - 360°) for a specific duration (in milliseconds).",
+            "Make Sphero roll at a specific speed (-255 - 255) in a specific direction (0° - 360°) for a specific duration (in milliseconds) and then come back to a complete stop.",
         code: `
  // Roll at full speed in the forward direction for 1 second
 await sphero.rollTime(255, 0, 1000)

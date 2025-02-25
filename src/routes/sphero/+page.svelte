@@ -27,7 +27,6 @@
       } catch (e) {
         console.error(`Driving Error Occurred: ${e}`);
       }
-      await sphero.roll(0, 0);
       await sphero.sleep();
       await sphero.disconnect();
     } catch (e) {
