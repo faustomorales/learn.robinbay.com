@@ -60,6 +60,18 @@ var drive = async (sphero) => {
         will be called with a single argument that represents the Sphero ball.
       </p>
       <Highlight class="mt-2" language={javascript} code={sampleCode.trim()} />
+      <p class="mt-2">
+        When connecting to the Sphero, you will be prompted to select a
+        Bluetooth device. For this to work, you must make sure that you are
+        using a browser that supports the Web Bluetooth API (e.g., Google Chrome
+        on a laptop/desktop or the Bluefy app for iOS). You may have to modify
+        your system settings to allow the browser to communicate with Bluetooth
+        devices.
+      </p>
+      <p class="mt-2">
+        The <span class="font-mono font-bold">sphero</span> object has the following
+        methods.
+      </p>
 
       {#each documentation as { title, description, code }}
         <h3 class="text-2xl font-bold mt-6 font-mono">{title}</h3>

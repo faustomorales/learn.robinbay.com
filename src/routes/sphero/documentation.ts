@@ -41,4 +41,38 @@ await sphero.wait(1000);
 await sphero.setColor(255, 0, 0)
 `
     },
+    {
+        title: "aim(duration)",
+        desscribe: "Run the aiming function for duration (in milliseconds). When aiming, the Sphero will turn off its main LED and turn on the back LED. Point the back LED in the opposite direction of what you want forward to be.",
+        code: `
+// Give the user 5 seconds to aim the Sphero
+await sphero.aim(5000)
+`
+    },
+    {
+        title: "setBackLed(brightness)",
+        description: "Set the brightness (0-255) of the Sphero's back LED light.",
+        code: `
+// Set the brightness to full
+await sphero.setBackLed(255)
+
+// Turn off the back LED
+await sphero.setBackLed(0)
+`
+    },
+    {
+        title: "getBatteryLevel()",
+        description: "Get the battery level of the Sphero.",
+        code: `
+// Get the battery level
+const batteryLevel = await sphero.getBatteryLevel()
+console.log("Battery level:", batteryLevel)
+`
+    },
+    {
+        title: "setStabilization(enable)",
+        description: "Enable or disable the Sphero's stabilization. Stabilization should only be turned off to allow for aiming the Sphero (i.e., to get it to stop trying to correct its position).",
+        code: "await sphero.setStabilization(true)"
+    },
+    { title: "resetAim()", description: "Reset the Sphero's aim to the direction it is currently facing. Used only as part of aiming when stabilization is disabled.", code: "await sphero.resetAim()" }
 ]
