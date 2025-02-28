@@ -37,10 +37,10 @@
   let sampleCode = `
 var drive = async (sphero) => {
     await sphero.wake();
-    await sphero.wait(500);
+    await sphero.delay(500);
     await sphero.setColor(255, 0, 0)
     await sphero.rollTime(200, 0, 500);
-    await sphero.wait(500);
+    await sphero.delay(500);
 }
   `;
 </script>

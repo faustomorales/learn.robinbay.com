@@ -26,11 +26,11 @@ await sphero.rollTime(255, 0, 1000)
 `,
     },
     {
-        title: "wait(duration)",
+        title: "delay(duration)",
         description: "Pause sending commands to the Sphero for duration (in milliseconds).",
         code: `
 // Wait for 1 second
-await sphero.wait(1000);
+await sphero.delay(1000);
 `
     },
     {
