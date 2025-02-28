@@ -2,6 +2,7 @@
 	import JsLogo from "virtual:icons/vscode-icons/file-type-js-official";
 	import CssLogo from "virtual:icons/vscode-icons/file-type-style";
 	import HtmlLogo from "virtual:icons/ic/baseline-code";
+	import Hint from "./Hint.svelte";
 	import { Tabs, TabItem } from "flowbite-svelte";
 	import { type PrependedCode, defaultPrependedCode } from "$lib/common";
 	import { onMount } from "svelte";
@@ -27,15 +28,14 @@
 		tabs?: { html?: boolean; css?: boolean; js?: boolean };
 		hideIframe?: boolean;
 	} = $props();
-	let theme = $state(githubDark)
+	let theme = $state(githubDark);
 	onMount(() => {
-		const listener = ({ matches: isDark }: { matches: boolean}) => {
+		const listener = ({ matches: isDark }: { matches: boolean }) => {
 			theme = isDark ? githubDark : githubLight;
 		};
-		listener(window.matchMedia("(prefers-color-scheme: dark)"))
+		listener(window.matchMedia("(prefers-color-scheme: dark)"));
 		const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 		mediaQuery.addEventListener("change", listener);
-
 		return () => {
 			mediaQuery.removeEventListener("change", listener);
 		};
@@ -50,8 +50,8 @@
 		html: (browser && localStorage.getItem(keys.html)) || initial.html,
 		css: (browser && localStorage.getItem(keys.css)) || initial.css,
 	});
-
 	let source = $derived(`
+		<!DOCTYPE html>
 		<html lang="en">
 		<head>
 			<meta charset="UTF-8">
@@ -59,33 +59,47 @@
 			<title>Document</title>
 		</head>
 		<script>
-			const internal = console.log;
-			/* const external = (...args) => {
-				parent.window.postMessage({ type: 'log', args: args }, '*')
-				internal(...args)
-			}
-			console.log = external; */
+			window.onerror = (message, source, lineno, colno, error) => parent.window.postMessage(
+			{ type: 'javascript-error', message, source, lineno, colno, error }, '*');
 		<\/script>
 		<body>
 			${prepend.html}
 			${components.html}
 		</body>
-		<style>
+		<style onerror="parent.window.postMessage({ type: 'error', message: 'CSS Error' }, '*')">
 			${prepend.css}
 			${components.css}
 		</style>
 		<script>
+			"use strict";
 			${prepend.js}
+			"start-marker";
 			${components.js}
 		<\/script>
 		</html>`);
-	let messages: MessageEvent[] = $state([]);
+	let javascriptStart = $derived(
+		source
+			.split("\n")
+			.map((l) => l.trim())
+			.indexOf(`"start-marker";`),
+	);
+	let javascriptError = $state("");
 	onMount(() => {
-		window.addEventListener("message", (message) => {
-			if (message.data.type === "log") {
-				messages.push(message);
-			}
-		});
+		window.addEventListener(
+			"message",
+			(message: {
+				data: {
+					type: "javascript-error";
+					lineno: number;
+					message: string;
+				};
+			}) => {
+				if (message.data.type === "javascript-error") {
+					javascriptError = `Error on line ${message.data.lineno - javascriptStart - 1}. ${message.data.message}`;
+					iframe!.onload = () => (javascriptError = "");
+				}
+			},
+		);
 	});
 	$effect(() => {
 		localStorage.setItem(keys.js, components.js);
@@ -138,6 +152,9 @@
 						{theme}
 					/>
 				</div>
+				{#if javascriptError}
+					<Hint hint={javascriptError}></Hint>
+				{/if}
 			</TabItem>
 		{/if}
 	</Tabs>
