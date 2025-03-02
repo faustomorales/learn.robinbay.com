@@ -33,10 +33,8 @@
 	let theme: typeof githubDark | typeof githubLight | undefined =
 		$state(undefined);
 	onMount(() => {
-		const listener = ({ matches: isDark }: { matches: boolean }) => {
-			console.log("isDark", isDark);
-			theme = isDark ? githubDark : githubLight;
-		};
+		const listener = ({ matches: isDark }: { matches: boolean }) =>
+			(theme = isDark ? githubDark : githubLight);
 		const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 		listener(mediaQuery);
 		mediaQuery.addEventListener("change", listener);

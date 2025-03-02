@@ -152,10 +152,7 @@ export default class SpheroMiniSimulator implements Drivable {
         // Check for intersection with walls
         let sphere = this.contents.ball.geometry.boundingSphere!.clone().applyMatrix4(this.contents.ball.matrixWorld);
         if (
-            this.contents.walls.some((w) => {
-                console.log(`Checking`, w, 'against', sphere)
-                w.intersectsSphere(sphere)
-            })
+            this.contents.walls.some((w) => w.intersectsSphere(sphere))
         ) {
             this.contents.renderer.setAnimationLoop(null);
             throw new Error("You touched one of the boundaries!");
