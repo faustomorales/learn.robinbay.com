@@ -156,7 +156,10 @@
 					/>
 				</div>
 				{#if javascriptError}
-					<Hint hint={javascriptError}></Hint>
+					<Hint
+						hint={javascriptError}
+						className="text-red-500 p-2 font-mono text-xs"
+					></Hint>
 				{/if}
 			</TabItem>
 		{/if}

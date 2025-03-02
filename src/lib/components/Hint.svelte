@@ -1,5 +1,5 @@
 <script lang="ts">
-    let { hint }: { hint: string } = $props();
+    let { hint, className="text-red-500 font-bold p-2" }: { hint: string, className: string } = $props();
 </script>
 
-<div class="text-red-500 font-bold p-2">{@html hint}</div>
+<div class={className}>{@html hint}</div>

@@ -8,7 +8,7 @@ const degreesToRadians = (degrees: number) => degrees * (Math.PI / 180);
 const PPI = 10;
 
 const CONSTANTS = {
-    dimensions: { width: 30 * PPI, height: 30 * PPI },
+    dimensions: { width: 40 * PPI, height: 40 * PPI },
     radius: (1.57 / 2) * PPI,
     z: new THREE.Vector3(0, 0, 1),
     maxDegreesPerSecond: 2 * 360,
@@ -46,22 +46,23 @@ export default class SpheroMiniSimulator implements Drivable {
 
     constructor(element: HTMLElement, walls: { x1: number, y1: number, x2: number, y2: number }[] = []) {
         this.time = 0;
+        let dimensions = { width: element.getBoundingClientRect().width, height: CONSTANTS.dimensions.height }
         this.contents = {
             floor: new THREE.Mesh(
-                new THREE.PlaneGeometry(60 * PPI, 60 * PPI),
+                new THREE.PlaneGeometry(90 * PPI, 90 * PPI),
                 new THREE.MeshToonMaterial({
-                    map: new THREE.TextureLoader().load('carpet.jpg', (texture) => {
+                    map: new THREE.TextureLoader().load('/carpet.jpg', (texture) => {
                         texture.wrapS = THREE.RepeatWrapping;
                         texture.wrapT = THREE.RepeatWrapping;
-                        texture.repeat.set(8, 8);
+                        texture.repeat.set(12, 12);
                     }),
-                    side: THREE.DoubleSide
+                    side: THREE.FrontSide
                 })
             ),
             renderer: new THREE.WebGLRenderer(),
             camera: new THREE.PerspectiveCamera(
                 100 * PPI,
-                CONSTANTS.dimensions.width / CONSTANTS.dimensions.height,
+                dimensions.width / dimensions.height,
                 0.1,
                 2000,
             ),
@@ -69,6 +70,7 @@ export default class SpheroMiniSimulator implements Drivable {
                 new THREE.SphereGeometry(CONSTANTS.radius, 32, 16),
                 new THREE.MeshToonMaterial({
                     map: new THREE.TextureLoader().load("/sphiro.png"),
+                    side: THREE.DoubleSide,
                 }),
             ),
             scene: new THREE.Scene(),
@@ -77,7 +79,7 @@ export default class SpheroMiniSimulator implements Drivable {
             mainLed: new THREE.PointLight(0xffffff, 0, PPI * 30),
             walls: []
         }
-        this.contents.camera.position.z = 10 * PPI;
+        this.contents.camera.position.z = 12 * PPI;
         this.contents.camera.lookAt(new THREE.Vector3(0, 0, 0));
         this.contents.camera.rotateOnWorldAxis(CONSTANTS.z, (2 * Math.PI) / 2);
         this.contents.ball.position.set(0, 0, CONSTANTS.radius);
@@ -92,6 +94,11 @@ export default class SpheroMiniSimulator implements Drivable {
         this.contents.ball.add(this.contents.mainLed)
         this.contents.scene.add(new THREE.AxesHelper(20 * PPI));
 
+        let wallTexture = new THREE.TextureLoader().load('/brick.jpg', (texture) => {
+            texture.colorSpace = THREE.SRGBColorSpace;
+            texture.wrapS = THREE.ClampToEdgeWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+        })
         walls.forEach((w) => {
             let dx = w.x2 - w.x1;
             let dy = w.y2 - w.y1;
@@ -99,7 +106,7 @@ export default class SpheroMiniSimulator implements Drivable {
             let dz = 3 * PPI;
             let wall = new THREE.Mesh(
                 new THREE.BoxGeometry(length * PPI, 1 * PPI, dz),
-                new THREE.MeshToonMaterial({ color: 0xffff00 }),
+                new THREE.MeshToonMaterial({ map: wallTexture }),
             );
             let transform = new THREE.Matrix4()
                 .makeTranslation(PPI * (w.x1 + dx / 2), PPI * (w.y1 + dy / 2), dz / 2)
@@ -125,7 +132,7 @@ export default class SpheroMiniSimulator implements Drivable {
         element.appendChild(this.contents.renderer.domElement);
         this.contents.renderer.setAnimationLoop(this.animate);
         this.contents.ball.material.map!.colorSpace = THREE.SRGBColorSpace;
-        this.contents.renderer.setSize(CONSTANTS.dimensions.width, CONSTANTS.dimensions.height);
+        this.contents.renderer.setSize(dimensions.width, dimensions.height);
     }
 
     private animate = (time: number) => {
@@ -138,13 +145,19 @@ export default class SpheroMiniSimulator implements Drivable {
             .multiplyScalar(deltaAngleRadians * CONSTANTS.radius);
         this.contents.ball.position.add(deltaPosition);
         this.contents.camera.position.add(deltaPosition);
+        // this.contents.camera.lookAt(this.contents.ball.position);
+        this.contents.camera.rotation.z = Math.PI;
         this.contents.light.position.add(deltaPosition);
 
         // Check for intersection with walls
         let sphere = this.contents.ball.geometry.boundingSphere!.clone().applyMatrix4(this.contents.ball.matrixWorld);
         if (
-            this.contents.walls.some((w) => w.intersectsSphere(sphere))
+            this.contents.walls.some((w) => {
+                console.log(`Checking`, w, 'against', sphere)
+                w.intersectsSphere(sphere)
+            })
         ) {
+            this.contents.renderer.setAnimationLoop(null);
             throw new Error("You touched one of the boundaries!");
         }
         this.time = time;
@@ -198,5 +211,8 @@ export default class SpheroMiniSimulator implements Drivable {
     public resetAim = () => Promise.resolve(createResponsePacket(this.sequence++, "driving:resetAim"))
     public aim = async (duration: number = 5000) => aim(this, duration)
     public connect = async () => Promise.resolve()
-    public disconnect = async () => Promise.resolve()
+    public disconnect = async () => {
+        this.contents.renderer.setAnimationLoop(null);
+        Promise.resolve()
+    }
 }

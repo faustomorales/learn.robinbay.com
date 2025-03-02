@@ -67,14 +67,6 @@
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
 			<title>Document</title>
 		</head>
-		<script>
-			const internal = console.log;
-			const external = (...args) => {
-				parent.window.postMessage({ type: 'log', args: args }, '*')
-				internal(...args)
-			}
-			console.log = external;
-		<\/script>
 		<body>${html}</body>
 		<style>${css}</style>
 		<script>${js}<\/script>

@@ -16,7 +16,7 @@
     disableCodeEditing = true;
     let ball = simulate
       ? new SpheroMiniSimulator(simulatorContainer!, [
-          // { x1: 0, y1: -3, x2: 7, y2: -3 },
+          { x1: 0, y1: -3, x2: 7, y2: -3 },
         ])
       : sphero;
     try {
@@ -60,7 +60,7 @@ var drive = async (sphero) => {
   <title>Sphero</title>
 </svelte:head>
 
-<div class="p-8 h-screen">
+<div class="p-4 h-screen">
   <div class="flex gap-8">
     <div class="w-1/2 max-h-screen overflow-y-auto mb-6">
       <h2 class="text-4xl font-bold">Sphero Playground</h2>
@@ -100,17 +100,20 @@ var drive = async (sphero) => {
         disabled={disableCodeEditing}
       />
       <button
+        disabled={disableCodeEditing}
         onclick={() => drive(true)}
-        class={`mt-4 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded`}
+        class={`mt-4 disabled:bg-gray-800 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded`}
       >
         Run on Simulator
       </button>
       <button
+        disabled={disableCodeEditing}
         onclick={() => drive(false)}
-        class={`mt-4 bg-blue-500 hover:bg-blue-700 text-white ml-4 py-2 px-4 rounded`}
+        class={`mt-4 disabled:bg-gray-800 bg-blue-500 hover:bg-blue-700 text-white ml-3 py-2 px-4 rounded`}
       >
         Run on Sphero
       </button>
+
       <div bind:this={simulatorContainer} class="simulator mt-4"></div>
     </div>
   </div>
