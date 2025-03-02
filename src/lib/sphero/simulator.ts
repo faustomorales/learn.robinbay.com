@@ -144,8 +144,12 @@ export default class SpheroMiniSimulator implements Drivable {
             .clone()
             .multiplyScalar(deltaAngleRadians * CONSTANTS.radius);
         this.contents.ball.position.add(deltaPosition);
-        this.contents.camera.position.add(deltaPosition);
-        // this.contents.camera.lookAt(this.contents.ball.position);
+        // this.contents.camera.position.add(deltaPosition);
+
+        // Update target position based on the object's position
+        this.contents.camera.position.lerp(this.contents.camera.position.clone().add(deltaPosition), 0.90); 
+        this.contents.camera.lookAt(this.contents.ball.position);
+
         this.contents.camera.rotation.z = Math.PI;
         this.contents.light.position.add(deltaPosition);
 

@@ -2,7 +2,7 @@
     import Step from "$lib/components/Step.svelte";
     import List from "$lib/components/List.svelte";
     import { fail } from "$lib/common"
-    import type { Verifier } from "$lib/verifications";
+    import type { Verifier } from "$lib/verifications.svelte";
 
     let { step = $bindable() }: { step: Step } = $props()
     const title = "Add a function that populates the table with rows";

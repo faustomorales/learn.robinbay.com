@@ -3,47 +3,11 @@
   import javascript from "svelte-highlight/languages/javascript";
   import documentation from "./documentation";
   import Editor from "$lib/components/Editor.svelte";
-  import Sphero from "$lib/sphero/";
-  import SpheroMiniSimulator from "$lib/sphero/simulator";
-  import type { Drivable } from "$lib/sphero/packets";
+  import { createSpheroDriver } from "$lib/verifications.svelte";
 
   let iframe: HTMLIFrameElement | undefined = $state(undefined);
   let simulatorContainer: HTMLDivElement | undefined = $state(undefined);
-  let sphero: Sphero = $state(new Sphero());
-  let disableCodeEditing = $state(false);
-
-  const drive = async (simulate: boolean) => {
-    disableCodeEditing = true;
-    let ball = simulate
-      ? new SpheroMiniSimulator(simulatorContainer!, [
-          { x1: 0, y1: -3, x2: 7, y2: -3 },
-        ])
-      : sphero;
-    try {
-      await ball.connect(navigator.bluetooth);
-      console.log(
-        `Connected to Sphero. Battery Level: ${await ball.getBatteryLevel()}`,
-      );
-      try {
-        if (!iframe) {
-          throw new Error("No iframe found");
-        }
-        let window: { drive: (ball: Drivable) => Promise<any> } =
-          iframe.contentWindow! as any;
-        if (typeof window.drive !== "function") {
-          throw new Error("No drive function found");
-        }
-        await window.drive(ball);
-      } catch (e) {
-        console.error(`Driving Error Occurred: ${e}`);
-      }
-      await ball.sleep();
-      await ball.disconnect();
-    } catch (e) {
-      console.error(`Application Error Occurred: ${e}`);
-    }
-    disableCodeEditing = false;
-  };
+  let { drive, simulate, disableCodeEditing } = createSpheroDriver();
 
   let sampleCode = `
 var drive = async (sphero) => {
@@ -62,7 +26,9 @@ var drive = async (sphero) => {
 
 <div class="p-4 h-screen print:h-full">
   <div class="flex gap-8">
-    <div class="w-1/2 max-h-screen overflow-y-auto mb-6 print:w-full print:max-h-full">
+    <div
+      class="w-1/2 max-h-screen overflow-y-auto mb-6 print:w-full print:max-h-full"
+    >
       <h2 class="text-4xl font-bold">Sphero Playground</h2>
       <p class="mt-2">
         This application allows you to control a Sphero Mini using JavaScript.
@@ -101,14 +67,14 @@ var drive = async (sphero) => {
       />
       <button
         disabled={disableCodeEditing}
-        onclick={() => drive(true)}
+        onclick={() => simulate(simulatorContainer!, iframe!)}
         class={`mt-4 disabled:bg-gray-800 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded`}
       >
         Run on Simulator
       </button>
       <button
         disabled={disableCodeEditing}
-        onclick={() => drive(false)}
+        onclick={() => drive(simulatorContainer!, iframe!)}
         class={`mt-4 disabled:bg-gray-800 bg-blue-500 hover:bg-blue-700 text-white ml-3 py-2 px-4 rounded`}
       >
         Run on Sphero

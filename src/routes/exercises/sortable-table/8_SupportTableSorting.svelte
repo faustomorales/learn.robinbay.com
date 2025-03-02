@@ -1,7 +1,7 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
     import List from "$lib/components/List.svelte";
-    import { ensureFunctionExists, type Verifier } from "$lib/verifications";
+    import { ensureFunctionExists, type Verifier } from "$lib/verifications.svelte";
     import { fail } from "$lib/common";
 
     let { step = $bindable() }: { step: Step } = $props();

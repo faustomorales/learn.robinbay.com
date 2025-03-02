@@ -1,6 +1,6 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
-    import type { Verifier } from "$lib/verifications";
+    import type { Verifier } from "$lib/verifications.svelte";
     import { fail } from "$lib/common";
     import List from "$lib/components/List.svelte";
 

@@ -1,7 +1,7 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
     import { fail } from "$lib/common";
-    import type { Verifier } from "$lib/verifications";
+    import type { Verifier } from "$lib/verifications.svelte";
     import Highlight from "svelte-highlight";
     import xml from "svelte-highlight/languages/xml";
     import List from "$lib/components/List.svelte";

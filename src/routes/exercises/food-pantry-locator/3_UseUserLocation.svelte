@@ -4,7 +4,7 @@
     import html from "svelte-highlight/languages/xml";
     import Step from "$lib/components/Step.svelte";
     import List from "$lib/components/List.svelte";
-    import type { Verifier } from "$lib/verifications";
+    import type { Verifier } from "$lib/verifications.svelte";
     import solutionCodeJavaScript from "./final.js?raw";
     import { fail } from "$lib/common";
     let { step = $bindable() }: { step: Step } = $props();

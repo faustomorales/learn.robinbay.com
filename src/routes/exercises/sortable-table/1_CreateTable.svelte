@@ -1,7 +1,7 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
     import { fail } from "$lib/common"
-    import type { Verifier } from "$lib/verifications";
+    import type { Verifier } from "$lib/verifications.svelte";
     let { step = $bindable() }: { step: Step } = $props()
     const title = "Create a table";
     const verifier: Verifier = (iframe) => {

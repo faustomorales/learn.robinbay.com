@@ -3,7 +3,7 @@
     import PassFailIndicator from "./PassFailIndicator.svelte";
     import BasicAccordionItem from "./BasicAccordionItem.svelte";
     import Hint from "./Hint.svelte";
-    import type { Verifier } from "$lib/verifications";
+    import type { Verifier } from "$lib/verifications.svelte";
     import type { ExerciseContext } from "$lib/common";
     let {
         verifier,

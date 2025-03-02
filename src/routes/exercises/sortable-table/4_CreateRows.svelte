@@ -1,8 +1,8 @@
 <script lang="ts">
     import Step from "$lib/components/Step.svelte";
-    import type { Verifier } from "$lib/verifications";
+    import type { Verifier } from "$lib/verifications.svelte";
     import { fail } from "$lib/common"
-    import { ensureFunctionExists } from "$lib/verifications";
+    import { ensureFunctionExists } from "$lib/verifications.svelte";
     let { step = $bindable() }: { step: Step } = $props()
     const title = "Create a function to generate rows";
     const verifier: Verifier = (iframe) => {

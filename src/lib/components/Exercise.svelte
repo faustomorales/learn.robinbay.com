@@ -3,8 +3,9 @@
 
     import Step from "./Step.svelte";
     import Editor from "./Editor.svelte";
-    import { onMount, setContext } from "svelte";
+    import { onMount, setContext, type Component } from "svelte";
     import { defaultPrependedCode, type PrependedCode } from "$lib/common";
+    import { createStepChecker } from "$lib/verifications.svelte";
     let {
         steps,
         stateId,
@@ -12,7 +13,7 @@
         initial = defaultPrependedCode,
         prepend = defaultPrependedCode,
     }: {
-        steps: any[]; // TODO: Make this work with Component<{step: Step}> (also see above)
+        steps: Component<{ step: Step }>[]; // TODO: Make this work with Component<{step: Step}> (also see above)
         stateId: string;
         title: string;
         initial?: PrependedCode;
@@ -20,36 +21,8 @@
     } = $props();
     let iframe: HTMLIFrameElement | undefined = $state();
     let editor: Editor;
-    let states: {
-        component: any;
-        step?: Step;
-    }[] = $state(steps.map((component) => ({ component })));
-    let check = (iframe: HTMLIFrameElement | undefined, initial = false) => {
-        if (!iframe) {
-            throw new Error("Inline frame not found, cannot conduct check.");
-        }
-        let result = states.reduce(
-            (previous, step, index) => {
-                if (previous.passed && step.step) {
-                    let passedCurrent = step.step.verify(iframe, initial);
-                    return {
-                        passed: passedCurrent,
-                        last: passedCurrent ? index : previous.last,
-                    };
-                } else if (step.step) {
-                    step.step.reset();
-                }
-                return { passed: false, last: previous.last };
-            },
-            { passed: true, last: -1 },
-        );
-        let open = Math.min(result.last + 1, states.length - 1);
-        if (initial) {
-            states.forEach((state, index) =>
-                state.step?.setOpen(index === open),
-            );
-        }
-    };
+    let { states, check } = createStepChecker(steps);
+
     setContext<ExerciseContext>("exercise", {
         check: () => check(iframe, false),
     });

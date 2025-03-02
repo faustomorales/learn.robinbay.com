@@ -35,7 +35,7 @@ await sphero.delay(1000);
     },
     {
         title: "setColor(red, green, blue)",
-        describe: "Set the color of the Sphero's LED light.",
+        description: "Set the color of the Sphero's LED light.",
         code: `
 // Set the color to red
 await sphero.setColor(255, 0, 0)
@@ -43,7 +43,7 @@ await sphero.setColor(255, 0, 0)
     },
     {
         title: "aim(duration)",
-        desscribe: "Run the aiming function for duration (in milliseconds). When aiming, the Sphero will turn off its main LED and turn on the back LED. Point the back LED in the opposite direction of what you want forward to be.",
+        description: "Run the aiming function for duration (in milliseconds). When aiming, the Sphero will turn off its main LED and turn on the back LED. Point the back LED in the opposite direction of what you want forward to be.",
         code: `
 // Give the user 5 seconds to aim the Sphero
 await sphero.aim(5000)

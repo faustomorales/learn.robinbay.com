@@ -17,9 +17,3 @@
     stateId="/exercises/fundamentals/html/v1"
     steps={[Step0, Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8, Step9]}
 ></Exercise>
-
-<style>
-    :global(.vocabulary) {
-        z-index: 201; /* Ensure it's above the editor (200). */
-    }
-</style>
