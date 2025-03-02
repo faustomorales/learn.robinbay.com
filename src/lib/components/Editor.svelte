@@ -20,11 +20,13 @@
 		iframe = $bindable(),
 		tabs = { html: true, css: true, js: true },
 		hideIframe = false,
+		disabled = false,
 	}: {
 		stateId: string;
 		iframe?: HTMLIFrameElement;
 		prepend?: PrependedCode;
 		initial?: PrependedCode;
+		disabled?: boolean;
 		tabs?: { html?: boolean; css?: boolean; js?: boolean };
 		hideIframe?: boolean;
 	} = $props();
@@ -118,6 +120,7 @@
 				<div class="pane">
 					<CodeMirror
 						bind:value={components.html}
+						readonly={disabled}
 						{theme}
 						lang={html({})}
 					/>
@@ -131,6 +134,7 @@
 				</div>
 				<div class="pane">
 					<CodeMirror
+						readonly={disabled}
 						bind:value={components.css}
 						lang={css()}
 						{theme}
@@ -145,6 +149,7 @@
 				</div>
 				<div class="pane">
 					<CodeMirror
+						readonly={disabled}
 						bind:value={components.js}
 						lang={javascript()}
 						{theme}

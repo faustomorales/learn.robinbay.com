@@ -9,10 +9,11 @@
 
   let iframe: HTMLIFrameElement | undefined = $state(undefined);
   let simulatorContainer: HTMLDivElement | undefined = $state(undefined);
-
   let sphero: Sphero = $state(new Sphero());
+  let disableCodeEditing = $state(false);
 
   const drive = async (simulate: boolean) => {
+    disableCodeEditing = true;
     let ball = simulate
       ? new SpheroMiniSimulator(simulatorContainer!, [
           // { x1: 0, y1: -3, x2: 7, y2: -3 },
@@ -41,6 +42,7 @@
     } catch (e) {
       console.error(`Application Error Occurred: ${e}`);
     }
+    disableCodeEditing = false;
   };
 
   let sampleCode = `
@@ -90,7 +92,13 @@ var drive = async (sphero) => {
     </div>
 
     <div class="w-1/2 h-full max-h-screen">
-      <Editor bind:iframe stateId={"/sphero"} tabs={{ js: true }} hideIframe />
+      <Editor
+        bind:iframe
+        stateId={"/sphero"}
+        tabs={{ js: true }}
+        hideIframe
+        disabled={disableCodeEditing}
+      />
       <button
         onclick={() => drive(true)}
         class={`mt-4 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded`}

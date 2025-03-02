@@ -12,6 +12,7 @@ const CONSTANTS = {
     radius: (1.57 / 2) * PPI,
     z: new THREE.Vector3(0, 0, 1),
     maxDegreesPerSecond: 2 * 360,
+    maxIntensity: PPI * 30,
 }
 
 
@@ -141,7 +142,6 @@ export default class SpheroMiniSimulator implements Drivable {
 
         // Check for intersection with walls
         let sphere = this.contents.ball.geometry.boundingSphere!.clone().applyMatrix4(this.contents.ball.matrixWorld);
-        // this.contents.sphere.copy(this.contents.ball.geometry.boundingSphere!).applyMatrix4(this.contents.ball.matrixWorld);
         if (
             this.contents.walls.some((w) => w.intersectsSphere(sphere))
         ) {
@@ -154,11 +154,14 @@ export default class SpheroMiniSimulator implements Drivable {
     public wake = () => {
         this.settings.awake = true;
         this.contents.mainLed.color.setRGB(this.settings.color.red / 255, this.settings.color.green / 255, this.settings.color.blue / 255);
+        this.contents.mainLed.intensity = CONSTANTS.maxIntensity;
         return Promise.resolve(createResponsePacket(this.sequence++, "power:wake"))
     }
     public sleep = () => {
         this.settings.awake = false;
         this.contents.mainLed.color.setRGB(0, 0, 0);
+        this.contents.mainLed.intensity = 0;
+        this.contents.backLed.intensity = 0;
         return Promise.resolve(createResponsePacket(this.sequence++, "power:sleep"))
     }
     public setColor = (red: number, green: number, blue: number) => {
@@ -172,10 +175,16 @@ export default class SpheroMiniSimulator implements Drivable {
     public delay = (time: number) => new Promise((resolve) => setTimeout(resolve, time))
     public getBatteryLevel = () => Promise.resolve(100)
     public setBackLed = (brightness: number) => {
-        this.contents.backLed.intensity = brightness / 255;
+        if (!this.settings.awake) {
+            throw new Error("Sphero is asleep.")
+        }
+        this.contents.backLed.intensity = (brightness / 255) * CONSTANTS.maxIntensity;
         return Promise.resolve(createResponsePacket(this.sequence++, "io:rearLightBrightness"))
     }
     public roll = (speed: number, heading: number) => {
+        if (!this.settings.awake) {
+            throw new Error("Sphero is asleep.")
+        }
         this.settings.heading = {
             radiansPerSecond: degreesToRadians((speed / 255) * CONSTANTS.maxDegreesPerSecond),
             vector: new THREE.Vector3(Math.cos(degreesToRadians(-heading)), Math.sin(degreesToRadians(-heading)), 0),
