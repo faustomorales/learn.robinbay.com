@@ -5,6 +5,7 @@ export interface PacketConfiguration {
     data?: number[],
 }
 
+
 export interface Packet {
     config: PacketConfiguration;
     sequence: number;
@@ -15,6 +16,22 @@ export interface Packet {
 export interface Word {
     high: number;
     low: number;
+}
+
+export interface Drivable {
+    wake: () => Promise<Packet>;
+    sleep: () => Promise<Packet>;
+    delay: (ms: number) => Promise<unknown>;
+    setColor: (r: number, g: number, b: number) => Promise<Packet>;
+    rollTime: (speed: number, heading: number, time: number) => Promise<Packet>;
+    getBatteryLevel: () => Promise<number>;
+    aim: (heading: number) => Promise<void>;
+    setBackLed: (brightness: number) => Promise<Packet>;
+    roll: (speed: number, heading: number) => Promise<Packet>;
+    setStabilization: (enabled: boolean) => Promise<Packet>;
+    resetAim: () => Promise<Packet>;
+    connect: (bluetooth: Bluetooth) => Promise<void>;
+    disconnect: () => Promise<void>;
 }
 
 const flags = {
@@ -33,6 +50,8 @@ const commands = {
     "driving:driveWithHeading": { did: 0x16, cid: 0x07 },
     "driving:setStabilization": { did: 0x16, cid: 0x0C },
 }
+
+export type Command = keyof typeof commands
 
 const delimiters = {
     sop: 0x8d,
@@ -124,4 +143,21 @@ export const create = (sequence: number, config: PacketConfiguration): Packet =>
         sequence,
         bytes: (new Uint8Array(packet))
     }
+}
+
+export const aim = async (object: Drivable, duration: number = 5000) => {
+    await object.wake()
+    await object.delay(1000)
+    await object.setColor(0, 0, 0)
+    await object.setBackLed(255)
+    await object.delay(1000)
+    await object.setStabilization(false)
+    console.log("[SPHERO] [AIM] Aim to set heading.")
+    await object.delay(duration)
+    await object.resetAim()
+    console.log("[SPHERO] [AIM] Completed aiming.")
+    await object.setStabilization(true)
+    await object.setColor(255, 0, 0)
+    await object.setBackLed(0)
+    await object.delay(3000)
 }

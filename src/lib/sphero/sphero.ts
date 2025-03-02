@@ -1,4 +1,4 @@
-import { parse, create, receive, encodeSpeedAndHeading, toHex, type PacketConfiguration, type Packet } from "./packets"
+import { parse, create, receive, encodeSpeedAndHeading, toHex, aim, type PacketConfiguration, type Packet, type Drivable } from "./packets"
 
 const services: { [key: string]: string } = {
     api: "00010001-574f-4f20-5370-6865726f2121",
@@ -26,7 +26,7 @@ const characteristics = {
 
 type CharacteristicName = keyof typeof characteristics
 
-export default class Sphero {
+export default class Sphero implements Drivable {
     private seq: number;
     private device: BluetoothDevice | undefined;
     private characteristics: { [key in CharacteristicName]: {
@@ -168,21 +168,6 @@ export default class Sphero {
             setTimeout(() => this.roll(0, heading).then(resolve, reject), time), reject))
     public authenticate = () => this.write("antidos", (new TextEncoder()).encode("usetheforce...band"))
     public getBatteryLevel = () => this.read("battery_level").then((value) => value.getUint8(0))
-    public aim = async (duration: number = 5000) => {
-        await this.wake()
-        await this.delay(1000)
-        await this.setColor(0, 0, 0)
-        await this.setBackLed(255)
-        await this.delay(1000)
-        await this.setStabilization(false)
-        console.log("[SPHERO] [AIM] Aim to set heading.")
-        await this.delay(duration)
-        await this.resetAim()
-        console.log("[SPHERO] [AIM] Completed aiming.")
-        await this.setStabilization(true)
-        await this.setColor(255, 0, 0)
-        await this.setBackLed(0)
-        await this.delay(3000)
-    }
+    public aim = async (duration: number = 5000) => aim(this, duration)
 
 }

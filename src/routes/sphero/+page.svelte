@@ -4,31 +4,40 @@
   import documentation from "./documentation";
   import Editor from "$lib/components/Editor.svelte";
   import Sphero from "$lib/sphero/";
+  import SpheroMiniSimulator from "$lib/sphero/simulator";
+  import type { Drivable } from "$lib/sphero/packets";
 
   let iframe: HTMLIFrameElement | undefined = $state(undefined);
+  let simulatorContainer: HTMLDivElement | undefined = $state(undefined);
 
   let sphero: Sphero = $state(new Sphero());
 
-  const drive = async () => {
+  const drive = async (simulate: boolean) => {
+    let ball = simulate
+      ? new SpheroMiniSimulator(simulatorContainer!, [
+          // { x1: 0, y1: -3, x2: 7, y2: -3 },
+        ])
+      : sphero;
     try {
-      await sphero.connect(navigator.bluetooth);
+      await ball.connect(navigator.bluetooth);
       console.log(
-        `Connected to Sphero. Battery Level: ${await sphero.getBatteryLevel()}`,
+        `Connected to Sphero. Battery Level: ${await ball.getBatteryLevel()}`,
       );
       try {
         if (!iframe) {
           throw new Error("No iframe found");
         }
-        let window = iframe.contentWindow! as any;
+        let window: { drive: (ball: Drivable) => Promise<any> } =
+          iframe.contentWindow! as any;
         if (typeof window.drive !== "function") {
           throw new Error("No drive function found");
         }
-        await window.drive(sphero);
+        await window.drive(ball);
       } catch (e) {
         console.error(`Driving Error Occurred: ${e}`);
       }
-      await sphero.sleep();
-      await sphero.disconnect();
+      await ball.sleep();
+      await ball.disconnect();
     } catch (e) {
       console.error(`Application Error Occurred: ${e}`);
     }
@@ -83,11 +92,18 @@ var drive = async (sphero) => {
     <div class="w-1/2 h-full max-h-screen">
       <Editor bind:iframe stateId={"/sphero"} tabs={{ js: true }} hideIframe />
       <button
-        onclick={drive}
+        onclick={() => drive(true)}
         class={`mt-4 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded`}
+      >
+        Run on Simulator
+      </button>
+      <button
+        onclick={() => drive(false)}
+        class={`mt-4 bg-blue-500 hover:bg-blue-700 text-white ml-4 py-2 px-4 rounded`}
       >
         Run on Sphero
       </button>
+      <div bind:this={simulatorContainer} class="simulator mt-4"></div>
     </div>
   </div>
 </div>

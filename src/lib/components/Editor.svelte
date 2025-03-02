@@ -75,13 +75,11 @@
 			${prepend.js}
 			"start-marker";
 			${components.js}
+			"end-marker";
 		<\/script>
 		</html>`);
 	let javascriptStart = $derived(
-		source
-			.split("\n")
-			.map((l) => l.trim())
-			.indexOf(`"start-marker";`),
+		source.slice(0, source.indexOf(`"start-marker";`)).split("\n").length,
 	);
 	let javascriptError = $state("");
 	onMount(() => {
@@ -95,7 +93,7 @@
 				};
 			}) => {
 				if (message.data.type === "javascript-error") {
-					javascriptError = `Error on line ${message.data.lineno - javascriptStart - 1}. ${message.data.message}`;
+					javascriptError = `Error on line ${message.data.lineno - javascriptStart}. ${message.data.message}`;
 					iframe!.onload = () => (javascriptError = "");
 				}
 			},
