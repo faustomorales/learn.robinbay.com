@@ -69,10 +69,4 @@ const batteryLevel = await sphero.getBatteryLevel()
 console.log("Battery level:", batteryLevel)
 `
     },
-    {
-        title: "setStabilization(enable)",
-        description: "Enable or disable the Sphero's stabilization. Stabilization should only be turned off to allow for aiming the Sphero (i.e., to get it to stop trying to correct its position).",
-        code: "await sphero.setStabilization(true)"
-    },
-    { title: "resetAim()", description: "Reset the Sphero's aim to the direction it is currently facing. Used only as part of aiming when stabilization is disabled.", code: "await sphero.resetAim()" }
 ]

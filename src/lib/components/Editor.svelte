@@ -30,13 +30,15 @@
 		tabs?: { html?: boolean; css?: boolean; js?: boolean };
 		hideIframe?: boolean;
 	} = $props();
-	let theme = $state(githubDark);
+	let theme: typeof githubDark | typeof githubLight | undefined =
+		$state(undefined);
 	onMount(() => {
 		const listener = ({ matches: isDark }: { matches: boolean }) => {
+			console.log("isDark", isDark);
 			theme = isDark ? githubDark : githubLight;
 		};
-		listener(window.matchMedia("(prefers-color-scheme: dark)"));
 		const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+		listener(mediaQuery);
 		mediaQuery.addEventListener("change", listener);
 		return () => {
 			mediaQuery.removeEventListener("change", listener);
@@ -109,61 +111,63 @@
 </script>
 
 <div>
-	<Tabs
-		contentClass={"bg-gray-50 dark:bg-gray-800 border-b-solid border-b-1 border-r-1 border-l-1 border-gray-200 dark:border-gray-700"}
-	>
-		{#if tabs.html}
-			<TabItem open>
-				<div slot="title" class="heading flex items-center">
-					<HtmlLogo /><span class="p-1">HTML</span>
-				</div>
-				<div class="pane">
-					<CodeMirror
-						bind:value={components.html}
-						readonly={disabled}
-						{theme}
-						lang={html({})}
-					/>
-				</div>
-			</TabItem>
-		{/if}
-		{#if tabs.css}
-			<TabItem open={!tabs.html}>
-				<div slot="title" class="heading flex items-center">
-					<CssLogo /><span class="p-1">CSS</span>
-				</div>
-				<div class="pane">
-					<CodeMirror
-						readonly={disabled}
-						bind:value={components.css}
-						lang={css()}
-						{theme}
-					/>
-				</div>
-			</TabItem>
-		{/if}
-		{#if tabs.js}
-			<TabItem open={!tabs.html && !tabs.css}>
-				<div slot="title" class="heading flex items-center">
-					<JsLogo /><span class="p-1">JavaScript</span>
-				</div>
-				<div class="pane">
-					<CodeMirror
-						readonly={disabled}
-						bind:value={components.js}
-						lang={javascript()}
-						{theme}
-					/>
-				</div>
-				{#if javascriptError}
-					<Hint
-						hint={javascriptError}
-						className="text-red-500 p-2 font-mono text-xs"
-					></Hint>
-				{/if}
-			</TabItem>
-		{/if}
-	</Tabs>
+	{#if theme}
+		<Tabs
+			contentClass={"bg-gray-50 dark:bg-gray-800 border-b-solid border-b-1 border-r-1 border-l-1 border-gray-200 dark:border-gray-700"}
+		>
+			{#if tabs.html}
+				<TabItem open>
+					<div slot="title" class="heading flex items-center">
+						<HtmlLogo /><span class="p-1">HTML</span>
+					</div>
+					<div class="pane">
+						<CodeMirror
+							bind:value={components.html}
+							readonly={disabled}
+							{theme}
+							lang={html({})}
+						/>
+					</div>
+				</TabItem>
+			{/if}
+			{#if tabs.css}
+				<TabItem open={!tabs.html}>
+					<div slot="title" class="heading flex items-center">
+						<CssLogo /><span class="p-1">CSS</span>
+					</div>
+					<div class="pane">
+						<CodeMirror
+							readonly={disabled}
+							bind:value={components.css}
+							lang={css()}
+							{theme}
+						/>
+					</div>
+				</TabItem>
+			{/if}
+			{#if tabs.js}
+				<TabItem open={!tabs.html && !tabs.css}>
+					<div slot="title" class="heading flex items-center">
+						<JsLogo /><span class="p-1">JavaScript</span>
+					</div>
+					<div class="pane">
+						<CodeMirror
+							readonly={disabled}
+							bind:value={components.js}
+							lang={javascript()}
+							{theme}
+						/>
+					</div>
+					{#if javascriptError}
+						<Hint
+							hint={javascriptError}
+							className="text-red-500 p-2 font-mono text-xs"
+						></Hint>
+					{/if}
+				</TabItem>
+			{/if}
+		</Tabs>
+	{/if}
 </div>
 
 <iframe

@@ -6,6 +6,9 @@ export default {
   darkMode: 'selector',
   theme: {
     extend: {
+      screens: {
+        print: { raw: 'print' }
+      },
       colors: {
         // flowbite-svelte
         primary: {

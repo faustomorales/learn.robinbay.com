@@ -60,9 +60,9 @@ var drive = async (sphero) => {
   <title>Sphero</title>
 </svelte:head>
 
-<div class="p-4 h-screen">
+<div class="p-4 h-screen print:h-full">
   <div class="flex gap-8">
-    <div class="w-1/2 max-h-screen overflow-y-auto mb-6">
+    <div class="w-1/2 max-h-screen overflow-y-auto mb-6 print:w-full print:max-h-full">
       <h2 class="text-4xl font-bold">Sphero Playground</h2>
       <p class="mt-2">
         This application allows you to control a Sphero Mini using JavaScript.
@@ -91,7 +91,7 @@ var drive = async (sphero) => {
       {/each}
     </div>
 
-    <div class="w-1/2 h-full max-h-screen">
+    <div class="w-1/2 h-full max-h-screen print:hidden">
       <Editor
         bind:iframe
         stateId={"/sphero"}
