@@ -190,6 +190,6 @@
 		height: 100%;
 	}
 	.pane {
-		height: 320px;
+		height: 300px;
 	}
 </style>
