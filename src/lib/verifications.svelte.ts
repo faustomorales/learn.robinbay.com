@@ -82,6 +82,7 @@ export const createSpheroDriver = () => {
             } catch (e) {
                 console.error(`Driving Error Occurred: ${e}`);
             }
+            await ball.delay(500);
             await ball.sleep();
             await ball.disconnect();
         } catch (e) {
