@@ -83,7 +83,7 @@ export const encodeSpeedAndHeading = (speed: number, heading: number) => {
 
 const escape = (value: number) => {
     if (value < 0 || value > 255) {
-        throw new Error("Value must be between 0 and 255")
+        throw new Error("Values must be between 0 and 255")
     }
     // Escape values according to https://sdk.sphero.com/documentation/api-documents#h.e2aai3smjz3b
     if ([delimiters.sop, delimiters.eop, delimiters.esc].includes(value)) {
@@ -149,6 +149,7 @@ export const aim = async (object: Drivable, duration: number = 5000) => {
     await object.wake()
     await object.delay(1000)
     await object.setColor(0, 0, 0)
+    await object.delay(1000)
     await object.setBackLed(255)
     await object.delay(1000)
     await object.setStabilization(false)
