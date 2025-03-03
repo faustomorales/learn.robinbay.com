@@ -215,7 +215,7 @@ export default class SpheroMiniSimulator implements Drivable {
             setTimeout(() => this.roll(0, heading).then(resolve, reject), time), reject))
     public setStabilization = (enabled: boolean) => Promise.resolve(createResponsePacket(this.sequence++, "driving:setStabilization"))
     public resetAim = () => Promise.resolve(createResponsePacket(this.sequence++, "driving:resetAim"))
-    public aim = async (duration: number = 5000) => aim(this, duration)
+    public aim = async (duration: number = 2000) => aim(this, duration)
     public connect = async () => Promise.resolve()
     public disconnect = async () => {
         this.contents.renderer.setAnimationLoop(null);
