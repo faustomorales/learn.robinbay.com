@@ -35,7 +35,7 @@ await sphero.delay(1000);
     },
     {
         title: "setColor(red, green, blue)",
-        description: "Set the color of the Sphero's LED light.",
+        description: "Set the color of the Sphero's LED light Red, green, and blue values should be provided as values between 0 - 255.",
         code: `
 // Set the color to red
 await sphero.setColor(255, 0, 0)

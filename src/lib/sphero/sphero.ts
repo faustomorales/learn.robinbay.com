@@ -155,7 +155,11 @@ export default class Sphero implements Drivable {
         })
     public setBackLed = (brightness: number) => this.writeToApi({ data: [0x00, 0x01, brightness], command: "io:rearLightBrightness" })
     public delay = (time: number) => new Promise((resolve) => setTimeout(resolve, time))
-    public wake = () => this.writeToApi({ data: [], command: "power:wake" })
+    public wake = () => new Promise<Packet>((resolve, reject) => {
+        this.writeToApi({ data: [], command: "power:wake" })
+            .then((packet) => this.delay(500).then(() => resolve(packet), reject),
+                reject)
+    })
     public sleep = () => this.writeToApi({ data: [], command: "power:sleep" })
     public resetAim = () => this.writeToApi({ data: [], command: "driving:resetAim" })
     public roll = (speed: number, heading: number) => this.writeToApi({
@@ -165,7 +169,7 @@ export default class Sphero implements Drivable {
     public setStabilization = (enable: boolean) => this.writeToApi({ data: [enable === true ? 1 : 0], command: "driving:setStabilization" })
     public rollTime = (speed: number, heading: number, time: number) =>
         new Promise<Packet>((resolve, reject) => this.roll(speed, heading).then(() =>
-            setTimeout(() => this.roll(0, heading).then(resolve, reject), time), reject))
+            setTimeout(() => this.roll(0, heading).then((stop) => this.delay(500).then(() => resolve(stop), reject), reject), time), reject))
     public authenticate = () => this.write("antidos", (new TextEncoder()).encode("usetheforce...band"))
     public getBatteryLevel = () => this.read("battery_level").then((value) => value.getUint8(0))
     public aim = async (duration: number = 5000) => aim(this, duration)

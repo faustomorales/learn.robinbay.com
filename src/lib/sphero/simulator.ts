@@ -11,7 +11,13 @@ const CONSTANTS = {
     dimensions: { width: 40 * PPI, height: 40 * PPI },
     radius: (1.57 / 2) * PPI,
     z: new THREE.Vector3(0, 0, 1),
-    maxDegreesPerSecond: 2 * 360,
+    /*
+        The ball can roll up to 37 inches per second
+        (measured experimentally) and has diameter
+        1.57in. This means we roll
+        (37 / (2 * pi * 1.57)) * 360 =  degrees per second.
+    */
+    maxDegreesPerSecond: (37 / (Math.PI * 1.57)) * 360,
     maxIntensity: PPI * 30,
 }
 
@@ -147,7 +153,7 @@ export default class SpheroMiniSimulator implements Drivable {
         // this.contents.camera.position.add(deltaPosition);
 
         // Update target position based on the object's position
-        this.contents.camera.position.lerp(this.contents.camera.position.clone().add(deltaPosition), 0.90); 
+        this.contents.camera.position.lerp(this.contents.camera.position.clone().add(deltaPosition), 0.90);
         this.contents.camera.lookAt(this.contents.ball.position);
 
         this.contents.camera.rotation.z = Math.PI;
@@ -169,7 +175,7 @@ export default class SpheroMiniSimulator implements Drivable {
         this.settings.awake = true;
         this.contents.mainLed.color.setRGB(this.settings.color.red / 255, this.settings.color.green / 255, this.settings.color.blue / 255);
         this.contents.mainLed.intensity = CONSTANTS.maxIntensity;
-        return Promise.resolve(createResponsePacket(this.sequence++, "power:wake"))
+        return new Promise<Packet>((resolve) => setTimeout(() => resolve(createResponsePacket(this.sequence++, "power:wake")), 500))
     }
     public sleep = () => {
         this.settings.awake = false;
