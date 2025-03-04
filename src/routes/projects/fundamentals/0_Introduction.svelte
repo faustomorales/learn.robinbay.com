@@ -134,7 +134,7 @@
         <div class="final">
             <Final />
             <div class="text-xs text-gray-800 pt-2">
-                By the end of this exercise, you will have built this
+                By the end of this project, you will have built this
                 interactive house using HTML, CSS, and JavaScript. Hover and
                 click on the rooms to see what they do.
             </div>

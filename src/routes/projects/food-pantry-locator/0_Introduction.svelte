@@ -41,7 +41,7 @@
     }}
 >
     <p class="mb-2">
-        The goal of this exercise is to build a tool to help users find the
+        The goal of this project is to build a tool to help users find the
         nearest food pantry location. Below is an example of what we're
         building. Click on the button below the table to see how it uses your
         location to list food pantries near you.

@@ -4,7 +4,7 @@
     import BasicAccordionItem from "./BasicAccordionItem.svelte";
     import Hint from "./Hint.svelte";
     import type { Verifier } from "$lib/verifications.svelte";
-    import type { ExerciseContext } from "$lib/common";
+    import type { ProjectContext } from "$lib/common";
     let {
         verifier,
         title = "",
@@ -27,7 +27,7 @@
     export const setOpen = (targetState: boolean) => {
         open = targetState;
     };
-    const exerciseContext = getContext<ExerciseContext>("exercise");
+    const projectContext = getContext<ProjectContext>("project");
     export const verify = (iframe: HTMLIFrameElement, initial = false) => {
         try {
             verifier(iframe, initial);
@@ -62,7 +62,7 @@
     <Hint hint={verified.comment} />
     <div class="flex gap-2">
         <button
-            onclick={exerciseContext.check}
+            onclick={projectContext.check}
             class={`bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded ${verified.status === "pass" ? "bg-green-500 hover:bg-green-700" : ""}`}
         >
             Check my work!

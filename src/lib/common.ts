@@ -4,7 +4,7 @@ export type PrependedCode = {
     css: string;
 }
 
-export type ExerciseContext = {
+export type ProjectContext = {
     check: () => void;
 }
 

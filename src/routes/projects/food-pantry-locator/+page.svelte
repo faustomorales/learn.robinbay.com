@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Exercise from "$lib/components/Exercise.svelte";
+    import Project from "$lib/components/Project.svelte";
     import Step0 from "./0_Introduction.svelte";
     import Step1 from "./1_CreateTable.svelte";
     import Step2 from "./2_StyleTable.svelte";
@@ -7,9 +7,9 @@
     import prependJavaScript from "./prepend.js?raw";
 </script>
 
-<Exercise
+<Project
     title="Food Pantry Locator"
-    stateId="/exercises/sortable-table/v1"
+    stateId="/projects/sortable-table/v1"
     steps={[Step0, Step1, Step2, Step3]}
     prepend={{ html: "", css: "", js: prependJavaScript }}
-></Exercise>
+></Project>

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { ExerciseContext } from "$lib/common";
+    import type { ProjectContext } from "$lib/common";
 
     import Step from "./Step.svelte";
     import Editor from "./Editor.svelte";
@@ -23,7 +23,7 @@
     let editor: Editor;
     let { states, check } = createStepChecker(steps);
 
-    setContext<ExerciseContext>("exercise", {
+    setContext<ProjectContext>("project", {
         check: () => check(iframe, false),
     });
     onMount(() => setTimeout(() => check(iframe, true), 100));

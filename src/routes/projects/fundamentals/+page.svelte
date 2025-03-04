@@ -9,11 +9,11 @@
     import Step7 from "./7_JavaScript.svelte"
     import Step8 from "./8_JavaScript.svelte"
     import Step9 from "./9_HTMLJavaScript.svelte"
-    import Exercise from "$lib/components/Exercise.svelte";
+    import Project from "$lib/components/Project.svelte";
 </script>
 
-<Exercise
+<Project
     title="HTML Fundamentals"
-    stateId="/exercises/fundamentals/html/v1"
+    stateId="/projects/fundamentals/html/v1"
     steps={[Step0, Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8, Step9]}
-></Exercise>
+></Project>
