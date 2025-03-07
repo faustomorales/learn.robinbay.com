@@ -73,6 +73,7 @@ const encodeWord = (value: number) => {
 const decodeWord = (word: Word) => (word.high << 8) | word.low
 
 export const encodeSpeedAndHeading = (speed: number, heading: number) => {
+    heading = (heading % 360 + 360) % 360;
     // Negative values get converted to positive values and result
     // in the ball rolling in the opposite direction
     let speedBytes = encodeWord(speed < 0 ? -1 * speed + 256 : speed)
