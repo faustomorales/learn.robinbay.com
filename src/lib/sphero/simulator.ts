@@ -30,7 +30,7 @@ const createResponsePacket = (sequence: number, command: Command) => create(
 export default class SpheroMiniSimulator implements Drivable {
     private time: number;
     private settings: {
-        heading: { vector: THREE.Vector3; radiansPerSecond: number };
+        heading: { vector: THREE.Vector3; radiansPerSecond: number, z: number };
         awake: boolean;
         color: { red: number, green: number, blue: number },
     }
@@ -128,6 +128,7 @@ export default class SpheroMiniSimulator implements Drivable {
             heading: {
                 radiansPerSecond: 0,
                 vector: new THREE.Vector3(1, 0, 0),
+                z: 0,
             },
             awake: false,
             color: { red: 255, green: 255, blue: 255 },
@@ -145,6 +146,7 @@ export default class SpheroMiniSimulator implements Drivable {
         let deltaSeconds = (time - this.time) / 1000;
         let deltaAngleRadians = deltaSeconds * this.settings.heading.radiansPerSecond;
         let axis = this.settings.heading.vector.clone().cross(CONSTANTS.z).negate()
+        this.contents.ball.rotation.z = this.settings.heading.z;
         this.contents.ball.rotateOnWorldAxis(axis, deltaAngleRadians);
         let deltaPosition = this.settings.heading.vector
             .clone()
@@ -207,6 +209,7 @@ export default class SpheroMiniSimulator implements Drivable {
         this.settings.heading = {
             radiansPerSecond: degreesToRadians((speed / 255) * CONSTANTS.maxDegreesPerSecond),
             vector: new THREE.Vector3(Math.cos(degreesToRadians(-heading)), Math.sin(degreesToRadians(-heading)), 0),
+            z: degreesToRadians(-heading),
         }
         return Promise.resolve(createResponsePacket(this.sequence++, "driving:driveWithHeading"))
     }
