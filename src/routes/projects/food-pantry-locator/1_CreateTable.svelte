@@ -1,9 +1,8 @@
 <script lang="ts">
+    import AnnotatedCode from "$lib/components/AnnotatedCode.svelte";
     import Step from "$lib/components/Step.svelte";
     import { fail } from "$lib/common";
     import type { Verifier } from "$lib/verifications.svelte";
-    import Highlight from "svelte-highlight";
-    import xml from "svelte-highlight/languages/xml";
     import List from "$lib/components/List.svelte";
 
     let { step = $bindable() }: { step: Step } = $props();
@@ -137,7 +136,7 @@
             fail("");
         }
     };
-    let solutionCode = `<table class="food-pantries">
+    let solutionCode = `<<mark>table</mark> class="food-pantries">
     <thead>
         <tr>
             <th>Name</th>
@@ -244,7 +243,7 @@
         </div>
     </div>
     {#snippet solution()}
-        <Highlight language={xml} code={solutionCode} class="mt-4" />
+        <AnnotatedCode code={solutionCode} language="markup" class="mt-4" />
     {/snippet}
 </Step>
 

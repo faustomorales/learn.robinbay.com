@@ -1,12 +1,10 @@
 <script lang="ts">
-    import Highlight from "svelte-highlight";
-    import javascript from "svelte-highlight/languages/javascript";
-    import html from "svelte-highlight/languages/xml";
     import Step from "$lib/components/Step.svelte";
     import List from "$lib/components/List.svelte";
     import type { Verifier } from "$lib/verifications.svelte";
     import solutionCodeJavaScript from "./final.js?raw";
     import { fail } from "$lib/common";
+    import AnnotatedCode from "$lib/components/AnnotatedCode.svelte";
     let { step = $bindable() }: { step: Step } = $props();
     export const title = "JavaScript: Use User Location";
     let validations: { text: string; message?: string }[] = $state([
@@ -106,13 +104,13 @@
     >
     {#snippet solution()}
         <p class="font-medium mt-4 mb-1">JavaScript</p>
-        <Highlight
-            language={javascript}
+        <AnnotatedCode
+            language="javascript"
             code={solutionCodeJavaScript.replace("// @ts-nocheck\n\n", "")}
         />
         <p class="font-medium mt-4 mb-1">HTML</p>
-        <Highlight
-            language={html}
+        <AnnotatedCode
+            language="markup"
             code={`<button onclick="populateByDistance()" class="sort">Sort by Distance</button>`}
         />
     {/snippet}

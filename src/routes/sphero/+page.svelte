@@ -1,9 +1,8 @@
 <script lang="ts">
-  import Highlight from "svelte-highlight";
-  import javascript from "svelte-highlight/languages/javascript";
   import documentation from "./documentation";
   import Editor from "$lib/components/Editor.svelte";
   import { createSpheroDriver } from "$lib/verifications.svelte";
+  import AnnotatedCode from "$lib/components/AnnotatedCode.svelte";
 
   let iframe: HTMLIFrameElement | undefined = $state(undefined);
   let simulatorContainer: HTMLDivElement | undefined = $state(undefined);
@@ -36,7 +35,11 @@ var drive = async (sphero) => {
         async function called <span class="font-mono font-bold">drive</span> which
         will be called with a single argument that represents the Sphero ball.
       </p>
-      <Highlight class="mt-2" language={javascript} code={sampleCode.trim()} />
+      <AnnotatedCode
+        class="mt-2"
+        language="javascript"
+        code={sampleCode.trim()}
+      />
       <p class="mt-2">
         When connecting to the Sphero, you will be prompted to select a
         Bluetooth device. For this to work, you must make sure that you are
@@ -53,7 +56,7 @@ var drive = async (sphero) => {
       {#each documentation as { title, description, code }}
         <h3 class="text-2xl font-bold mt-6 font-mono">{title}</h3>
         <p class="mt-2">{description}</p>
-        <Highlight class="mt-2" language={javascript} code={code.trim()} />
+        <AnnotatedCode class="mt-2" language="javascript" code={code.trim()} />
       {/each}
     </div>
 

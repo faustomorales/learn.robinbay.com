@@ -1,6 +1,5 @@
 <script lang="ts">
-    import Highlight from "svelte-highlight";
-    import css from "svelte-highlight/languages/css";
+    import AnnotatedCode from "$lib/components/AnnotatedCode.svelte";
     import Step from "$lib/components/Step.svelte";
     import List from "$lib/components/List.svelte";
     import { fail } from "$lib/common";
@@ -184,6 +183,6 @@
             </li>{/each}</List
     >
     {#snippet solution()}
-        <Highlight language={css} code={solutionCode} class="mt-4" />
+        <AnnotatedCode language="css" code={solutionCode} class="mt-4" />
     {/snippet}
 </Step>
