@@ -110,7 +110,7 @@
         />
         <p class="font-medium mt-4 mb-1">HTML</p>
         <AnnotatedCode
-            language="markup"
+            language="html"
             code={`<button onclick="populateByDistance()" class="sort">Sort by Distance</button>`}
         />
     {/snippet}

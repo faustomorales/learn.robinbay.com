@@ -243,7 +243,7 @@
         </div>
     </div>
     {#snippet solution()}
-        <AnnotatedCode code={solutionCode} language="markup" class="mt-4" />
+        <AnnotatedCode code={solutionCode} language="html" class="mt-4" />
     {/snippet}
 </Step>
 

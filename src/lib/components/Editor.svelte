@@ -1,34 +1,49 @@
 <script lang="ts">
+	import type { ClassValue } from "svelte/elements";
 	import JsLogo from "virtual:icons/vscode-icons/file-type-js-official";
 	import CssLogo from "virtual:icons/vscode-icons/file-type-style";
 	import HtmlLogo from "virtual:icons/ic/baseline-code";
 	import Hint from "./Hint.svelte";
 	import { Tabs, TabItem } from "flowbite-svelte";
-	import { type PrependedCode, defaultPrependedCode } from "$lib/common";
+	import {
+		type PrependedCode,
+		type Tooltip,
+		defaultPrependedCode,
+	} from "$lib/common";
 	import { onMount } from "svelte";
 	import { browser } from "$app/environment";
 	import CodeMirror from "svelte-codemirror-editor";
+	import { hoverTooltip } from "@codemirror/view";
+
 	import { githubDark } from "@fsegurai/codemirror-theme-github-dark";
 	import { githubLight } from "@fsegurai/codemirror-theme-github-light";
 	import { javascript } from "@codemirror/lang-javascript";
 	import { html } from "@codemirror/lang-html";
 	import { css } from "@codemirror/lang-css";
 	let {
-		stateId,
+		stateId = "",
 		prepend = defaultPrependedCode,
 		initial = defaultPrependedCode,
 		iframe = $bindable(),
 		tabs = { html: true, css: true, js: true },
+		hideTabs = false,
 		hideIframe = false,
-		disabled = false,
+		readonly = false,
+		tooltips = {},
+		height = null,
+		...props
 	}: {
-		stateId: string;
+		stateId?: string;
 		iframe?: HTMLIFrameElement;
 		prepend?: PrependedCode;
 		initial?: PrependedCode;
-		disabled?: boolean;
+		readonly?: boolean;
+		hideTabs?: boolean;
+		height?: number | null;
 		tabs?: { html?: boolean; css?: boolean; js?: boolean };
 		hideIframe?: boolean;
+		class?: ClassValue;
+		tooltips?: { html?: Tooltip[]; css?: Tooltip[]; js?: Tooltip[] };
 	} = $props();
 	let theme: typeof githubDark | typeof githubLight | undefined =
 		$state(undefined);
@@ -42,15 +57,43 @@
 			mediaQuery.removeEventListener("change", listener);
 		};
 	});
+	const createTooltips = (tips: Tooltip[]) => {
+		return hoverTooltip((view, pos, side) => {
+			let matching = tips.find(
+				({ from, to }) => pos >= from && pos <= to,
+			);
+			if (!matching) return null;
+			return {
+				pos: matching.from,
+				end: matching.to,
+				above: true,
+				create(view) {
+					let dom = document.createElement("div");
+					dom.className = "tooltip";
+					dom.innerHTML = matching.text;
+					return { dom };
+				},
+			};
+		});
+	};
 	let keys = {
-		js: `${stateId}:js`,
-		css: `${stateId}:css`,
-		html: `${stateId}:html`,
+		js: stateId ? `${stateId}:js` : null,
+		css: stateId ? `${stateId}:css` : null,
+		html: stateId ? `${stateId}:html` : null,
 	};
 	let components = $state({
-		js: (browser && localStorage.getItem(keys.js)) || initial.js,
-		html: (browser && localStorage.getItem(keys.html)) || initial.html,
-		css: (browser && localStorage.getItem(keys.css)) || initial.css,
+		js:
+			(browser && keys.js && localStorage.getItem(keys.js)) ||
+			initial.js ||
+			"",
+		html:
+			(browser && keys.html && localStorage.getItem(keys.html)) ||
+			initial.html ||
+			"",
+		css:
+			(browser && keys.css && localStorage.getItem(keys.css)) ||
+			initial.css ||
+			"",
 	});
 	let source = $derived(`
 		<!DOCTYPE html>
@@ -102,16 +145,19 @@
 		);
 	});
 	$effect(() => {
-		localStorage.setItem(keys.js, components.js);
-		localStorage.setItem(keys.html, components.html);
-		localStorage.setItem(keys.css, components.css);
+		if (!keys.js || !keys.css || !keys.html) return;
+		localStorage.setItem(keys.js, components.js || "");
+		localStorage.setItem(keys.html, components.html || "");
+		localStorage.setItem(keys.css, components.css || "");
 	});
 </script>
 
-<div>
+<div style={`--editor-height: ${height}px;`} class={props.class}>
 	{#if theme}
 		<Tabs
-			contentClass={"bg-gray-50 dark:bg-gray-800 border-b-solid border-b-1 border-r-1 border-l-1 border-gray-200 dark:border-gray-700"}
+			contentClass={`${readonly ? "readonly" : ""} bg-gray-50 dark:bg-gray-800 border-b-solid border-b-1 border-r-1 border-l-1 border-gray-200 dark:border-gray-700`}
+			activeClasses={`${hideTabs ? "hidden" : ""} p-2 text-primary-600 bg-gray-100 rounded-t-lg dark:bg-gray-800 dark:text-primary-500`}
+			inactiveClasses="p-2 text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300"
 		>
 			{#if tabs.html}
 				<TabItem open>
@@ -121,9 +167,10 @@
 					<div class="pane">
 						<CodeMirror
 							bind:value={components.html}
-							readonly={disabled}
+							{readonly}
 							{theme}
 							lang={html({})}
+							extensions={[createTooltips(tooltips.html || [])]}
 						/>
 					</div>
 				</TabItem>
@@ -135,10 +182,11 @@
 					</div>
 					<div class="pane">
 						<CodeMirror
-							readonly={disabled}
+							{readonly}
 							bind:value={components.css}
 							lang={css()}
 							{theme}
+							extensions={[createTooltips(tooltips.css || [])]}
 						/>
 					</div>
 				</TabItem>
@@ -150,10 +198,11 @@
 					</div>
 					<div class="pane">
 						<CodeMirror
-							readonly={disabled}
+							{readonly}
 							bind:value={components.js}
 							lang={javascript()}
 							{theme}
+							extensions={[createTooltips(tooltips.js || [])]}
 						/>
 					</div>
 					{#if javascriptError}
@@ -190,6 +239,13 @@
 		height: 100%;
 	}
 	.pane {
-		height: 300px;
+		height: var(--editor-height);
+	}
+	:global(.tooltip) {
+		padding: 4px 8px;
+		color: black;
+		background-color: white;
+		border: 1px black solid;
+		box-shadow: 0 0 3px #ccc;
 	}
 </style>

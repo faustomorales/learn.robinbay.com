@@ -1,7 +1,7 @@
 export type PrependedCode = {
-    html: string;
-    js: string;
-    css: string;
+    html?: string;
+    js?: string;
+    css?: string;
 }
 
 export type ProjectContext = {
@@ -11,3 +11,5 @@ export type ProjectContext = {
 export const defaultPrependedCode = { html: "", js: "", css: "" };
 
 export const fail = (message: string) => { throw new Error(message) }
+
+export type Tooltip = { text: string; from: number; to: number };
