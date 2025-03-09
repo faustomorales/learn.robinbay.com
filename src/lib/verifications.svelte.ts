@@ -1,7 +1,4 @@
 import type { Component } from "svelte"
-import type { Drivable } from "$lib/sphero/packets"
-import SpheroMiniSimulator from "$lib/sphero/simulator"
-import Sphero from "./sphero"
 import type Step from "$lib/components/Step.svelte"
 
 export let ensureFunctionExists = (iframe: HTMLIFrameElement, name: string): Function => {
@@ -47,51 +44,6 @@ export const createStepChecker = (steps: Component<{ step: Step }>[]) => {
         }
     };
     return { states, check };
-}
-
-export const createSpheroDriver = () => {
-    let sphero: Sphero = $state(new Sphero());
-    let disableCodeEditing = $state(false)
-    const drive = async (simulate: boolean, simulatorContainer: HTMLDivElement, iframe: HTMLIFrameElement) => {
-        disableCodeEditing = true;
-
-        try {
-            if (!iframe) {
-                throw new Error("No iframe found");
-            }
-            let window: {
-                drive: (ball: Drivable) => Promise<any>;
-                walls?: { x1: number; y1: number; x2: number; y2: number }[];
-            } = iframe.contentWindow! as any;
-            if (typeof window.drive !== "function") {
-                throw new Error("No drive function found");
-            }
-            let walls =
-                window.walls && typeof window.walls === "object" && window.walls.length
-                    ? window.walls
-                    : [];
-            let ball = simulate
-                ? new SpheroMiniSimulator(simulatorContainer!, walls)
-                : sphero;
-            await ball.connect(navigator.bluetooth);
-            console.log(
-                `Connected to Sphero. Battery Level: ${await ball.getBatteryLevel()}`,
-            );
-            try {
-                await window.drive(ball);
-            } catch (e) {
-                console.error(`Driving Error Occurred: ${e}`);
-            }
-            await ball.delay(500);
-            await ball.sleep();
-            await ball.disconnect();
-        } catch (e) {
-            console.error(`Application Error Occurred: ${e}`);
-        }
-
-        disableCodeEditing = false;
-    };
-    return { simulate: drive.bind(null, true), drive: drive.bind(null, false), disableCodeEditing };
 }
 
 export type Verifier = (iframe: HTMLIFrameElement, initial: boolean) => void

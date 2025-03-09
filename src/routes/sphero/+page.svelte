@@ -1,12 +1,7 @@
 <script lang="ts">
   import documentation from "./documentation";
-  import Editor from "$lib/components/Editor.svelte";
-  import { createSpheroDriver } from "$lib/verifications.svelte";
+  import Sphero from "$lib/components/Sphero.svelte";
   import AnnotatedCode from "$lib/components/AnnotatedCode.svelte";
-
-  let iframe: HTMLIFrameElement | undefined = $state(undefined);
-  let simulatorContainer: HTMLDivElement | undefined = $state(undefined);
-  let { drive, simulate, disableCodeEditing } = createSpheroDriver();
 
   let sampleCode = `
 var drive = async (sphero) => {
@@ -61,29 +56,7 @@ var drive = async (sphero) => {
     </div>
 
     <div class="w-1/2 h-full max-h-screen print:hidden">
-      <Editor
-        bind:iframe
-        stateId={"/sphero"}
-        tabs={{ js: true }}
-        hideIframe
-        disabled={disableCodeEditing}
-      />
-      <button
-        disabled={disableCodeEditing}
-        onclick={() => simulate(simulatorContainer!, iframe!)}
-        class={`mt-4 disabled:bg-gray-800 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded`}
-      >
-        Run on Simulator
-      </button>
-      <button
-        disabled={disableCodeEditing}
-        onclick={() => drive(simulatorContainer!, iframe!)}
-        class={`mt-4 disabled:bg-gray-800 bg-blue-500 hover:bg-blue-700 text-white ml-3 py-2 px-4 rounded`}
-      >
-        Run on Sphero
-      </button>
-
-      <div bind:this={simulatorContainer} class="simulator mt-4"></div>
+      <Sphero />
     </div>
   </div>
 </div>
