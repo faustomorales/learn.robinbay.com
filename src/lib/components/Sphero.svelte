@@ -25,6 +25,7 @@
         simulatorContainer: HTMLDivElement,
         iframe: HTMLIFrameElement,
     ) => {
+        error = "";
         try {
             if (!iframe) {
                 throw new Error("No iframe found");
