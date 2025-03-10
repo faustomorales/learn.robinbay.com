@@ -32,6 +32,7 @@
 		prepend = defaultPrependedCode,
 		initial = defaultPrependedCode,
 		iframe = $bindable(),
+		disableIframe = false,
 		tabs = { html: true, css: true, js: true },
 		hideTabs = false,
 		hideIframe = false,
@@ -46,6 +47,7 @@
 		initial?: PrependedCode;
 		readonly?: boolean;
 		hideTabs?: boolean;
+		disableIframe?: boolean;
 		height?: number | null;
 		tabs?: { html?: boolean; css?: boolean; js?: boolean };
 		hideIframe?: boolean;
@@ -260,17 +262,19 @@
 	{/if}
 </div>
 
-<iframe
-	srcdoc={source}
-	onerror={(e) => {
-		console.log("Error Mark 1", e);
-	}}
-	sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-downloads allow-presentation"
-	title="output"
-	frameborder="0"
-	bind:this={iframe}
-	class={`border-solid border-1 border-gray-200 dark:border-gray-700 mt-2 ${hideIframe ? "hidden" : ""}`}
-></iframe>
+{#if !disableIframe}
+	<iframe
+		srcdoc={source}
+		onerror={(e) => {
+			console.log("Error Mark 1", e);
+		}}
+		sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-downloads allow-presentation"
+		title="output"
+		frameborder="0"
+		bind:this={iframe}
+		class={`border-solid border-1 border-gray-200 dark:border-gray-700 mt-2 ${hideIframe ? "hidden" : ""}`}
+	></iframe>
+{/if}
 
 <style>
 	iframe {

@@ -5,6 +5,7 @@
     import { ensureVariableExists } from "$lib/verifications.svelte";
     import { stringToColor } from "$lib/sphero/packets";
     import Table from "$lib/components/Table.svelte";
+    import Link from "$lib/components/Link.svelte";
 </script>
 
 <svelte:head>
@@ -25,7 +26,7 @@
             it, stick it somewhere, and look at it when you need to remember
             what you wrote.
         </p>
-        <h2 class="text-xl font-bold mb-2 mt-2">Example</h2>
+        <h2 class="text-xl font-bold mb-2 mt-3">Example</h2>
         <p class="mb-2">
             Here is an example of a variable in JavaScript. This code creates a
             variable called message and stores the word "Hello!" inside it.
@@ -63,11 +64,15 @@
             language="javascript"
             class="mb-2"
         />
-        <h2 class="text-xl font-bold mb-2 mt-2">Your Task</h2>
+        <h2 class="text-xl font-bold mb-2 mt-3">Your Task</h2>
         <p class="mb-2">
             Create a variable called <CodeText>color</CodeText> and set it to the
             color you want the ball to turn. You can choose a color by writing its
-            name inside quotes, like "blue" or "red".
+            name inside quotes, like "blue" or "red". See
+            <Link
+                href="https://developer.mozilla.org/en-US/docs/Web/CSS/named-color"
+                >this page</Link
+            > for a list of colors to choose from.
         </p>
         <Sphero
             stateId="exercises/javscript/variables/strings"
@@ -92,7 +97,9 @@ var drive = async (sphero) => {
             }}
         />
         <details>
-            <summary class="text-md font-bold text-gray-800 dark:text-gray-300 mb-2 mt-2">
+            <summary
+                class="text-md font-bold text-gray-800 dark:text-gray-300 mb-2 mt-2"
+            >
                 Help! Something went wrong.
             </summary>
             <p>

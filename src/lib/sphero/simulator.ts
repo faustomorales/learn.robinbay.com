@@ -48,9 +48,10 @@ export default class SpheroMiniSimulator implements Drivable {
         mainLed: THREE.PointLight;
         backLed: THREE.PointLight;
         walls: OBB[];
+        platforms: { mesh: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshToonMaterial>, coordinates: { x1: number, y1: number, x2: number, y2: number } }[];
     }
 
-    constructor(element: HTMLElement, walls: { x1: number, y1: number, x2: number, y2: number }[] = []) {
+    constructor(element: HTMLElement, walls: { x1: number, y1: number, x2: number, y2: number }[] = [], platforms: { x1: number, y1: number, x2: number, y2: number, color?: number }[]) {
         this.time = 0;
         let dimensions = { width: element.getBoundingClientRect().width, height: CONSTANTS.dimensions.height }
         this.contents = {
@@ -83,7 +84,8 @@ export default class SpheroMiniSimulator implements Drivable {
             light: new THREE.PointLight(0xffffff, PPI * 1000),
             backLed: new THREE.PointLight(0xff0000, 0, PPI * 30),
             mainLed: new THREE.PointLight(0xffffff, 0, PPI * 30),
-            walls: []
+            walls: [],
+            platforms: [],
         }
         this.contents.camera.position.z = 12 * PPI;
         this.contents.camera.lookAt(new THREE.Vector3(0, 0, 0));
@@ -106,8 +108,8 @@ export default class SpheroMiniSimulator implements Drivable {
             texture.wrapT = THREE.RepeatWrapping;
         })
         walls.forEach((w) => {
-            let dx = w.x2 - w.x1;
-            let dy = w.y2 - w.y1;
+            let dx = Math.abs(w.x2 - w.x1);
+            let dy = Math.abs(w.y2 - w.y1);
             let length = new THREE.Vector3(dx, dy).length();
             let dz = 3 * PPI;
             let wall = new THREE.Mesh(
@@ -124,6 +126,19 @@ export default class SpheroMiniSimulator implements Drivable {
             wall.geometry.applyMatrix4(transform);
             this.contents.scene.add(wall);
         });
+        platforms.forEach((p) => {
+            let dx = p.x2 - p.x1;
+            let dy = p.y2 - p.y1;
+            let platform = new THREE.Mesh(
+                new THREE.PlaneGeometry(dx * PPI, dy * PPI),
+                new THREE.MeshToonMaterial({ color: p.color || 0xff0000 })
+            )
+            platform.position.z = 0.05;
+            platform.position.x = PPI * (p.x1 + dx / 2);
+            platform.position.y = PPI * (p.y1 + dy / 2);
+            this.contents.scene.add(platform);
+            this.contents.platforms.push({ mesh: platform, coordinates: { x1: p.x1 * PPI, y1: p.y1 * PPI, x2: p.x2 * PPI, y2: p.y2 * PPI } });
+        })
         this.settings = {
             heading: {
                 radiansPerSecond: 0,
@@ -168,6 +183,9 @@ export default class SpheroMiniSimulator implements Drivable {
             this.contents.renderer.setAnimationLoop(null);
             throw new Error("You touched one of the boundaries!");
         }
+        this.contents.platforms.filter((p) => sphere.center.x >= p.coordinates.x1 && sphere.center.x <= p.coordinates.x2 && sphere.center.y >= p.coordinates.y1 && sphere.center.y <= p.coordinates.y2).forEach((p) => {
+            p.mesh.material.color.setHex(0x00ff00);
+        })
         this.time = time;
         this.contents.renderer.render(this.contents.scene, this.contents.camera);
     };
@@ -229,6 +247,6 @@ export default class SpheroMiniSimulator implements Drivable {
     public connect = async () => Promise.resolve()
     public disconnect = async () => {
         this.contents.renderer.setAnimationLoop(null);
-        Promise.resolve()
+        return Promise.resolve()
     }
 }

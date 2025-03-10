@@ -38,6 +38,7 @@
     class={props.class}
     {tooltips}
     hideIframe
+    disableIframe
     readonly
     hideTabs
 />
