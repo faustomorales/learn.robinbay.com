@@ -22,7 +22,7 @@ export interface Drivable {
     wake: () => Promise<Packet>;
     sleep: () => Promise<Packet>;
     delay: (ms: number) => Promise<unknown>;
-    setColor: (r: number, g: number, b: number) => Promise<Packet>;
+    setColor: (r: number | string, g?: number, b?: number) => Promise<Packet>;
     rollTime: (speed: number, heading: number, time: number) => Promise<Packet>;
     getBatteryLevel: () => Promise<number>;
     aim: (heading: number) => Promise<void>;
@@ -79,6 +79,16 @@ export const encodeSpeedAndHeading = (speed: number, heading: number) => {
     let speedBytes = encodeWord(speed < 0 ? -1 * speed + 256 : speed)
     let headingBytes = encodeWord(heading)
     return [speedBytes.low, headingBytes.high, headingBytes.low, speedBytes.high]
+}
+
+export const stringToColor = (color: string) => {
+    const tempElement = document.createElement('div');
+    tempElement.style.backgroundColor = color;
+    document.body.appendChild(tempElement);
+    const computedColor = window.getComputedStyle(tempElement).backgroundColor;
+    document.body.removeChild(tempElement);
+    const match = computedColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    return match ? { red: parseInt(match[1]), green: parseInt(match[2]), blue: parseInt(match[3]) } : null;
 }
 
 

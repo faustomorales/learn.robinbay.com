@@ -13,7 +13,14 @@
 	import { onMount } from "svelte";
 	import { browser } from "$app/environment";
 	import CodeMirror from "svelte-codemirror-editor";
-	import { hoverTooltip } from "@codemirror/view";
+	import {
+		hoverTooltip,
+		Decoration,
+		type DecorationSet,
+		EditorView,
+		ViewPlugin,
+	} from "@codemirror/view";
+	import { RangeSet } from "@codemirror/state";
 
 	import { githubDark } from "@fsegurai/codemirror-theme-github-dark";
 	import { githubLight } from "@fsegurai/codemirror-theme-github-light";
@@ -47,6 +54,7 @@
 	} = $props();
 	let theme: typeof githubDark | typeof githubLight | undefined =
 		$state(undefined);
+	let uid = $props.id();
 	onMount(() => {
 		const listener = ({ matches: isDark }: { matches: boolean }) =>
 			(theme = isDark ? githubDark : githubLight);
@@ -57,24 +65,52 @@
 			mediaQuery.removeEventListener("change", listener);
 		};
 	});
+
 	const createTooltips = (tips: Tooltip[]) => {
-		return hoverTooltip((view, pos, side) => {
-			let matching = tips.find(
-				({ from, to }) => pos >= from && pos <= to,
-			);
-			if (!matching) return null;
-			return {
-				pos: matching.from,
-				end: matching.to,
-				above: true,
-				create(view) {
-					let dom = document.createElement("div");
-					dom.className = "tooltip";
-					dom.innerHTML = matching.text;
-					return { dom };
+		return [
+			hoverTooltip((view, pos, side) => {
+				let matching = tips.find(
+					({ from, to }) => pos >= from && pos <= to,
+				);
+				if (!matching) return null;
+				return {
+					pos: matching.from,
+					end: matching.to,
+					above: true,
+					create(view) {
+						let dom = document.createElement("div");
+						dom.className = "tooltip";
+						dom.innerHTML = matching.text;
+						return { dom };
+					},
+				};
+			}),
+			ViewPlugin.fromClass(
+				class {
+					marks: DecorationSet;
+					constructor(view: EditorView) {
+						this.marks = RangeSet.of(
+							tips.map(({ from, to }) =>
+								Decoration.mark({
+									inclusive: true,
+									inclusiveStart: true,
+									inclusiveEnd: true,
+									class: "cm-placeholder",
+								}).range(from, to),
+							),
+						);
+					}
 				},
-			};
-		});
+				{
+					decorations: (instance) => instance.marks,
+					provide: (plugin) =>
+						EditorView.atomicRanges.of(
+							(view) =>
+								view.plugin(plugin)?.marks || Decoration.none,
+						),
+				},
+			),
+		];
 	};
 	let keys = {
 		js: stateId ? `${stateId}:js` : null,
@@ -105,7 +141,7 @@
 		</head>
 		<script>
 			window.onerror = (message, source, lineno, colno, error) => parent.window.postMessage(
-			{ type: 'javascript-error', message, source, lineno, colno, error }, '*');
+			{ type: 'javascript-error', message, source, lineno, colno, error, uid: "${uid}" }, '*');
 		<\/script>
 		<body>
 			${prepend.html}
@@ -134,10 +170,15 @@
 				data: {
 					type: "javascript-error";
 					lineno: number;
+					source: string;
 					message: string;
+					uid: string;
 				};
 			}) => {
-				if (message.data.type === "javascript-error") {
+				if (
+					message.data.type === "javascript-error" &&
+					message.data.uid === uid
+				) {
 					javascriptError = `Error on line ${message.data.lineno - javascriptStart}. ${message.data.message}`;
 					iframe!.onload = () => (javascriptError = "");
 				}
@@ -170,7 +211,9 @@
 							{readonly}
 							{theme}
 							lang={html({})}
-							extensions={[createTooltips(tooltips.html || [])]}
+							extensions={[
+								...createTooltips(tooltips.html || []),
+							]}
 						/>
 					</div>
 				</TabItem>
@@ -186,7 +229,7 @@
 							bind:value={components.css}
 							lang={css()}
 							{theme}
-							extensions={[createTooltips(tooltips.css || [])]}
+							extensions={[...createTooltips(tooltips.css || [])]}
 						/>
 					</div>
 				</TabItem>
@@ -202,14 +245,14 @@
 							bind:value={components.js}
 							lang={javascript()}
 							{theme}
-							extensions={[createTooltips(tooltips.js || [])]}
+							extensions={[...createTooltips(tooltips.js || [])]}
 						/>
 					</div>
 					{#if javascriptError}
 						<Hint
 							hint={javascriptError}
 							className="text-red-500 p-2 font-mono text-xs"
-						></Hint>
+						/>
 					{/if}
 				</TabItem>
 			{/if}
@@ -220,7 +263,7 @@
 <iframe
 	srcdoc={source}
 	onerror={(e) => {
-		console.log(e);
+		console.log("Error Mark 1", e);
 	}}
 	sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-downloads allow-presentation"
 	title="output"
@@ -247,5 +290,9 @@
 		background-color: white;
 		border: 1px black solid;
 		box-shadow: 0 0 3px #ccc;
+		max-width: 256px;
+	}
+	:global(.cm-placeholder) {
+		background-color: rgba(255, 255, 0, 0.25);
 	}
 </style>

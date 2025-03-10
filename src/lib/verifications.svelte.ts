@@ -1,16 +1,23 @@
 import type { Component } from "svelte"
 import type Step from "$lib/components/Step.svelte"
 
-export let ensureFunctionExists = (iframe: HTMLIFrameElement, name: string): Function => {
+export let ensureVariableExists = <VariableType extends "string" | "number" | "function", ReturnType extends (VariableType extends "string" ? string : VariableType extends "number" ? number : VariableType extends "function" ? Function : never)>(
+    name: string, type: VariableType, iframe?: HTMLIFrameElement): ReturnType => {
+    if (!iframe) {
+        throw new Error("Inline frame not found, cannot conduct check.")
+    }
     let target = (iframe.contentWindow as any)[name]
     if (!target) {
-        throw `The ${name} function is missing.`
+        throw `The ${name} variable is missing.`
     }
-    if (typeof target !== "function") {
-        throw `${name} is not a function.`
+    let targetType = typeof target;
+    if (targetType !== type) {
+        throw `The ${name} variable was found but it is a ${targetType} instead of a ${type}.`
     }
     return target
 }
+
+export let ensureFunctionExists = (iframe: HTMLIFrameElement, name: string): Function => ensureVariableExists(name, "function", iframe)
 
 export const createStepChecker = (steps: Component<{ step: Step }>[]) => {
     let states: {

@@ -3,10 +3,23 @@
     import type { Drivable } from "$lib/sphero/packets";
     import SpheroMiniSimulator from "$lib/sphero/simulator";
     import Sphero from "$lib/sphero/sphero";
+    import Hint from "$lib/components/Hint.svelte";
+    let {
+        stateId,
+        hideTabs = true,
+        prepend = { html: "", css: "", js: "" },
+        precheck = (iframe) => null,
+    }: {
+        stateId: string;
+        hideTabs?: boolean;
+        precheck?: (iframe: HTMLIFrameElement) => void;
+        prepend?: { html?: string; css?: string; js?: string };
+    } = $props();
     let iframe: HTMLIFrameElement | undefined = $state(undefined);
     let simulatorContainer: HTMLDivElement | undefined = $state(undefined);
     let sphero: Sphero = $state(new Sphero());
     let disableCodeEditing = $state(false);
+    let error = $state("");
     const drive = async (
         simulate: boolean,
         simulatorContainer: HTMLDivElement,
@@ -16,6 +29,9 @@
         try {
             if (!iframe) {
                 throw new Error("No iframe found");
+            }
+            if (precheck) {
+                precheck(iframe);
             }
             let window: {
                 drive: (ball: Drivable) => Promise<any>;
@@ -40,13 +56,13 @@
             try {
                 await window.drive(ball);
             } catch (e) {
-                console.error(`Driving Error Occurred: ${e}`);
+                error = `${e}`;
             }
             await ball.delay(500);
             await ball.sleep();
             await ball.disconnect();
         } catch (e) {
-            console.error(`Application Error Occurred: ${e}`);
+            error = `${e}`;
         }
 
         disableCodeEditing = false;
@@ -55,22 +71,25 @@
 
 <Editor
     bind:iframe
-    stateId={"/sphero"}
+    {stateId}
     tabs={{ js: true }}
     hideIframe
+    {prepend}
     readonly={disableCodeEditing}
+    {hideTabs}
 />
+<Hint hint={error} className="text-red-500 p-2 font-mono text-xs" />
 <button
     disabled={disableCodeEditing}
     onclick={() => drive(true, simulatorContainer!, iframe!)}
-    class={`mt-4 disabled:bg-gray-800 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded`}
+    class={`mt-4 disabled:bg-gray-800 disabled:dark:bg-black bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded`}
 >
     Run on Simulator
 </button>
 <button
     disabled={disableCodeEditing}
     onclick={() => drive(false, simulatorContainer!, iframe!)}
-    class={`mt-4 disabled:bg-gray-800 bg-blue-500 hover:bg-blue-700 text-white ml-3 py-2 px-4 rounded`}
+    class={`mt-4 disabled:bg-gray-800 disabled:dark:bg-black bg-blue-500 hover:bg-blue-700 text-white ml-3 py-2 px-4 rounded`}
 >
     Run on Sphero
 </button>

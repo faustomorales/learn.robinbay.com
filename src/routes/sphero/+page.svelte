@@ -56,7 +56,7 @@ var drive = async (sphero) => {
     </div>
 
     <div class="w-1/2 h-full max-h-screen print:hidden">
-      <Sphero />
+      <Sphero stateId="/sphero" />
     </div>
   </div>
 </div>
