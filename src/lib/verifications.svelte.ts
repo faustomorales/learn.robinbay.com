@@ -17,8 +17,6 @@ export let ensureVariableExists = <VariableType extends "string" | "number" | "f
     return target
 }
 
-export let ensureFunctionExists = (iframe: HTMLIFrameElement, name: string): Function => ensureVariableExists(name, "function", iframe)
-
 export const createStepChecker = (steps: Component<{ step: Step }>[]) => {
     let states: {
         component: any;

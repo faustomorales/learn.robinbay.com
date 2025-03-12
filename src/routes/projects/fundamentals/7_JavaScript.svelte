@@ -3,6 +3,7 @@
     import Step from "$lib/components/Step.svelte";
     import List from "$lib/components/List.svelte";
     import { fail } from "$lib/common";
+    import { ensureVariableExists } from "$lib/verifications.svelte";
     let { step = $bindable() }: { step: Step } = $props();
 </script>
 
@@ -11,17 +12,12 @@
     title="JavaScript: Functions"
     verifier={(iframe) => {
         let contentWindow = iframe.contentWindow as any;
-        var increaseRoomWidth = contentWindow.increaseRoomWidth;
+        let increaseRoomWidth = ensureVariableExists(
+            "increaseRoomWidth",
+            "function",
+            iframe,
+        );
         contentWindow.roomWidth = 50;
-        if (increaseRoomWidth === undefined) {
-            fail("increaseRoomWidth does not appear to be defined.");
-        }
-        let increaseRoomWidhType = typeof increaseRoomWidth;
-        if (typeof increaseRoomWidth !== "function") {
-            fail(
-                `increaseRoomWidth appears to be a ${increaseRoomWidhType} instead of a function.`,
-            );
-        }
         increaseRoomWidth();
         if (contentWindow.roomWidth !== 51) {
             fail(

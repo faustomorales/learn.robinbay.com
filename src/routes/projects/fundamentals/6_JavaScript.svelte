@@ -3,7 +3,7 @@
     import JSNumber from "$lib/drawings/javascript-variable-number.svg?raw";
     import Step from "$lib/components/Step.svelte";
     import List from "$lib/components/List.svelte";
-    import { fail } from "$lib/common";
+    import { ensureVariableExists } from "$lib/verifications.svelte";
     let { step = $bindable() }: { step: Step } = $props();
 </script>
 
@@ -11,27 +11,8 @@
     bind:this={step}
     title="JavaScript: Strings and Numbers"
     verifier={(iframe) => {
-        let contentWindow = iframe.contentWindow as any;
-        let roomColor = contentWindow.roomColor;
-        let roomWidth = contentWindow.roomWidth;
-        let roomWidthType = typeof roomWidth;
-        let roomColorType = typeof roomColor;
-        if (roomColor === undefined) {
-            fail("roomColor does not appear to be defined.");
-        }
-        if (roomWidth === undefined) {
-            fail("roomWidth does not appear to be defined.");
-        }
-        if (typeof roomColor !== "string") {
-            fail(
-                `roomColor appears to be a ${roomColorType} instead of a string.`,
-            );
-        }
-        if (roomWidthType !== "number") {
-            fail(
-                `roomWidth appears to be a ${roomWidthType} instead of a number.`,
-            );
-        }
+        ensureVariableExists("roomColor", "string", iframe);
+        ensureVariableExists("roomWidth", "number", iframe);
     }}
 >
     <p class="mb-4">
