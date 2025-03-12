@@ -88,7 +88,24 @@ export const stringToColor = (color: string) => {
     const computedColor = window.getComputedStyle(tempElement).backgroundColor;
     document.body.removeChild(tempElement);
     const match = computedColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-    return match ? { red: parseInt(match[1]), green: parseInt(match[2]), blue: parseInt(match[3]) } : null;
+    if (!match) {
+        throw new Error(`${color} is an invalid color. Please choose a valid CSS color.`)
+    }
+    return { red: parseInt(match[1]), green: parseInt(match[2]), blue: parseInt(match[3]) }
+}
+
+export const interpretColor = (red: number | string, green?: number, blue?: number) => {
+    let color: { red: number, green: number, blue: number } | null = null
+    if (typeof red === "string" && typeof green === "undefined" && typeof blue === "undefined") {
+        color = stringToColor(red)
+
+    } else if (typeof red === "number" && typeof green === "number" && typeof blue === "number") {
+        color = { red, green, blue }
+    }
+    if (color === null) {
+        throw new Error("Invalid color format. Please provide a CSS color string or three numbers.")
+    };
+    return color
 }
 
 

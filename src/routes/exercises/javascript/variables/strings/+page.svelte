@@ -78,12 +78,7 @@
             stateId="exercises/javscript/variables/strings"
             precheck={(iframe) => {
                 let color = ensureVariableExists("color", "string", iframe);
-                let converted = stringToColor(color);
-                if (!converted) {
-                    throw new Error(
-                        `${color} is an invalid color. Please choose a valid CSS color.`,
-                    );
-                }
+                stringToColor(color);
             }}
             prepend={{
                 js: `

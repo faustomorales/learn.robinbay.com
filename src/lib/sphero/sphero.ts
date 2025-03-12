@@ -1,4 +1,4 @@
-import { stringToColor, parse, create, receive, encodeSpeedAndHeading, toHex, aim, type PacketConfiguration, type Packet, type Drivable } from "./packets"
+import { parse, create, receive, encodeSpeedAndHeading, toHex, aim, type PacketConfiguration, type Packet, type Drivable, interpretColor } from "./packets"
 
 const services: { [key: string]: string } = {
     api: "00010001-574f-4f20-5370-6865726f2121",
@@ -149,16 +149,7 @@ export default class Sphero implements Drivable {
         }
     }
     public setColor = (red: number | string, green?: number, blue?: number) => {
-        let color: { red: number, green: number, blue: number } | null = null
-        if (typeof red === "string" && typeof green === "undefined" && typeof blue === "undefined") {
-            color = stringToColor(red)
-
-        } else if (typeof red === "number" && typeof green === "number" && typeof blue === "number") {
-            color = { red, green, blue }
-        }
-        if (color === null) {
-            throw new Error("Invalid color format. Please provide a string or three numbers.")
-        };
+        let color = interpretColor(red, green, blue)
         return this.writeToApi({
             data: [0x00, 0x0e, color.red, color.green, color.blue],
             command: "io:color",

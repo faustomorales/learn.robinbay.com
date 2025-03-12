@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OBB } from "three/addons/math/OBB.js";
 import type { Packet, Drivable, Command } from "./packets";
-import { create, aim, stringToColor } from "./packets"
+import { create, aim, interpretColor } from "./packets"
 
 const degreesToRadians = (degrees: number) => degrees * (Math.PI / 180);
 
@@ -204,17 +204,7 @@ export default class SpheroMiniSimulator implements Drivable {
         return Promise.resolve(createResponsePacket(this.sequence++, "power:sleep"))
     }
     public setColor = (red: number | string, green?: number, blue?: number) => {
-        let color: { red: number, green: number, blue: number } | null = null
-        if (typeof red === "string" && typeof green === "undefined" && typeof blue === "undefined") {
-            color = stringToColor(red)
-
-        } else if (typeof red === "number" && typeof green === "number" && typeof blue === "number") {
-            color = { red, green, blue }
-        }
-        if (color === null) {
-            throw new Error("Invalid color format. Please provide a CSS color string or three numbers.")
-        };
-        this.settings.color = color;
+        this.settings.color = interpretColor(red, green, blue);
         this.contents.mainLed.color.setRGB(this.settings.color.red / 255, this.settings.color.green / 255, this.settings.color.blue / 255);
         return Promise.resolve(createResponsePacket(this.sequence++, "io:color"))
     }
