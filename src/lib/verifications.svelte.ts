@@ -1,8 +1,48 @@
 import type { Component } from "svelte"
 import type Step from "$lib/components/Step.svelte"
 
-export let ensureVariableExists = <VariableType extends "string" | "number" | "function", ReturnType extends (VariableType extends "string" ? string : VariableType extends "number" ? number : VariableType extends "function" ? Function : never)>(
-    name: string, type: VariableType, iframe?: HTMLIFrameElement): ReturnType => {
+export let ensureVariableType = <VariableType extends "object" | "string" | "number" | "function" | "array<number>" | "array<string>",
+    ReturnType extends (
+        VariableType extends "object" ? object :
+        VariableType extends "string" ? string :
+        VariableType extends "number" ? number :
+        VariableType extends "function" ? Function :
+        VariableType extends "array<number>" ? Array<number> :
+        VariableType extends "array<string>" ? Array<string> : never
+    )>(name: string, target: any, type: VariableType): ReturnType => {
+    if (type.startsWith("array")) {
+        if (!Array.isArray(target)) {
+            throw `The ${name} variable was found but it is not an array.`
+        }
+        let arrayType = type.slice(6, -1) as "string" | "number"
+        let targetType = [... new Set(target.map((element: any) => typeof element))]
+        if (targetType.length !== 1) {
+            throw new Error(`The ${name} variable was found but, instead of containing only ${arrayType}, it contains a mix of ${targetType.join(", ")}.`)
+        } else if (targetType[0] !== arrayType) {
+            throw new Error(`The ${name} variable was found but, instead of containing only ${arrayType}, it contains ${targetType[0]}.`)
+        }
+        return target as ReturnType
+    }
+    else {
+        let targetType = typeof target;
+        if (targetType !== type) {
+            throw `The ${name} variable was found but it is a ${targetType} instead of a ${type}.`
+        }
+    }
+    return target
+}
+
+export let ensureVariableExists = <
+    VariableType extends "object" | "string" | "number" | "function" | "array<number>" | "array<string>",
+    ReturnType extends (
+        VariableType extends "object" ? object :
+        VariableType extends "string" ? string :
+        VariableType extends "number" ? number :
+        VariableType extends "function" ? Function :
+        VariableType extends "array<number>" ? Array<number> :
+        VariableType extends "array<string>" ? Array<string> : never
+    )>(
+        name: string, type: VariableType, iframe?: HTMLIFrameElement): ReturnType => {
     if (!iframe) {
         throw new Error("Inline frame not found, cannot conduct check.")
     }
@@ -10,11 +50,7 @@ export let ensureVariableExists = <VariableType extends "string" | "number" | "f
     if (!target) {
         throw `The ${name} variable is missing.`
     }
-    let targetType = typeof target;
-    if (targetType !== type) {
-        throw `The ${name} variable was found but it is a ${targetType} instead of a ${type}.`
-    }
-    return target
+    return ensureVariableType(name, target, type)
 }
 
 export const createStepChecker = (steps: Component<{ step: Step }>[]) => {

@@ -1,0 +1,67 @@
+<script lang="ts">
+    import type { Snippet } from "svelte";
+    import Sphero from "./Sphero.svelte";
+    import Table from "./Table.svelte";
+    import type { PrependedCode } from "$lib/common";
+
+    let {
+        title,
+        heading,
+        explanation,
+        example,
+        task,
+        hints,
+        precheck,
+        prepend,
+        stateId,
+    }: {
+        title: string;
+        stateId: string;
+        heading: string;
+        prepend: PrependedCode;
+        explanation: Snippet;
+        example: Snippet;
+        task: Snippet;
+        precheck: (iframe: HTMLIFrameElement) => void;
+        hints: { mistake: string; hint: string }[];
+    } = $props();
+</script>
+
+<svelte:head>
+    <title>{title}</title>
+</svelte:head>
+
+<div class="max-w-2xl mx-auto p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold mb-2">
+            {heading}
+        </h1>
+        {@render explanation()}
+        <h2 class="text-xl font-bold mb-2 mt-3">Example</h2>
+        {@render example()}
+        <h2 class="text-xl font-bold mb-2 mt-3">Your Task</h2>
+        {@render task()}
+        <Sphero {stateId} {precheck} {prepend} />
+        <details>
+            <summary
+                class="text-md font-bold text-gray-800 dark:text-gray-300 mb-2 mt-2"
+            >
+                Help! Something went wrong.
+            </summary>
+            <p>
+                If you're having trouble with this exercise, here are some
+                common mistakes and hints to help you out:
+            </p>
+            <Table
+                meta={[
+                    { key: "mistake", heading: "Mistake" },
+                    { key: "hint", heading: "Hint" },
+                ]}
+                data={hints}
+            />
+        </details>
+    </div>
+</div>
+
+<style>
+</style>

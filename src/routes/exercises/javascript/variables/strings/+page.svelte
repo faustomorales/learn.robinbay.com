@@ -1,20 +1,52 @@
 <script lang="ts">
-    import Sphero from "$lib/components/Sphero.svelte";
+    import SpheroExercise from "$lib/components/SpheroExercise.svelte";
     import CodeText from "$lib/components/CodeText.svelte";
     import AnnotatedCode from "$lib/components/AnnotatedCode.svelte";
     import { ensureVariableExists } from "$lib/verifications.svelte";
     import { stringToColor } from "$lib/sphero/packets";
-    import Table from "$lib/components/Table.svelte";
     import Link from "$lib/components/Link.svelte";
 </script>
 
-<svelte:head>
-    <title>Javascript :: Variables :: Strings</title>
-</svelte:head>
-
-<div class="max-w-2xl mx-auto p-6">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <h1 class="text-2xl font-bold mb-2">What Are Variables?</h1>
+<SpheroExercise
+    stateId="exercises/javscript/variables/strings"
+    precheck={(iframe) => {
+        let color = ensureVariableExists("color", "string", iframe);
+        stringToColor(color);
+    }}
+    heading="What Are Variables?"
+    title="JavaScript :: Variables :: Strings"
+    prepend={{
+        js: `
+var drive = async (sphero) => {
+    await sphero.wake();
+    await sphero.delay(500);
+    await sphero.setColor(color);
+    await sphero.delay(1000);
+}
+`,
+    }}
+    hints={[
+        {
+            mistake:
+                "Using the the wrong keyword to declare the variable (e.g., let or const)",
+            hint: `In this exercise, you should use the var keyword to declare the variable so that the automated checker will work.`,
+        },
+        {
+            mistake: `Forgetting to use quotes around the color name (e.g., ar color = green;)`,
+            hint: `Remember, color names are words (strings), so they need to be inside quotes: "green".`,
+        },
+        {
+            mistake:
+                "Making a minor typo (e.g., bar instead of var or collor instead of color).",
+            hint: "Check your spelling and make sure you use the correct variable name.",
+        },
+        {
+            mistake: `Using an unsupported color name (e.g., let color = "rainbow";)`,
+            hint: `Only certain colors work. Try a common color like "blue", "red", or "yellow".`,
+        },
+    ]}
+>
+    {#snippet explanation()}
         <p class="mb-2">
             In programming, a variable is like a container that holds
             information. You can name the container and store something inside
@@ -26,7 +58,8 @@
             it, stick it somewhere, and look at it when you need to remember
             what you wrote.
         </p>
-        <h2 class="text-xl font-bold mb-2 mt-3">Example</h2>
+    {/snippet}
+    {#snippet example()}
         <p class="mb-2">
             Here is an example of a variable in JavaScript. This code creates a
             variable called message and stores the word "Hello!" inside it.
@@ -64,7 +97,8 @@
             language="javascript"
             class="mb-2"
         />
-        <h2 class="text-xl font-bold mb-2 mt-3">Your Task</h2>
+    {/snippet}
+    {#snippet task()}
         <p class="mb-2">
             Create a variable called <CodeText>color</CodeText> and set it to the
             color you want the ball to turn. You can choose a color by writing its
@@ -74,62 +108,5 @@
                 >this page</Link
             > for a list of colors to choose from.
         </p>
-        <Sphero
-            stateId="exercises/javscript/variables/strings"
-            precheck={(iframe) => {
-                let color = ensureVariableExists("color", "string", iframe);
-                stringToColor(color);
-            }}
-            prepend={{
-                js: `
-var drive = async (sphero) => {
-    await sphero.wake();
-    await sphero.delay(500);
-    await sphero.setColor(color);
-    await sphero.delay(1000);
-}
-`,
-            }}
-        />
-        <details>
-            <summary
-                class="text-md font-bold text-gray-800 dark:text-gray-300 mb-2 mt-2"
-            >
-                Help! Something went wrong.
-            </summary>
-            <p>
-                If you're having trouble with this exercise, here are some
-                common mistakes and hints to help you out:
-            </p>
-            <Table
-                meta={[
-                    { key: "mistake", heading: "Mistake" },
-                    { key: "hint", heading: "Hint" },
-                ]}
-                data={[
-                    {
-                        mistake:
-                            "Using the the wrong keyword to declare the variable (e.g., let or const)",
-                        hint: `In this exercise, you should use the var keyword to declare the variable so that the automated checker will work.`,
-                    },
-                    {
-                        mistake: `Forgetting to use quotes around the color name (e.g., ar color = green;)`,
-                        hint: `Remember, color names are words (strings), so they need to be inside quotes: "green".`,
-                    },
-                    {
-                        mistake:
-                            "Making a minor typo (e.g., bar instead of var or collor instead of color).",
-                        hint: "Check your spelling and make sure you use the correct variable name.",
-                    },
-                    {
-                        mistake: `Using an unsupported color name (e.g., let color = "rainbow";)`,
-                        hint: `Only certain colors work. Try a common color like "blue", "red", or "yellow".`,
-                    },
-                ]}
-            />
-        </details>
-    </div>
-</div>
-
-<style>
-</style>
+    {/snippet}
+</SpheroExercise>
