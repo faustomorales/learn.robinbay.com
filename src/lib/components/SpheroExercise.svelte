@@ -1,5 +1,6 @@
 <script lang="ts">
-    import type { Snippet } from "svelte";
+    import { page } from "$app/state";
+    import { type Snippet } from "svelte";
     import Sphero from "./Sphero.svelte";
     import Table from "./Table.svelte";
     import type { PrependedCode } from "$lib/common";
@@ -44,7 +45,7 @@
         <Sphero {stateId} {precheck} {prepend} />
         <details>
             <summary
-                class="text-md font-bold text-gray-800 dark:text-gray-300 mb-2 mt-2"
+                class="text-md font-bold text-gray-800 dark:text-gray-300 mb-2 mt-2 cursor-pointer"
             >
                 Help! Something went wrong.
             </summary>
@@ -60,6 +61,13 @@
                 data={hints}
             />
         </details>
+    </div>
+    <div class="pt-2 text-right text-xs">
+        <a
+            href={`https://github.com/faustomorales/learn.robinbay.com/blob/main/src/routes${page.route.id}/%2Bpage.svelte`}
+            class="text-gray-500 hover:underline"
+            target="_blank">View Source</a
+        >
     </div>
 </div>
 
