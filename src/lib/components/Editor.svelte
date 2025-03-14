@@ -67,11 +67,29 @@
 			mediaQuery.removeEventListener("change", listener);
 		};
 	});
-
-	const createTooltips = (tips: Tooltip[]) => {
+	const createTooltips = (code: string, tips: Tooltip[]) => {
+		let lineStartIndexes = code.split("\n").reduce(
+			(acc, line) => {
+				acc.push(acc[acc.length - 1] + line.length + 1);
+				return acc;
+			},
+			[0],
+		);
+		let normalized = tips.map((t) => {
+			let line = t.line ? t.line - 1 : 0;
+			let lineStart = lineStartIndexes[line];
+			let lineEnd = t.line
+				? lineStartIndexes[line + 1] || code.length
+				: code.length;
+			return {
+				from: lineStart + (t.from || 0),
+				to: t.to ? lineStart + t.to : lineEnd,
+				text: t.text,
+			};
+		});
 		return [
 			hoverTooltip((view, pos, side) => {
-				let matching = tips.find(
+				let matching = normalized.find(
 					({ from, to }) => pos >= from && pos <= to,
 				);
 				if (!matching) return null;
@@ -92,7 +110,7 @@
 					marks: DecorationSet;
 					constructor(view: EditorView) {
 						this.marks = RangeSet.of(
-							tips.map(({ from, to }) =>
+							normalized.map(({ from, to }) =>
 								Decoration.mark({
 									inclusive: true,
 									inclusiveStart: true,
@@ -214,7 +232,10 @@
 							{theme}
 							lang={html({})}
 							extensions={[
-								...createTooltips(tooltips.html || []),
+								...createTooltips(
+									components.html,
+									tooltips.html || [],
+								),
 							]}
 						/>
 					</div>
@@ -231,7 +252,12 @@
 							bind:value={components.css}
 							lang={css()}
 							{theme}
-							extensions={[...createTooltips(tooltips.css || [])]}
+							extensions={[
+								...createTooltips(
+									components.css,
+									tooltips.css || [],
+								),
+							]}
 						/>
 					</div>
 				</TabItem>
@@ -247,7 +273,12 @@
 							bind:value={components.js}
 							lang={javascript()}
 							{theme}
-							extensions={[...createTooltips(tooltips.js || [])]}
+							extensions={[
+								...createTooltips(
+									components.js,
+									tooltips.js || [],
+								),
+							]}
 						/>
 					</div>
 					{#if javascriptError}

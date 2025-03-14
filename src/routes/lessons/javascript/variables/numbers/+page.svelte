@@ -6,8 +6,8 @@
 </script>
 
 <SpheroExercise
-    title="Javascript :: Variables :: Numbers"
-    heading="How do we use numbers in JavaScript?"
+    title="Blink Twice If You're A Robot"
+    subtitle="Lesson 2: Numbers"
     hints={[
         {
             mistake:

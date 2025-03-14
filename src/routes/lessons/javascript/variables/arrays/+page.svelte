@@ -8,8 +8,8 @@
 </script>
 
 <SpheroExercise
-    title="Javascript :: Variables :: Numbers"
-    heading="How do we use numbers in JavaScript?"
+    title="Robots Love Rainbows"
+    subtitle="Lesson 3: Arrays"
     hints={[
         {
             mistake: "Using parentheses instead of square brackets",
@@ -25,13 +25,9 @@
             hint: 'Each color is a string, so it must be inside quotation marks. Example: <span class="font-mono">var colors = ["red", "green", "blue"];</span>',
         },
         {
-            mistake: "Accidentally adding a comma after the last item",
-            hint: 'There should be no extra comma after the last value in an array. Example: <span class="font-mono">var colors = ["red", "green", "blue"];</span>',
-        },
-        {
             mistake:
                 'Misspelling or using the wrong case for the variable name or for <span class="font-mono">var</span>',
-            hint: 'JavaScript is case-sensitive, so the casing (and spelling) must be exactly correct. For example: <span class="font-mono">var colors = ["red", "green", "blue"];</span>',
+            hint: "JavaScript is case-sensitive, so the casing (and spelling) must be exactly correct.",
         },
     ]}
     prepend={{
@@ -65,41 +61,33 @@ await sphero.delay(1000);
             useful when we need to keep track of many things at once, like a
             list of names, numbers, or colors.
         </p>
-
-        <p class="mb-2">
-            In the last exercise, you learned how to create a variable that
-            holds a single piece of information, like this:
-        </p>
-
-        <AnnotatedCode code={`var color = "blue";`} language="javascript" />
-
-        <p class="mb-2">
-            But what if we want our robot ball to change colors multiple times?
-            Instead of creating a separate variable for each color, we can use
-            an array to store them all in one place!
-        </p>
     {/snippet}
 
     {#snippet example()}
-        Here’s how an array looks in JavaScript:
+        Here’s an example of an array in JavaScript. This code contains a series
+        of strings that could refer to people's names.
 
         <AnnotatedCode
-            code={`var colors = ["red", "green", "blue"];`}
+            code={`var names = ["Alice", "Bob", "Sally"];`}
             language="javascript"
         />
 
-        This array contains three colors. Each color is written inside
+        This array contains three names. Each color is written inside
         <span class="font-bold">quotation marks</span>
-        (since they are strings), and they are separated by
+        (since they are strings, just as you learned in Lesson 1), and they are separated
+        by
         <span class="font-bold">commas</span>
-        inside <span class="font-bold">square brackets</span>.
+        inside <span class="font-bold">square brackets</span>. All arrays use
+        this structure, no matter what type of data they store.
     {/snippet}
 
     {#snippet task()}
         <p class="mb-2">
-            Write JavaScript code to create an array named <CodeText
-                >colors</CodeText
-            > that contains at least three different colors of your choice. See
+            In Lesson 1, we made the ball light up with one color. In this
+            lesson, you can provide an <CodeText>array</CodeText> of colors through
+            which the ball will cycle. Write JavaScript code to create an array named
+            <CodeText>colors</CodeText> that contains at least three different colors
+            of your choice. See
             <Link
                 href="https://developer.mozilla.org/en-US/docs/Web/CSS/named-color"
                 >this page</Link

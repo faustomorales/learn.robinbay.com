@@ -6,8 +6,8 @@
     import type { PrependedCode } from "$lib/common";
 
     let {
+        subtitle,
         title,
-        heading,
         explanation,
         example,
         task,
@@ -16,9 +16,9 @@
         prepend,
         stateId,
     }: {
-        title: string;
+        subtitle: string;
         stateId: string;
-        heading: string;
+        title: string;
         prepend: PrependedCode;
         explanation: Snippet;
         example: Snippet;
@@ -29,14 +29,17 @@
 </script>
 
 <svelte:head>
-    <title>{title}</title>
+    <title>{subtitle}</title>
 </svelte:head>
 
 <div class="max-w-2xl mx-auto p-6">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <h1 class="text-2xl font-bold mb-2">
-            {heading}
-        </h1>
+        <header class="mb-2">
+            <h1 class="text-2xl font-bold">
+                {title}
+            </h1>
+            <p class="text-sm text-gray-500">{subtitle}</p>
+        </header>
         {@render explanation()}
         <h2 class="text-xl font-bold mb-2 mt-3">Example</h2>
         {@render example()}
@@ -47,7 +50,7 @@
             <summary
                 class="text-md font-bold text-gray-800 dark:text-gray-300 mb-2 mt-2 cursor-pointer"
             >
-                Help! Something went wrong.
+                Hints
             </summary>
             <p>
                 If you're having trouble with this exercise, here are some
@@ -66,7 +69,7 @@
         <a
             href={`https://github.com/faustomorales/learn.robinbay.com/blob/main/src/routes${page.route.id}/%2Bpage.svelte`}
             class="text-gray-500 hover:underline"
-            target="_blank">View Source</a
+            target="_blank">View Source Code</a
         >
     </div>
 </div>

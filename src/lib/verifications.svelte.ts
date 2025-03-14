@@ -1,20 +1,21 @@
 import type { Component } from "svelte"
 import type Step from "$lib/components/Step.svelte"
 
-export let ensureVariableType = <VariableType extends "object" | "string" | "number" | "function" | "array<number>" | "array<string>",
+export let ensureVariableType = <VariableType extends "object" | "string" | "number" | "function" | "array<number>" | "array<string>" | "array<object>",
     ReturnType extends (
         VariableType extends "object" ? object :
         VariableType extends "string" ? string :
         VariableType extends "number" ? number :
         VariableType extends "function" ? Function :
         VariableType extends "array<number>" ? Array<number> :
-        VariableType extends "array<string>" ? Array<string> : never
+        VariableType extends "array<string>" ? Array<string> :
+        VariableType extends "array<object>" ? Array<object> : never
     )>(name: string, target: any, type: VariableType): ReturnType => {
     if (type.startsWith("array")) {
         if (!Array.isArray(target)) {
             throw `The ${name} variable was found but it is not an array.`
         }
-        let arrayType = type.slice(6, -1) as "string" | "number"
+        let arrayType = type.slice(6, -1) as "string" | "number" | "object"
         let targetType = [... new Set(target.map((element: any) => typeof element))]
         if (targetType.length !== 1) {
             throw new Error(`The ${name} variable was found but, instead of containing only ${arrayType}, it contains a mix of ${targetType.join(", ")}.`)
@@ -25,22 +26,26 @@ export let ensureVariableType = <VariableType extends "object" | "string" | "num
     }
     else {
         let targetType = typeof target;
+        if (targetType === "undefined") {
+            throw new Error(`${name} is not defined.`)
+        }
         if (targetType !== type) {
-            throw `The ${name} variable was found but it is a ${targetType} instead of a ${type}.`
+            throw new Error(`${name} was found but it is a ${targetType} instead of a ${type}.`)
         }
     }
     return target
 }
 
 export let ensureVariableExists = <
-    VariableType extends "object" | "string" | "number" | "function" | "array<number>" | "array<string>",
+    VariableType extends "object" | "string" | "number" | "function" | "array<number>" | "array<string>" | "array<object>",
     ReturnType extends (
         VariableType extends "object" ? object :
         VariableType extends "string" ? string :
         VariableType extends "number" ? number :
         VariableType extends "function" ? Function :
         VariableType extends "array<number>" ? Array<number> :
-        VariableType extends "array<string>" ? Array<string> : never
+        VariableType extends "array<string>" ? Array<string> :
+        VariableType extends "array<object>" ? Array<object> : never
     )>(
         name: string, type: VariableType, iframe?: HTMLIFrameElement): ReturnType => {
     if (!iframe) {
