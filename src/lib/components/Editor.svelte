@@ -17,8 +17,11 @@
 		hoverTooltip,
 		Decoration,
 		type DecorationSet,
+		type ViewUpdate,
 		EditorView,
 		ViewPlugin,
+		WidgetType,
+		MatchDecorator,
 	} from "@codemirror/view";
 	import { RangeSet } from "@codemirror/state";
 
@@ -57,6 +60,51 @@
 	let theme: typeof githubDark | typeof githubLight | undefined =
 		$state(undefined);
 	let uid = $props.id();
+	class DropdownWidget extends WidgetType {
+		selected: string;
+		options: string[];
+
+		constructor(selected: string, options: string[]) {
+			super();
+			this.selected = selected;
+			this.options = options;
+		}
+
+		eq(other: DropdownWidget) {
+			return other.selected == this.selected;
+		}
+
+		updateDOM(dom: HTMLElement, view: EditorView): boolean {
+			return true;
+		}
+
+		toDOM() {
+			console.log("toDom executing");
+			// Create the select element
+			const select = document.createElement("select");
+			select.contentEditable = "true";
+
+			// Loop through the options array and create an option element for each value
+			this.options.forEach((optionText) => {
+				const option = document.createElement("option");
+				option.value = optionText;
+				option.textContent = optionText;
+
+				// If this option matches the selected value, mark it as selected
+				if (optionText === this.selected) {
+					option.selected = true;
+				}
+
+				// Append the option to the select element
+				select.appendChild(option);
+			});
+			return select;
+		}
+
+		ignoreEvent() {
+			return false;
+		}
+	}
 	onMount(() => {
 		const listener = ({ matches: isDark }: { matches: boolean }) =>
 			(theme = isDark ? githubDark : githubLight);
@@ -85,6 +133,7 @@
 				from: lineStart + (t.from || 0),
 				to: t.to ? lineStart + t.to : lineEnd,
 				text: t.text,
+				options: t.options,
 			};
 		});
 		return [
@@ -105,6 +154,39 @@
 					},
 				};
 			}),
+			ViewPlugin.fromClass(
+				class {
+					dropdowns: DecorationSet;
+					constructor(view: EditorView) {
+						this.dropdowns = RangeSet.of(
+							normalized
+								.filter((n) => n.options)
+								.map(({ from, to, options }) =>
+									Decoration.replace({
+										widget: new DropdownWidget(
+											options![0],
+											options!,
+										),
+
+									}).range(from, to),
+								),
+						);
+					}
+				},
+				{
+					decorations: (instance) => instance.dropdowns,
+					eventHandlers: {
+						onchange: (event) => console.log("change"),
+					},
+					provide: (plugin) =>
+						EditorView.atomicRanges.of((view) => {
+							return (
+								view.plugin(plugin)?.dropdowns ||
+								Decoration.none
+							);
+						}),
+				},
+			),
 			ViewPlugin.fromClass(
 				class {
 					marks: DecorationSet;

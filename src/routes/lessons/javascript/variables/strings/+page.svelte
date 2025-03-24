@@ -35,8 +35,7 @@ var drive = async (sphero) => {
             hint: `When the quotes are missing, JavaScript thinks you're trying to refer to a variable called <span class="font-mono">green</span> when you are actually just trying to set the value "green" as the contents of the variable <span class="font-mono">color</span>.`,
         },
         {
-            mistake:
-                `Making a minor typo (e.g., <span class="font-mono">bar</span> instead of <span class="font-mono">var</span> or <span class="font-mono">collor</span> instead of <span class="font-mono">color</span>).`,
+            mistake: `Making a minor typo (e.g., <span class="font-mono">bar</span> instead of <span class="font-mono">var</span> or <span class="font-mono">collor</span> instead of <span class="font-mono">color</span>).`,
             hint: "Check your spelling and make sure you use the correct variable name.",
         },
         {
@@ -68,26 +67,32 @@ var drive = async (sphero) => {
             code={`var message = "Hello!";`}
             tooltips={[
                 {
+                    line: 1,
                     from: 0,
                     to: 3,
                     text: `<span class="font-mono">var</span> tells JavaScript that you want to declare a variable.`,
+                    options: ["var", "bar", "let"],
                 },
                 {
+                    line: 1,
                     from: 4,
                     to: 11,
                     text: `Indicates that the variable will have the name <span class="font-mono">message</span>.`,
                 },
                 {
+                    line: 1,
                     from: 12,
                     to: 13,
                     text: `The = sign is the assignment operator. It assigns the value on the right to the variable on the left.`,
                 },
                 {
+                    line: 1,
                     from: 14,
                     to: 22,
                     text: `The value assigned to the variable. In this case, the word "Hello!" The quotes are important because they indicate the start and end of a string.`,
                 },
                 {
+                    line: 1,
                     from: 22,
                     to: 24,
                     text: `The semicolon is used to end a statement in JavaScript. It tells the computer that this is the end of the line of code.`,

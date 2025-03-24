@@ -85,26 +85,31 @@ await sphero.delay(1000);
             code={`var myNumber = 10;`}
             tooltips={[
                 {
+                    line: 1,
                     from: 0,
                     to: 3,
                     text: `<span class="font-mono">var</span> tells JavaScript that you want to declare a variable.`,
                 },
                 {
+                    line: 1,
                     from: 4,
                     to: 12,
                     text: `Indicates that the variable will have the name <span class="font-mono">myNumber</span>.`,
                 },
                 {
+                    line: 1,
                     from: 13,
                     to: 14,
                     text: `The = sign is the assignment operator. It assigns the value on the right to the variable on the left.`,
                 },
                 {
+                    line: 1,
                     from: 15,
                     to: 17,
                     text: `The value assigned to the variable. In this case, the word "Hello!" The quotes are important because they indicate the start and end of a string.`,
                 },
                 {
+                    line: 1,
                     from: 17,
                     to: 19,
                     text: `The semicolon is used to end a statement in JavaScript. It tells the computer that this is the end of the line of code.`,
