@@ -25,7 +25,7 @@ export interface Drivable {
     setColor: (r: number | string, g?: number, b?: number) => Promise<Packet>;
     rollTime: (speed: number, heading: number, time: number) => Promise<Packet>;
     getBatteryLevel: () => Promise<number>;
-    aim: (heading: number) => Promise<void>;
+    aim: (duration: number) => Promise<void>;
     setBackLed: (brightness: number) => Promise<Packet>;
     roll: (speed: number, heading: number) => Promise<Packet>;
     setStabilization: (enabled: boolean) => Promise<Packet>;
