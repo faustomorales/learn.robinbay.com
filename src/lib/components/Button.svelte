@@ -13,7 +13,7 @@
 </script>
 
 <button
-    class={`disabled:bg-gray-800 disabled:dark:bg-gray-800 bg-${color}-500 hover:bg-${color}-700 text-white rounded py-2 px-4`}
+    class={`disabled:bg-gray-600 disabled:dark:bg-gray-600 bg-${color}-500 hover:bg-${color}-700 text-white rounded py-2 px-4`}
     {onclick}
     {disabled}
 >

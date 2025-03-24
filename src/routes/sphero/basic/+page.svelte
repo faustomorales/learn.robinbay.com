@@ -67,7 +67,7 @@ var drive = async (sphero, movements) => {
             await ball.wake();
             await ball.delay(500);
             if (!simulate) {
-                ball.aim(3000);
+                await ball.aim(3000);
             }
             await ball.setColor(0, 255, 0);
             try {
@@ -147,7 +147,7 @@ var drive = async (sphero, movements) => {
                 <tbody>
                     {#each movements as row, index}
                         <tr class={index === active ? "bg-blue-100" : ""}>
-                            <td class="px-4 py-2 border-b">
+                            <td class="p-2 border-b">
                                 <input
                                     type="text"
                                     bind:value={row.direction}
@@ -155,7 +155,7 @@ var drive = async (sphero, movements) => {
                                     placeholder="Enter direction"
                                 />
                             </td>
-                            <td class="px-4 py-2 border-b">
+                            <td class="p-2 border-b">
                                 <input
                                     type="text"
                                     bind:value={row.speed}
@@ -163,7 +163,7 @@ var drive = async (sphero, movements) => {
                                     placeholder="Enter speed"
                                 />
                             </td>
-                            <td class="px-4 py-2 border-b">
+                            <td class="p-2 border-b">
                                 <input
                                     type="text"
                                     bind:value={row.duration}
@@ -171,7 +171,7 @@ var drive = async (sphero, movements) => {
                                     placeholder="Enter duration"
                                 />
                             </td>
-                            <td class="px-4 py-2 border-b">
+                            <td class="p-2 border-b">
                                 <Button
                                     text="Delete"
                                     color="red"
