@@ -5,6 +5,7 @@
     import Sphero from "$lib/sphero/sphero";
     import SpheroMiniSimulator from "$lib/sphero/simulator";
     import { browser } from "$app/environment";
+    import AnnotatedCode from "$lib/components/AnnotatedCode.svelte";
 
     let simulatorContainer: HTMLDivElement | undefined = $state(undefined);
 
@@ -13,31 +14,48 @@
     let sphero: Sphero = $state(new Sphero());
     let ball: Drivable | undefined = $state(undefined);
     let stateId = "sphero/basic";
-    let rows: { speed: string; direction: string; duration: string }[] = $state(
-        browser &&
-            JSON.parse(
-                localStorage.getItem(stateId) ||
-                    JSON.stringify([
-                        { speed: "", duration: "", direction: "" }, // Initial blank row
-                    ]),
-            ),
-    );
-    $effect(() => localStorage.setItem(stateId, JSON.stringify(rows)));
+    let movements: { speed: string; direction: string; duration: string }[] =
+        $state(
+            browser &&
+                JSON.parse(
+                    localStorage.getItem(stateId) ||
+                        JSON.stringify([
+                            { speed: "", duration: "", direction: "" }, // Initial blank row
+                        ]),
+                ),
+        );
+    $effect(() => localStorage.setItem(stateId, JSON.stringify(movements)));
     const isNumerical = (value: string) => !isNaN(parseInt(value));
     let valid = $derived(
-        rows.length > 0 &&
-            rows.every(
-                (row) =>
-                    isNumerical(row.speed) &&
-                    isNumerical(row.duration) &&
-                    isNumerical(row.direction),
+        movements.length > 0 &&
+            movements.every(
+                (movement) =>
+                    isNumerical(movement.speed) &&
+                    isNumerical(movement.duration) &&
+                    isNumerical(movement.direction),
             ),
     );
 
-    // Function to add a new row
-    const addRow = () => {
-        rows = [...rows, { speed: "", duration: "", direction: "" }];
+    // Function to add a new movement
+    const addMovement = () => {
+        movements = [...movements, { speed: "", duration: "", direction: "" }];
     };
+    const code = `
+var drive = async (sphero, movements) => {
+    await sphero.wake();
+    await sphero.delay(500);
+    await sphero.setColor(0, 255, 0);
+    for (const movement of movements) {
+        await sphero.roll(
+            parseInt(movement.speed),
+            parseInt(movement.direction),
+        );
+        await sphero.delay(parseInt(movement.duration));
+    }
+    await sphero.roll(0, parseInt(movements[movements.length - 1].direction));
+    await sphero.setColor(255, 0, 0);
+}
+`.trim();
     const drive = async (simulate: boolean) => {
         error = "";
         try {
@@ -52,17 +70,20 @@
             }
             await ball.setColor(0, 255, 0);
             try {
-                for (const row of rows) {
+                for (const movement of movements) {
                     await ball!.roll(
-                        parseInt(row.speed),
-                        parseInt(row.direction),
+                        parseInt(movement.speed),
+                        parseInt(movement.direction),
                     );
-                    await ball!.delay(parseInt(row.duration));
+                    await ball!.delay(parseInt(movement.duration));
                 }
             } catch (e) {
                 error = `${e}`;
             }
-            await ball.roll(0, parseInt(rows[rows.length - 1].direction));
+            await ball.roll(
+                0,
+                parseInt(movements[movements.length - 1].direction),
+            );
             await ball.setColor(255, 0, 0);
             await ball.delay(500);
             await ball.sleep();
@@ -76,8 +97,8 @@
     const buttons = $derived([
         {
             text: "Add Movement",
-            onclick: addRow,
-            disabled: !valid && rows.length >= 1,
+            onclick: addMovement,
+            disabled: !valid && movements.length >= 1,
         },
         {
             text: "Run on Simulator",
@@ -100,64 +121,78 @@
 
 <div class="container mx-auto my-4 p-4">
     <h2 class="text-4xl font-bold">Sphero Playground</h2>
-    <p class="mt-2">
-        This application allows you to control a Sphero Mini by providing a list
-        of movements defined by their speed, direction, and duration.
-    </p>
-    <table
-        class="table-auto text-left table-auto font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900"
-    >
-        <thead>
-            <tr>
-                {#each ["Speed", "Duration", "Direction", ""] as direction}
-                    <th
-                        class="p-2 border-b border-blue-gray-100 bg-blue-gray-50"
-                        >{direction}</th
-                    >
-                {/each}
-            </tr>
-        </thead>
-        <tbody>
-            {#each rows as row, index}
-                <tr>
-                    <td class="px-4 py-2 border-b">
-                        <input
-                            type="text"
-                            bind:value={row.speed}
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter speed"
-                        />
-                    </td>
-                    <td class="px-4 py-2 border-b">
-                        <input
-                            type="text"
-                            bind:value={row.duration}
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter duration"
-                        />
-                    </td>
-                    <td class="px-4 py-2 border-b">
-                        <input
-                            type="text"
-                            bind:value={row.direction}
-                            class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter direction"
-                        />
-                    </td>
-                    <td class="px-4 py-2 border-b">
-                        <Button
-                            text="Delete"
-                            color="red"
-                            onclick={() =>
-                                (rows = rows
-                                    .slice(0, index)
-                                    .concat(rows.slice(index + 1)))}
-                        />
-                    </td>
-                </tr>
-            {/each}
-        </tbody>
-    </table>
+    <div class="flex gap-4 mt-4">
+        <div class="w-1/2">
+            <p>
+                This application allows you to control a Sphero Mini by
+                providing a list of movements defined by their direction, speed,
+                and duration.
+            </p>
+            <table
+                class="table-auto text-left table-auto font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900"
+            >
+                <thead>
+                    <tr>
+                        {#each ["Direction", "Speed", "Duration", ""] as direction}
+                            <th
+                                class="p-2 border-b border-blue-gray-100 bg-blue-gray-50"
+                                >{direction}</th
+                            >
+                        {/each}
+                    </tr>
+                </thead>
+                <tbody>
+                    {#each movements as row, index}
+                        <tr>
+                            <td class="px-4 py-2 border-b">
+                                <input
+                                    type="text"
+                                    bind:value={row.direction}
+                                    class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Enter direction"
+                                />
+                            </td>
+                            <td class="px-4 py-2 border-b">
+                                <input
+                                    type="text"
+                                    bind:value={row.speed}
+                                    class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Enter speed"
+                                />
+                            </td>
+                            <td class="px-4 py-2 border-b">
+                                <input
+                                    type="text"
+                                    bind:value={row.duration}
+                                    class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Enter duration"
+                                />
+                            </td>
+                            <td class="px-4 py-2 border-b">
+                                <Button
+                                    text="Delete"
+                                    color="red"
+                                    onclick={() =>
+                                        (movements = movements
+                                            .slice(0, index)
+                                            .concat(
+                                                movements.slice(index + 1),
+                                            ))}
+                                />
+                            </td>
+                        </tr>
+                    {/each}
+                </tbody>
+            </table>
+        </div>
+        <div class="w-1/2">
+            <p class="mb-4">
+                The movements in the table are executed using the following
+                code.
+            </p>
+            <AnnotatedCode language="javascript" {code}></AnnotatedCode>
+        </div>
+    </div>
     <div class="flex gap-2 mt-4">
         {#each buttons as { text, onclick, disabled }}
             <Button {text} {onclick} {disabled}></Button>
