@@ -25,6 +25,7 @@
                 ),
         );
     $effect(() => localStorage.setItem(stateId, JSON.stringify(movements)));
+    let active: null | number = $state(null);
     const isNumerical = (value: string) => !isNaN(parseInt(value));
     let valid = $derived(
         movements.length > 0 &&
@@ -70,7 +71,8 @@ var drive = async (sphero, movements) => {
             }
             await ball.setColor(0, 255, 0);
             try {
-                for (const movement of movements) {
+                for (const [index, movement] of movements.entries()) {
+                    active = index;
                     await ball!.roll(
                         parseInt(movement.speed),
                         parseInt(movement.direction),
@@ -80,6 +82,7 @@ var drive = async (sphero, movements) => {
             } catch (e) {
                 error = `${e}`;
             }
+            active = null;
             await ball.roll(
                 0,
                 parseInt(movements[movements.length - 1].direction),
@@ -143,7 +146,7 @@ var drive = async (sphero, movements) => {
                 </thead>
                 <tbody>
                     {#each movements as row, index}
-                        <tr>
+                        <tr class={index === active ? "bg-blue-100" : ""}>
                             <td class="px-4 py-2 border-b">
                                 <input
                                     type="text"
