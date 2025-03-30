@@ -27,6 +27,19 @@ const createResponsePacket = (sequence: number, command: Command) => create(
     { command, response: true, flags: ["isResponse", "resetsInactivityTimeout"], }
 )
 
+const renderPlatformUsingCoordinates = (p: { x1: number, y1: number, x2: number, y2: number, color?: number }) => {
+    let dx = p.x2 - p.x1;
+    let dy = p.y2 - p.y1;
+    let platform = new THREE.Mesh(
+        new THREE.PlaneGeometry(dx, dy),
+        new THREE.MeshToonMaterial({ color: p.color || 0xff0000 })
+    )
+    platform.position.z = 0.05;
+    platform.position.x = (p.x1 + dx / 2);
+    platform.position.y = (p.y1 + dy / 2);
+    return platform
+}
+
 export default class SpheroMiniSimulator implements Drivable {
     private time: number;
     private settings: {
@@ -127,17 +140,10 @@ export default class SpheroMiniSimulator implements Drivable {
             this.contents.scene.add(wall);
         });
         platforms.forEach((p) => {
-            let dx = p.x2 - p.x1;
-            let dy = p.y2 - p.y1;
-            let platform = new THREE.Mesh(
-                new THREE.PlaneGeometry(dx * PPI, dy * PPI),
-                new THREE.MeshToonMaterial({ color: p.color || 0xff0000 })
-            )
-            platform.position.z = 0.05;
-            platform.position.x = PPI * (p.x1 + dx / 2);
-            platform.position.y = PPI * (p.y1 + dy / 2);
+            let scaled = { x1: p.x1 * PPI, y1: p.y1 * PPI, x2: p.x2 * PPI, y2: p.y2 * PPI, color: p.color }
+            let platform = renderPlatformUsingCoordinates(scaled)
             this.contents.scene.add(platform);
-            this.contents.platforms.push({ mesh: platform, coordinates: { x1: p.x1 * PPI, y1: p.y1 * PPI, x2: p.x2 * PPI, y2: p.y2 * PPI } });
+            this.contents.platforms.push({ mesh: platform, coordinates: scaled });
         })
         this.settings = {
             heading: {
@@ -167,6 +173,16 @@ export default class SpheroMiniSimulator implements Drivable {
             .clone()
             .multiplyScalar(deltaAngleRadians * CONSTANTS.radius);
         this.contents.ball.position.add(deltaPosition);
+        let paint = 5;
+        this.contents.scene.add(
+            renderPlatformUsingCoordinates({
+                x1: this.contents.ball.position.x - paint,
+                y1: this.contents.ball.position.y - paint,
+                x2: this.contents.ball.position.x + paint,
+                y2: this.contents.ball.position.y + paint,
+                color: 0x005500,
+            }
+        ))
 
         // Update target position based on the object's position
         this.contents.camera.position.lerp(this.contents.camera.position.clone().add(deltaPosition), 0.90);
