@@ -33,6 +33,8 @@ export default class Sphero implements Drivable {
         characteristic: BluetoothRemoteGATTCharacteristic;
         buffer: number[]
     } };
+    private currentRollMessage?: { speed: number, heading: number }
+    private rollLoopId?: Parameters<typeof clearInterval>[0]
     private acknowledgements: { [key: number]: (packet: Packet) => void } = {}
     constructor() {
         this.seq = 0
@@ -111,14 +113,20 @@ export default class Sphero implements Drivable {
             resolve(ack)
         }, reject)
     })
-    public writeToApiRaw = (buffer: number[], timeout: number = 1000) => this.writePacketToApi(parse(buffer), timeout = timeout)
-    private async requestDevice(bluetooth: Bluetooth) {
-        this.log("Requesting device.")
-        this.device = await bluetooth.requestDevice({
-            filters: [{ services: [services.api] }],
-            optionalServices: [services.battery, services.dfu],
-        })
+    private initializeRollLoop = () => {
+        this.rollLoopId = setInterval(() => {
+            if (this.currentRollMessage) {
+                this.writeToApi({
+                    data: encodeSpeedAndHeading(
+                        this.currentRollMessage.speed,
+                        this.currentRollMessage.heading
+                    ),
+                    command: "driving:driveWithHeading",
+                })
+            }
+        }, 1000)
     }
+    public writeToApiRaw = (buffer: number[], timeout: number = 1000) => this.writePacketToApi(parse(buffer), timeout = timeout)
     public async connect(bluetooth: Bluetooth) {
         if (!bluetooth) {
             throw new Error("Your browser does not support Web Bluetooth.");
@@ -139,6 +147,7 @@ export default class Sphero implements Drivable {
             })
             await this.setup({ target: this.device })
         }
+        this.initializeRollLoop();
         await this.authenticate()
         this.device.addEventListener("gattserverdisconnected", this.setup as any)
     }
@@ -146,6 +155,9 @@ export default class Sphero implements Drivable {
         if (this.device) {
             this.device.removeEventListener("gattserverdisconnected", this.setup as any)
             await this.device.gatt!.disconnect()
+        }
+        if (this.rollLoopId) {
+            clearInterval(this.rollLoopId)
         }
     }
     public setColor = (red: number | string, green?: number, blue?: number) => {
@@ -164,10 +176,14 @@ export default class Sphero implements Drivable {
     })
     public sleep = () => this.writeToApi({ data: [], command: "power:sleep" })
     public resetAim = () => this.writeToApi({ data: [], command: "driving:resetAim" })
-    public roll = (speed: number, heading: number) => this.writeToApi({
+    private rollOnce = ({ speed, heading }: { speed: number, heading: number }) => this.writeToApi({
         data: encodeSpeedAndHeading(speed, heading),
-        command: "driving:driveWithHeading",
+        command: "driving:driveWithHeading"
     })
+    public roll = (speed: number, heading: number) => {
+        this.currentRollMessage = { speed, heading }
+        return this.rollOnce(this.currentRollMessage)
+    }
     public setStabilization = (enable: boolean) => this.writeToApi({ data: [enable === true ? 1 : 0], command: "driving:setStabilization" })
     public rollTime = (speed: number, heading: number, time: number) =>
         new Promise<Packet>((resolve, reject) => this.roll(speed, heading).then(() =>
