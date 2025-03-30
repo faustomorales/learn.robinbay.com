@@ -73,6 +73,10 @@ var drive = async (sphero, movements) => {
             try {
                 for (const [index, movement] of movements.entries()) {
                     active = index;
+                    if (!ball) {
+                        active = null;
+                        return;
+                    }
                     await ball!.roll(
                         parseInt(movement.speed),
                         parseInt(movement.direction),
@@ -97,23 +101,43 @@ var drive = async (sphero, movements) => {
 
         ball = undefined;
     };
-    const buttons = $derived([
+    const buttons: {
+        text: string;
+        onclick: () => void;
+        disabled: boolean;
+        visible: boolean;
+        color?: "red" | "blue";
+    }[] = $derived([
         {
             text: "Add Movement",
             onclick: addMovement,
             disabled: !valid && movements.length >= 1,
+            visible: !ball,
         },
         {
             text: "Run on Simulator",
-            simulator: true,
             onclick: () => drive(true),
             disabled: !valid,
+            visible: !ball,
         },
         {
             text: "Run on Sphero",
-            simulator: false,
             onclick: () => drive(false),
             disabled: !valid,
+            visible: !ball,
+        },
+        {
+            text: "Stop Program",
+            onclick: () => {
+                ball?.roll(0, 0);
+                ball?.delay(500);
+                ball?.disconnect();
+                active = null;
+                ball = undefined;
+            },
+            color: "red",
+            visible: ball !== undefined,
+            disabled: false,
         },
     ]);
 </script>
@@ -197,8 +221,10 @@ var drive = async (sphero, movements) => {
         </div>
     </div>
     <div class="flex gap-2 mt-4">
-        {#each buttons as { text, onclick, disabled }}
-            <Button {text} {onclick} {disabled}></Button>
+        {#each buttons as { text, onclick, disabled, visible, color }}
+            {#if visible}
+                <Button {text} {onclick} {disabled} {color}></Button>
+            {/if}
         {/each}
     </div>
 </div>
