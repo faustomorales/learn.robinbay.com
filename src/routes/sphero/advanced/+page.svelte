@@ -32,7 +32,7 @@ var drive = async (sphero) => {
       </p>
       <AnnotatedCode
         class="mt-2"
-        language="javascript"
+        language="js"
         code={sampleCode.trim()}
       />
       <p class="mt-2">
@@ -51,7 +51,7 @@ var drive = async (sphero) => {
       {#each documentation as { title, description, code }}
         <h3 class="text-2xl font-bold mt-6 font-mono">{title}</h3>
         <p class="mt-2">{description}</p>
-        <AnnotatedCode class="mt-2" language="javascript" code={code.trim()} />
+        <AnnotatedCode class="mt-2" language="js" code={code.trim()} />
       {/each}
     </div>
 

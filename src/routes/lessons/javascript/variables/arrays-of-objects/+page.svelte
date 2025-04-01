@@ -79,7 +79,7 @@ var drive = async (sphero) => {
     { name: "Bob", age: 25 },
     { name: "Charlie", age: 30 }
 ];`}
-            language="javascript"
+            language="js"
         />
     {/snippet}
 

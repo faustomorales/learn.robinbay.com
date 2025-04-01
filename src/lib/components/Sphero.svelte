@@ -81,11 +81,10 @@
 <Editor
     bind:iframe
     {stateId}
-    tabs={{ js: true }}
-    hideIframe
+    tabs={["js"]}
+    iframeVisibility="hidden"
     {prepend}
     readonly={ball !== undefined}
-    {hideTabs}
 />
 <Hint hint={error} className="text-red-500 p-2 font-mono text-xs" />
 

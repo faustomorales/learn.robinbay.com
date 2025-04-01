@@ -105,7 +105,7 @@
     {#snippet solution()}
         <p class="font-medium mt-4 mb-1">JavaScript</p>
         <AnnotatedCode
-            language="javascript"
+            language="js"
             code={solutionCodeJavaScript.replace("// @ts-nocheck\n\n", "")}
         />
         <p class="font-medium mt-4 mb-1">HTML</p>

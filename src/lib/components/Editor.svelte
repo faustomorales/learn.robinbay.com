@@ -6,24 +6,14 @@
 	import Hint from "./Hint.svelte";
 	import { Tabs, TabItem } from "flowbite-svelte";
 	import {
-		type PrependedCode,
+		createAnnotations,
+		type CodeInput,
 		type Tooltip,
-		defaultPrependedCode,
-	} from "$lib/common";
-	import { onMount } from "svelte";
+	} from "$lib/codemirror.svelte";
+	import { type PrependedCode, defaultPrependedCode } from "$lib/common";
+	import { onMount, type Component } from "svelte";
 	import { browser } from "$app/environment";
 	import CodeMirror from "svelte-codemirror-editor";
-	import {
-		hoverTooltip,
-		Decoration,
-		type DecorationSet,
-		type ViewUpdate,
-		EditorView,
-		ViewPlugin,
-		WidgetType,
-		MatchDecorator,
-	} from "@codemirror/view";
-	import { RangeSet } from "@codemirror/state";
 
 	import { githubDark } from "@fsegurai/codemirror-theme-github-dark";
 	import { githubLight } from "@fsegurai/codemirror-theme-github-light";
@@ -35,76 +25,30 @@
 		prepend = defaultPrependedCode,
 		initial = defaultPrependedCode,
 		iframe = $bindable(),
-		disableIframe = false,
-		tabs = { html: true, css: true, js: true },
-		hideTabs = false,
-		hideIframe = false,
+		iframeVisibility = "visible",
+		tabs = ["html", "css", "js"],
 		readonly = false,
 		tooltips = {},
+		inputs = {},
 		height = null,
 		...props
 	}: {
 		stateId?: string;
 		iframe?: HTMLIFrameElement;
+		iframeVisibility: "visible" | "hidden" | "disabled";
 		prepend?: PrependedCode;
 		initial?: PrependedCode;
 		readonly?: boolean;
-		hideTabs?: boolean;
-		disableIframe?: boolean;
 		height?: number | null;
-		tabs?: { html?: boolean; css?: boolean; js?: boolean };
-		hideIframe?: boolean;
+		tabs?: ("html" | "css" | "js")[];
 		class?: ClassValue;
 		tooltips?: { html?: Tooltip[]; css?: Tooltip[]; js?: Tooltip[] };
+		inputs?: { html?: CodeInput[]; css?: CodeInput[]; js?: CodeInput[] };
 	} = $props();
 	let theme: typeof githubDark | typeof githubLight | undefined =
 		$state(undefined);
 	let uid = $props.id();
-	class DropdownWidget extends WidgetType {
-		selected: string;
-		options: string[];
 
-		constructor(selected: string, options: string[]) {
-			super();
-			this.selected = selected;
-			this.options = options;
-		}
-
-		eq(other: DropdownWidget) {
-			return other.selected == this.selected;
-		}
-
-		updateDOM(dom: HTMLElement, view: EditorView): boolean {
-			return true;
-		}
-
-		toDOM() {
-			console.log("toDom executing");
-			// Create the select element
-			const select = document.createElement("select");
-			select.contentEditable = "true";
-
-			// Loop through the options array and create an option element for each value
-			this.options.forEach((optionText) => {
-				const option = document.createElement("option");
-				option.value = optionText;
-				option.textContent = optionText;
-
-				// If this option matches the selected value, mark it as selected
-				if (optionText === this.selected) {
-					option.selected = true;
-				}
-
-				// Append the option to the select element
-				select.appendChild(option);
-			});
-			return select;
-		}
-
-		ignoreEvent() {
-			return false;
-		}
-	}
 	onMount(() => {
 		const listener = ({ matches: isDark }: { matches: boolean }) =>
 			(theme = isDark ? githubDark : githubLight);
@@ -115,105 +59,6 @@
 			mediaQuery.removeEventListener("change", listener);
 		};
 	});
-	const createTooltips = (code: string, tips: Tooltip[]) => {
-		let lineStartIndexes = code.split("\n").reduce(
-			(acc, line) => {
-				acc.push(acc[acc.length - 1] + line.length + 1);
-				return acc;
-			},
-			[0],
-		);
-		let normalized = tips.map((t) => {
-			let line = t.line ? t.line - 1 : 0;
-			let lineStart = lineStartIndexes[line];
-			let lineEnd = t.line
-				? lineStartIndexes[line + 1] || code.length
-				: code.length;
-			return {
-				from: lineStart + (t.from || 0),
-				to: t.to ? lineStart + t.to : lineEnd,
-				text: t.text,
-				options: t.options,
-			};
-		});
-		return [
-			hoverTooltip((view, pos, side) => {
-				let matching = normalized.find(
-					({ from, to }) => pos >= from && pos <= to,
-				);
-				if (!matching) return null;
-				return {
-					pos: matching.from,
-					end: matching.to,
-					above: true,
-					create(view) {
-						let dom = document.createElement("div");
-						dom.className = "tooltip";
-						dom.innerHTML = matching.text;
-						return { dom };
-					},
-				};
-			}),
-			ViewPlugin.fromClass(
-				class {
-					dropdowns: DecorationSet;
-					constructor(view: EditorView) {
-						this.dropdowns = RangeSet.of(
-							normalized
-								.filter((n) => n.options)
-								.map(({ from, to, options }) =>
-									Decoration.replace({
-										widget: new DropdownWidget(
-											options![0],
-											options!,
-										),
-
-									}).range(from, to),
-								),
-						);
-					}
-				},
-				{
-					decorations: (instance) => instance.dropdowns,
-					eventHandlers: {
-						onchange: (event) => console.log("change"),
-					},
-					provide: (plugin) =>
-						EditorView.atomicRanges.of((view) => {
-							return (
-								view.plugin(plugin)?.dropdowns ||
-								Decoration.none
-							);
-						}),
-				},
-			),
-			ViewPlugin.fromClass(
-				class {
-					marks: DecorationSet;
-					constructor(view: EditorView) {
-						this.marks = RangeSet.of(
-							normalized.map(({ from, to }) =>
-								Decoration.mark({
-									inclusive: true,
-									inclusiveStart: true,
-									inclusiveEnd: true,
-									class: "cm-placeholder",
-								}).range(from, to),
-							),
-						);
-					}
-				},
-				{
-					decorations: (instance) => instance.marks,
-					provide: (plugin) =>
-						EditorView.atomicRanges.of(
-							(view) =>
-								view.plugin(plugin)?.marks || Decoration.none,
-						),
-				},
-			),
-		];
-	};
 	let keys = {
 		js: stateId ? `${stateId}:js` : null,
 		css: stateId ? `${stateId}:css` : null,
@@ -282,7 +127,10 @@
 					message.data.uid === uid
 				) {
 					javascriptError = `Error on line ${message.data.lineno - javascriptStart}. ${message.data.message}`;
-					iframe!.onload = () => (javascriptError = "");
+					console.log("iframe", typeof iframe);
+					if (typeof iframe === "object") {
+						iframe!.onload = () => (javascriptError = "");
+					}
 				}
 			},
 		);
@@ -293,99 +141,66 @@
 		localStorage.setItem(keys.html, components.html || "");
 		localStorage.setItem(keys.css, components.css || "");
 	});
+	let langs: {
+		[key in "html" | "css" | "js"]: {
+			logo: Component;
+			long?: string;
+			spec: typeof html | typeof css | typeof javascript;
+		};
+	} = {
+		html: { logo: HtmlLogo, spec: html },
+		css: { logo: CssLogo, spec: css },
+		js: { logo: JsLogo, spec: javascript, long: "JavaScript" },
+	};
 </script>
 
 <div style={`--editor-height: ${height}px;`} class={props.class}>
 	{#if theme}
 		<Tabs
 			contentClass={`${readonly ? "readonly" : ""} bg-gray-50 dark:bg-gray-800 border-b-solid border-b-1 border-r-1 border-l-1 border-gray-200 dark:border-gray-700`}
-			activeClasses={`${hideTabs ? "hidden" : ""} p-2 text-primary-600 bg-gray-100 rounded-t-lg dark:bg-gray-800 dark:text-primary-500`}
+			activeClasses={`${tabs.length > 1 ? "visible" : "hidden"} p-2 text-primary-600 bg-gray-100 rounded-t-lg dark:bg-gray-800 dark:text-primary-500`}
 			inactiveClasses="p-2 text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300"
 		>
-			{#if tabs.html}
-				<TabItem open>
+			{#each tabs.map((tab) => ({ lang: langs[tab], tab })) as tab, i}
+				<TabItem open={i === 0}>
 					<div slot="title" class="heading flex items-center">
-						<HtmlLogo /><span class="p-1">HTML</span>
+						<tab.lang.logo /><span class="p-1"
+							>{tab.lang.long || tab.tab.toUpperCase()}</span
+						>
 					</div>
 					<div class="pane">
 						<CodeMirror
-							bind:value={components.html}
+							bind:value={components[tab.tab]}
 							{readonly}
 							{theme}
-							lang={html({})}
-							extensions={[
-								...createTooltips(
-									components.html,
-									tooltips.html || [],
-								),
-							]}
+							lang={tab.lang.spec()}
+							extensions={createAnnotations(
+								components[tab.tab],
+								tooltips[tab.tab] || [],
+								inputs[tab.tab] || [],
+							)}
 						/>
 					</div>
-				</TabItem>
-			{/if}
-			{#if tabs.css}
-				<TabItem open={!tabs.html}>
-					<div slot="title" class="heading flex items-center">
-						<CssLogo /><span class="p-1">CSS</span>
-					</div>
-					<div class="pane">
-						<CodeMirror
-							{readonly}
-							bind:value={components.css}
-							lang={css()}
-							{theme}
-							extensions={[
-								...createTooltips(
-									components.css,
-									tooltips.css || [],
-								),
-							]}
-						/>
-					</div>
-				</TabItem>
-			{/if}
-			{#if tabs.js}
-				<TabItem open={!tabs.html && !tabs.css}>
-					<div slot="title" class="heading flex items-center">
-						<JsLogo /><span class="p-1">JavaScript</span>
-					</div>
-					<div class="pane">
-						<CodeMirror
-							{readonly}
-							bind:value={components.js}
-							lang={javascript()}
-							{theme}
-							extensions={[
-								...createTooltips(
-									components.js,
-									tooltips.js || [],
-								),
-							]}
-						/>
-					</div>
-					{#if javascriptError}
+					{#if tab.tab === "js" && javascriptError}
 						<Hint
 							hint={javascriptError}
 							className="text-red-500 p-2 font-mono text-xs"
 						/>
 					{/if}
 				</TabItem>
-			{/if}
+			{/each}
 		</Tabs>
 	{/if}
 </div>
 
-{#if !disableIframe}
+{#if iframeVisibility !== "disabled"}
 	<iframe
 		srcdoc={source}
-		onerror={(e) => {
-			console.log("Error Mark 1", e);
-		}}
 		sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation allow-downloads allow-presentation"
 		title="output"
 		frameborder="0"
 		bind:this={iframe}
-		class={`border-solid border-1 border-gray-200 dark:border-gray-700 mt-2 ${hideIframe ? "hidden" : ""}`}
+		class={`border-solid border-1 border-gray-200 dark:border-gray-700 mt-2 ${iframeVisibility === "hidden" ? "hidden" : "visible"}`}
 	></iframe>
 {/if}
 

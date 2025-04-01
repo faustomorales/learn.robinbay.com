@@ -84,7 +84,7 @@ var nameOfPerson2 = "Alex";
 var ageOfPerson2 = 30;
 var eyeColorOfPerson1 = "blue";
 var favoriteSnacksOfPerson2 = ["candy", "popcorn", "nuts"];`}
-            language="javascript"
+            language="js"
             tooltips={[
                 {
                     line: 7,
@@ -110,7 +110,7 @@ var person2 = {
     eyeColor: "blue",
     favoriteSnacks: ["candy", "popcorn", "nuts"]
 };`}
-            language="javascript"
+            language="js"
         />
         <p class="mb-2 mt-2">
             Objects use <span class="font-bold">key-value pairs</span>, where

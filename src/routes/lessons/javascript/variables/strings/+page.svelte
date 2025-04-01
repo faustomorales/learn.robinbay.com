@@ -98,7 +98,7 @@ var drive = async (sphero) => {
                     text: `The semicolon is used to end a statement in JavaScript. It tells the computer that this is the end of the line of code.`,
                 },
             ]}
-            language="javascript"
+            language="js"
             class="mb-2"
         />
         <p class="mb-2">
@@ -111,7 +111,7 @@ var drive = async (sphero) => {
                 >message</CodeText
             > variable to "Goodbye!".
         </p>
-        <AnnotatedCode code={`message = "Goodbye!";`} language="javascript" />
+        <AnnotatedCode code={`message = "Goodbye!";`} language="js" />
     {/snippet}
     {#snippet task()}
         <p class="mb-2">

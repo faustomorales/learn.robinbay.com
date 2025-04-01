@@ -115,7 +115,7 @@ await sphero.delay(1000);
                     text: `The semicolon is used to end a statement in JavaScript. It tells the computer that this is the end of the line of code.`,
                 },
             ]}
-            language="javascript"
+            language="js"
             class="mb-2"
         />
     {/snippet}

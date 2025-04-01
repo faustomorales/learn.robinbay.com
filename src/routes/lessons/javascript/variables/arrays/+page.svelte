@@ -69,7 +69,7 @@ await sphero.delay(1000);
 
         <AnnotatedCode
             code={`var names = ["Alice", "Bob", "Sally"];`}
-            language="javascript"
+            language="js"
         />
 
         This array contains three names. Each color is written inside

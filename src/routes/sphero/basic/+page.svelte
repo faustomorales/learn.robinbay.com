@@ -217,7 +217,7 @@ var drive = async (sphero, movements) => {
                 The movements in the table are executed using the following
                 code.
             </p>
-            <AnnotatedCode language="javascript" {code}></AnnotatedCode>
+            <AnnotatedCode language="js" {code}></AnnotatedCode>
         </div>
     </div>
     <div class="flex gap-2 mt-4">
