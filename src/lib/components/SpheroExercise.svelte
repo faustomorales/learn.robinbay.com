@@ -9,6 +9,7 @@
         subtitle,
         title,
         explanation,
+        questions,
         example,
         task,
         hints,
@@ -20,6 +21,7 @@
         stateId: string;
         title: string;
         prepend: PrependedCode;
+        questions?: Snippet;
         explanation: Snippet;
         example: Snippet;
         task: Snippet;
@@ -41,6 +43,12 @@
             <p class="text-sm text-gray-500">{subtitle}</p>
         </header>
         {@render explanation()}
+        {#if questions}
+            <h2 class="text-xl font-bold mb-2 mt-3">
+                Check Your Understanding
+            </h2>
+            {@render questions()}
+        {/if}
         <h2 class="text-xl font-bold mb-2 mt-3">Example</h2>
         {@render example()}
         <h2 class="text-xl font-bold mb-2 mt-3">Your Task</h2>

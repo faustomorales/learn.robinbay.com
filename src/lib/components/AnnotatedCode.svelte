@@ -6,6 +6,8 @@
     let {
         language,
         code,
+        tooltips,
+        inputs = $bindable([]),
         ...props
     }: {
         language: "html" | "css" | "js";
@@ -21,16 +23,6 @@
         js: language === "js" ? code : "",
     };
     let tabs = [language];
-    let tooltips = {
-        html: language === "html" ? props.tooltips : [],
-        css: language === "css" ? props.tooltips : [],
-        js: language === "js" ? props.tooltips : [],
-    };
-    let inputs = {
-        html: language === "html" ? props.inputs : [],
-        css: language === "css" ? props.inputs : [],
-        js: language === "js" ? props.inputs : [],
-    };
 </script>
 
 <Editor
@@ -38,7 +30,7 @@
     {tabs}
     class={props.class}
     {tooltips}
-    {inputs}
+    bind:inputs
     iframeVisibility="disabled"
     readonly
 />

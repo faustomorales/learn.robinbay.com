@@ -67,35 +67,64 @@ var drive = async (sphero) => {
             code={`var message = "Hello!";`}
             tooltips={[
                 {
-                    line: 1,
-                    from: 0,
-                    to: 3,
+                    from: {
+                        line: 1,
+                        character: 0,
+                    },
+                    to: {
+                        line: 1,
+                        character: 3,
+                    },
                     text: `<span class="font-mono">var</span> tells JavaScript that you want to declare a variable.`,
-                    options: ["var", "bar", "let"],
+                    language: "js",
                 },
                 {
-                    line: 1,
-                    from: 4,
-                    to: 11,
+                    from: {
+                        line: 1,
+                        character: 4,
+                    },
+                    to: {
+                        line: 1,
+                        character: 11,
+                    },
                     text: `Indicates that the variable will have the name <span class="font-mono">message</span>.`,
+                    language: "js",
                 },
                 {
-                    line: 1,
-                    from: 12,
-                    to: 13,
+                    from: {
+                        line: 1,
+                        character: 12,
+                    },
+                    to: {
+                        line: 1,
+                        character: 13,
+                    },
                     text: `The = sign is the assignment operator. It assigns the value on the right to the variable on the left.`,
+                    language: "js",
                 },
                 {
-                    line: 1,
-                    from: 14,
-                    to: 22,
+                    from: {
+                        line: 1,
+                        character: 14,
+                    },
+                    to: {
+                        line: 1,
+                        character: 22,
+                    },
                     text: `The value assigned to the variable. In this case, the word "Hello!" The quotes are important because they indicate the start and end of a string.`,
+                    language: "js",
                 },
                 {
-                    line: 1,
-                    from: 22,
-                    to: 24,
+                    from: {
+                        line: 1,
+                        character: 22,
+                    },
+                    to: {
+                        line: 1,
+                        character: 24,
+                    },
                     text: `The semicolon is used to end a statement in JavaScript. It tells the computer that this is the end of the line of code.`,
+                    language: "js",
                 },
             ]}
             language="js"

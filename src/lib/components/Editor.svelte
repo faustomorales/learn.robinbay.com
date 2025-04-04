@@ -9,6 +9,7 @@
 		createAnnotations,
 		type CodeInput,
 		type Tooltip,
+		type ReadonlySettings,
 	} from "$lib/codemirror.svelte";
 	import { type PrependedCode, defaultPrependedCode } from "$lib/common";
 	import { onMount, type Component } from "svelte";
@@ -28,22 +29,28 @@
 		iframeVisibility = "visible",
 		tabs = ["html", "css", "js"],
 		readonly = false,
-		tooltips = {},
-		inputs = {},
+		tooltips = [],
+		inputs = $bindable([]),
 		height = null,
 		...props
 	}: {
 		stateId?: string;
 		iframe?: HTMLIFrameElement;
-		iframeVisibility: "visible" | "hidden" | "disabled";
+		iframeVisibility?: "visible" | "hidden" | "disabled";
 		prepend?: PrependedCode;
 		initial?: PrependedCode;
-		readonly?: boolean;
+		readonly?:
+			| boolean
+			| {
+					js: ReadonlySettings;
+					html: ReadonlySettings;
+					css: ReadonlySettings;
+			  };
 		height?: number | null;
 		tabs?: ("html" | "css" | "js")[];
 		class?: ClassValue;
-		tooltips?: { html?: Tooltip[]; css?: Tooltip[]; js?: Tooltip[] };
-		inputs?: { html?: CodeInput[]; css?: CodeInput[]; js?: CodeInput[] };
+		tooltips?: Tooltip[];
+		inputs?: CodeInput[];
 	} = $props();
 	let theme: typeof githubDark | typeof githubLight | undefined =
 		$state(undefined);
@@ -127,7 +134,6 @@
 					message.data.uid === uid
 				) {
 					javascriptError = `Error on line ${message.data.lineno - javascriptStart}. ${message.data.message}`;
-					console.log("iframe", typeof iframe);
 					if (typeof iframe === "object") {
 						iframe!.onload = () => (javascriptError = "");
 					}
@@ -171,13 +177,16 @@
 					<div class="pane">
 						<CodeMirror
 							bind:value={components[tab.tab]}
-							{readonly}
 							{theme}
 							lang={tab.lang.spec()}
+							readonly={!!readonly}
+							on:beforeChange={() => {
+								console.log("Before change");
+							}}
 							extensions={createAnnotations(
 								components[tab.tab],
-								tooltips[tab.tab] || [],
-								inputs[tab.tab] || [],
+								tooltips.filter((t) => t.language == tab.tab),
+								inputs.filter((t) => t.language == tab.tab),
 							)}
 						/>
 					</div>
@@ -215,6 +224,9 @@
 	}
 	.pane {
 		height: var(--editor-height);
+	}
+	:global(.readonly .cm-scroller .cm-layer .cm-cursor.cm-cursor-primary) {
+		visibility: hidden;
 	}
 	:global(.tooltip) {
 		padding: 4px 8px;

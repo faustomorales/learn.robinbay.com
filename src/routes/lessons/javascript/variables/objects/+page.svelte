@@ -87,7 +87,15 @@ var favoriteSnacksOfPerson2 = ["candy", "popcorn", "nuts"];`}
             language="js"
             tooltips={[
                 {
-                    line: 7,
+                    from: {
+                        line: 7,
+                        character: 0,
+                    },
+                    to: {
+                        line: 7,
+                        character: 31,
+                    },
+                    language: "js",
                     text: `eyeColorOfPerson1 is defined twice (on line 3 and here on line 7). We probably meant for this variable to be called <span class="font-mono"><b>eyeColorOfPerson2</b></span>.`,
                 },
             ]}
