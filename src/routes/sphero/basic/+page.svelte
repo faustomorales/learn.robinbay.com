@@ -6,6 +6,7 @@
     import SpheroMiniSimulator from "$lib/sphero/simulator";
     import { browser } from "$app/environment";
     import AnnotatedCode from "$lib/components/AnnotatedCode.svelte";
+    import { getKeyValue, setKeyValue } from "$lib/common";
 
     let simulatorContainer: HTMLDivElement | undefined = $state(undefined);
 
@@ -18,13 +19,15 @@
         $state(
             browser &&
                 JSON.parse(
-                    localStorage.getItem(stateId) ||
+                    getKeyValue(
+                        stateId,
                         JSON.stringify([
                             { speed: "", duration: "", direction: "" }, // Initial blank row
                         ]),
+                    ),
                 ),
         );
-    $effect(() => localStorage.setItem(stateId, JSON.stringify(movements)));
+    $effect(() => setKeyValue(stateId, JSON.stringify(movements)));
     let active: null | number = $state(null);
     const isNumerical = (value: string) => !isNaN(parseInt(value));
     let valid = $derived(

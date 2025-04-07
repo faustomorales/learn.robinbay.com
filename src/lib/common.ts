@@ -1,3 +1,5 @@
+import { browser } from "$app/environment";
+
 export type PrependedCode = {
     html?: string;
     js?: string;
@@ -11,3 +13,13 @@ export type ProjectContext = {
 export const defaultPrependedCode = { html: "", js: "", css: "" };
 
 export const fail = (message: string) => { throw new Error(message) }
+
+export const getKeyValue = (key?: string | null, fallback?: string): string => {
+    return (browser && key && localStorage.getItem(key)) || fallback || ""
+}
+
+export const setKeyValue = (key: string | null, value: string) => {
+    if (key) {
+        localStorage.setItem(key, value)
+    }
+}

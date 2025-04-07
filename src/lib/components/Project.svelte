@@ -13,7 +13,7 @@
         initial = defaultPrependedCode,
         prepend = defaultPrependedCode,
     }: {
-        steps: Component<{ step: Step }>[]; // TODO: Make this work with Component<{step: Step}> (also see above)
+        steps: Component<{ step: Step }>[];
         stateId: string;
         title: string;
         initial?: PrependedCode;
