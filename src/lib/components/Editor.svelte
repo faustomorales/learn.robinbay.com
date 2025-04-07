@@ -20,6 +20,7 @@
   import { javascript } from "@codemirror/lang-javascript";
   import { html } from "@codemirror/lang-html";
   import { css } from "@codemirror/lang-css";
+  import Button from "./Button.svelte";
   let {
     stateId = "",
     prepend = defaultPrependedCode,
@@ -77,13 +78,16 @@
         ...t,
         content: getKeyValue(t.key, initial[t.language]),
         settings: languageSettings[t.language],
+        tooltips: tooltips.filter((tip) => t.language == tip.language),
+        inputs: inputs.filter((i) => t.language == i.language),
       }))
       .map((tab) => ({
         ...tab,
         ...createAnnotations(
           tab.content,
-          tooltips.filter((t) => t.language == tab.language),
-          inputs.filter((t) => t.language == tab.language),
+          tab.tooltips,
+          tab.inputs,
+          initial[tab.language],
         ),
       })),
   );
@@ -95,6 +99,20 @@
       html: string;
     },
   );
+  const reset = () => {
+    inputs.map((input) => setKeyValue(input.stateId, input.default));
+    components = components.map((tab) => {
+      return {
+        ...tab,
+        ...createAnnotations(
+          initial[tab.language] || "",
+          tab.tooltips,
+          inputs.filter((input) => input.language === tab.language),
+          initial[tab.language],
+        ),
+      };
+    });
+  };
   let source = $derived(`
 		<!DOCTYPE html>
 		<html lang="en">
@@ -185,7 +203,9 @@
               {theme}
               lang={component.settings.spec()}
               readonly={!!readonly}
-              on:ready={(event) => component.onReady(event.detail)}
+              on:ready={(event) => {
+                component.onReady(event.detail);
+              }}
               extensions={component.extensions}
             />
           </div>
@@ -198,6 +218,9 @@
         </TabItem>
       {/each}
     </Tabs>
+  {/if}
+  {#if initial.js || initial.css || initial.html}
+    <div class="mt-2"><Button onclick={reset} text="Reset" /></div>
   {/if}
 </div>
 

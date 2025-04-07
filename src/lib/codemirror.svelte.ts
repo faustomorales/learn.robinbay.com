@@ -7,16 +7,18 @@ import {
 } from "@codemirror/view";
 import { EditorState, Transaction } from "@codemirror/state";
 import { RangeSet } from "@codemirror/state";
+import { getKeyValue, setKeyValue } from "./common";
 
 export type Language = "html" | "css" | "js";
 export type CodeInput = {
-  key: string;
+  stateId: string;
+  default: string;
   value: string;
   options?: string[];
   language: Language;
-  line: number;
   width: number;
   positions: {
+    line: number;
     pos: number;
     id: string;
   }[];
@@ -45,7 +47,6 @@ export const preventModifyTargetRanges = (
     try {
       const readOnlyRangesBeforeTransaction = getReadOnlyRanges(tr.startState);
       const readOnlyRangesAfterTransaction = getReadOnlyRanges(tr.state);
-
       for (let i = 0; i < readOnlyRangesBeforeTransaction.length; i++) {
         const targetFromBeforeTransaction =
           readOnlyRangesBeforeTransaction[i].from ?? 0;
@@ -58,7 +59,6 @@ export const preventModifyTargetRanges = (
         const targetToAfterTransaction =
           readOnlyRangesAfterTransaction[i].to ??
           tr.state.doc.line(tr.state.doc.lines).to;
-
         if (
           tr.startState.sliceDoc(
             targetFromBeforeTransaction,
@@ -122,7 +122,7 @@ const createInputElement = (params: NormalizedCodeInput) => {
     input.size = params.width;
     (input as HTMLInputElement).maxLength = params.width;
   }
-  input.value = params.value;
+  input.value = getKeyValue(params.stateId, params.default);
   return input;
 };
 
@@ -195,10 +195,10 @@ const normalizeCodeInputs = (
           lineStartIndexes,
           {
             character: p.pos,
-            line: t.line,
+            line: p.line,
           },
           {
-            line: t.line,
+            line: p.line,
             character: p.pos + t.width,
           },
         ),
@@ -207,11 +207,12 @@ const normalizeCodeInputs = (
   });
 
 export const createAnnotations = (
-  code: string,
+  content: string,
   tips: Tooltip[],
   inputs: CodeInput[],
+  initial?: string,
 ) => {
-  let lineStartIndexes = code
+  let lineStartIndexes = content
     .split("\n")
     .reduce(
       (acc, line) => {
@@ -220,25 +221,24 @@ export const createAnnotations = (
       },
       [0],
     )
-    .concat([code.length]);
+    .concat([content.length]);
   let processed = {
     tips: normalizeTooltips(lineStartIndexes, tips),
     inputs: normalizeCodeInputs(lineStartIndexes, inputs),
   };
   let valueToCode = (
     view: EditorView,
-    key: string,
+    stateId: string,
     text: string,
     inputElements: (HTMLInputElement | HTMLSelectElement)[],
   ) => {
-    console.log("Mark 1", key, text);
+    setKeyValue(stateId, text);
     inputElements.forEach((input) => (input.value = text));
-    const input = processed.inputs.find((i) => i.key === key)!;
-    const rawInput = inputs.find((i) => i.key === key)!;
+    const input = processed.inputs.find((i) => i.stateId === stateId)!;
+    const rawInput = inputs.find((i) => i.stateId === stateId)!;
     input.value = text;
     rawInput.value = text;
     input.normalized.map((n) => {
-      console.log("dispatching to", n.from, n.to);
       view.dispatch({
         filter: false,
         changes: {
@@ -249,9 +249,16 @@ export const createAnnotations = (
       });
     });
   };
-  let readonly = processed.tips
-    .concat(processed.inputs as any)
-    .reduce((previous, item) => Math.max(item.normalized.to, previous), 0);
+  let readonly = Math.max(
+    ...processed.tips
+      .map((t) => t.normalized.to)
+      .concat(
+        processed.inputs.map((i) => i.normalized.map((p) => p.to)).flat(),
+      ),
+  );
+  if (initial) {
+    content = initial.slice(0, readonly).concat(content.slice(readonly));
+  }
   let extensions = [
     preventModifyTargetRanges(() => [{ from: 0, to: readonly }]),
     hoverTooltip((view, pos, side) => {
@@ -275,7 +282,7 @@ export const createAnnotations = (
     ViewPlugin.define(
       (view) => {
         let inputs = processed.inputs.map((params) => ({
-          key: params.key,
+          stateId: params.stateId,
           params,
           inputs: params.positions.map((p) => createInputElement(params)),
         }));
@@ -284,12 +291,10 @@ export const createAnnotations = (
             inputs
               .map((input) => {
                 input.inputs.map((element) => {
-                  console.log("adding event listener for", element);
-                  element.addEventListener("change", (event: any) => {
-                    console.log("got change event", event);
+                  element.addEventListener("input", (event: any) => {
                     valueToCode(
                       view,
-                      input.key,
+                      input.stateId,
                       event.target.value as string,
                       input.inputs,
                     );
@@ -333,8 +338,18 @@ export const createAnnotations = (
     ),
   ];
   const onReady = (view: EditorView) =>
-    processed.inputs.map(({ key, value }) => {
-      valueToCode(view, key, value, []);
+    processed.inputs.map(({ stateId, default: defaultValue }) => {
+      valueToCode(view, stateId, getKeyValue(stateId, defaultValue), []);
     });
-  return { extensions, onReady };
+  processed.inputs.forEach((i) => {
+    i.normalized.forEach((p) => {
+      content = content
+        .slice(0, p.from)
+        .concat(
+          getKeyValue(i.stateId, i.default).padEnd(i.width).slice(0, i.width),
+        )
+        .concat(content.slice(p.to));
+    });
+  });
+  return { content, extensions, onReady, readonly };
 };

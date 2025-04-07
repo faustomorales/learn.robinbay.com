@@ -1,10 +1,10 @@
 <script lang="ts">
-    let {
-        hint,
-        className = "text-red-500 font-bold p-2",
-    }: { hint: string; className?: string } = $props();
+  let {
+    hint,
+    className = "p-2",
+  }: { hint: string; className?: string } = $props();
 </script>
 
 {#if hint}
-    <div class={className}>{@html hint}</div>
+  <div class={className}>Hint: {@html hint}</div>
 {/if}
