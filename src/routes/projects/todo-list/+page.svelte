@@ -363,7 +363,7 @@ loadTasks();`,
     <div class="w-1/3 max-h-screen overflow-y-auto pb-6">
       <h2 class="text-xl font-bold mb-2 mt-3">The Todo List Project</h2>
       <p class="mb-2">
-        One of the classic projecst in learning software development is to build
+        One of the classic projects for student software developers is to build
         a humble todo list application. In this project, you will start with a
         mostly-working todo list app and make modifications to fix bugs and add
         features.
