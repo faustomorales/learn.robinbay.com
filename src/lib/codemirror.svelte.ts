@@ -353,3 +353,62 @@ export const createAnnotations = (
   });
   return { content, extensions, onReady, readonly };
 };
+
+export const parseInteractiveCode = (code: string, language: Language) => {
+  const inputs: { [key: string]: CodeInput } = {};
+  const regex = /\{\{(.*?)\}\}/g;
+  let formatted: string = "";
+
+  code.split("\n").forEach((line, lineIndex) => {
+    let match;
+    let replacements: { start: number; stop: number; spaces: number }[] = [];
+    let offset = 0;
+    while ((match = regex.exec(line)) !== null) {
+      const fullMatch = match[0];
+      try {
+        let content: { [key: string]: string } = JSON.parse(`{${match[1]}}`);
+        if (!content.stateId || !content.id) {
+          throw new Error("Did not find key or ID.");
+        }
+        let position = {
+          line: lineIndex + 1,
+          pos: match.index - offset,
+          id: content.id,
+        };
+        if (inputs[content.stateId]) {
+          inputs[content.stateId].positions.push(position);
+        } else {
+          inputs[content.stateId] = {
+            stateId: content.stateId!,
+            positions: [position],
+            default: content.default || "",
+            value: getKeyValue(content.stateId!, content.default || ""),
+            language,
+            width: (content.width as unknown as number) || 10,
+          };
+        }
+
+        // Replace in line with blank of appropriate width
+        replacements.push({
+          start: match.index - offset,
+          stop: match.index + fullMatch.length - offset,
+          spaces: inputs[content.stateId].width,
+        });
+        offset += fullMatch.length - inputs[content.stateId].width;
+        // Reset regex.lastIndex to account for changed line
+        regex.lastIndex = match.index + fullMatch.length;
+      } catch (e) {
+        console.error(`Could not parse ${fullMatch}`);
+      }
+    }
+    replacements.forEach((r) => {
+      line = line.slice(0, r.start) + "".padEnd(r.spaces) + line.slice(r.stop);
+    });
+    formatted += line + "\n";
+  });
+
+  return {
+    formatted,
+    inputs,
+  };
+};
