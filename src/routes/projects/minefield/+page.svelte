@@ -1,6 +1,5 @@
 <script lang="ts">
   import { parseInteractiveSnippets } from "$lib/codemirror.svelte";
-  import { ensureVariableExists } from "$lib/verifications.svelte";
   import { fail } from "$lib/common";
   import Question from "$lib/components/Question.svelte";
   import BaseQuestion from "$lib/components/BaseQuestion.svelte";
@@ -51,7 +50,7 @@
         solution?: string;
         validate: () => void;
       }
-  )[] = $state([
+  )[] = [
     {
       type: "mc",
       text: "When driving, what happens when you press and release one of the driving keys?",
@@ -236,7 +235,7 @@
         }
       },
     },
-  ]);
+  ];
 </script>
 
 <svelte:head>

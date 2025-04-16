@@ -413,7 +413,11 @@ export const parseInteractiveSnippet = (code: string, language: Language) => {
               width:
                 content.width ||
                 (content.options && content.options.length > 0
-                  ? Math.max(...content.options.map((o) => o.length))
+                  ? Math.max(
+                      ...content.options
+                        .concat(content.default ? [content.default] : [])
+                        .map((o) => o.length),
+                    )
                   : content.default
                     ? content.default.length
                     : 10),
