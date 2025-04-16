@@ -9,6 +9,7 @@
     options,
     class: className = "",
     stateId,
+    solution = "",
     selected = $bindable(JSON.parse(getKeyValue(stateId, JSON.stringify([])))),
     multiple = options.reduce(
       (previous, option) => (option.correct ? previous + 1 : previous),
@@ -22,6 +23,7 @@
     stateId: string;
     width?: string;
     showButton?: boolean;
+    solution?: string;
     multiple?: boolean;
     options: { id?: string; text: string; hint: string; correct: boolean }[];
   } = $props();
@@ -52,7 +54,13 @@
   };
 </script>
 
-<BaseQuestion class={className} {passed} {hint} validate={() => verify(false)}>
+<BaseQuestion
+  {solution}
+  class={className}
+  {passed}
+  {hint}
+  validate={() => verify(false)}
+>
   {@render children()}
 
   <ul

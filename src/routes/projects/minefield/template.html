@@ -1,0 +1,17 @@
+<div class="remote">
+  <!-- Directional Buttons -->
+  <div class="direction-buttons">
+    <button onmousedown="move('up')" onmouseup="move('stop')" class="<!--{{ "stateId": "minefield/direction-class-1"}}--> up"><!--{{ "stateId": "minefield/arrow-up", "width": 10, "default": "Up"}}--></button>
+    <div class="left-right">
+      <button onmousedown="move('left')" onmouseup="move('stop')" class="<!--{{ "stateId": "minefield/direction-class-2"}}--> left"><!--{{ "stateId": "minefield/arrow-left", "width": 10, "default": "Left"}}--></button>
+      <button onmousedown="move('right')" onmouseup="move('stop')" class="<!--{{ "stateId": "minefield/direction-class-3"}}--> right"><!--{{ "stateId": "minefield/arrow-right", "width": 10, "default": "Right"}}--></button>
+    </div>
+    <button onmousedown="move('down')" onmouseup="move('stop')" class="<!--{{ "stateId": "minefield/direction-class-4"}}--> down"><!--{{ "stateId": "minefield/arrow-down", "width": 10, "default": "Down"}}--></button>
+  </div>
+  <!-- Bottom Buttons (On/Off and Auto) -->
+  <div class="bottom-buttons">
+    <button onclick="toggleOnOff(event)" class="on-off">On/Off</button>
+    <button onclick="<!--{{"stateId": "minefield/html/auto/onclick", "options": ["", "driveAuto()", "driveAuto", "move()"]}}-->" class="auto">Auto</button>
+  </div>
+  <input type="range" id="speed" name="speed" min="0" max="255" />
+</div>

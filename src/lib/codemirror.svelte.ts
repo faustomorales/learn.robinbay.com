@@ -8,6 +8,7 @@ import {
 import { EditorState, Transaction } from "@codemirror/state";
 import { RangeSet } from "@codemirror/state";
 import { getKeyValue, setKeyValue } from "./common";
+import { js } from "three/tsl";
 
 export type Language = "html" | "css" | "js";
 export type CodeInput = {
@@ -20,7 +21,6 @@ export type CodeInput = {
   positions: {
     line: number;
     pos: number;
-    id: string;
   }[];
 };
 export type Tooltip = {
@@ -91,7 +91,7 @@ const createInputElement = (params: NormalizedCodeInput) => {
       "border-slate-200",
       "rounded-md",
       "text-center",
-      "p-1",
+      "p-0",
       "transition",
       "duration-300",
       "ease",
@@ -303,7 +303,10 @@ export const createAnnotations = (
 
                 return input.params.positions.map((p, idx) => {
                   return Decoration.replace({
-                    widget: new InputWidget(input.inputs[idx], p.id),
+                    widget: new InputWidget(
+                      input.inputs[idx],
+                      `${input.stateId}-${idx}`,
+                    ),
                   }).range(
                     input.params.normalized[idx].from,
                     input.params.normalized[idx].to,
@@ -354,61 +357,115 @@ export const createAnnotations = (
   return { content, extensions, onReady, readonly };
 };
 
-export const parseInteractiveCode = (code: string, language: Language) => {
+export const parseInteractiveSnippet = (code: string, language: Language) => {
   const inputs: { [key: string]: CodeInput } = {};
-  const regex = /\{\{(.*?)\}\}/g;
+  if (language === "js" || language === "css") {
+  }
+  const regex =
+    language === "html"
+      ? /\<\!\-\-\{\{(.*?)\}\}\-\-\>/g
+      : /\/\*\{\{(.*?)\}\}\*\//g;
   let formatted: string = "";
 
-  code.split("\n").forEach((line, lineIndex) => {
-    let match;
-    let replacements: { start: number; stop: number; spaces: number }[] = [];
-    let offset = 0;
-    while ((match = regex.exec(line)) !== null) {
-      const fullMatch = match[0];
-      try {
-        let content: { [key: string]: string } = JSON.parse(`{${match[1]}}`);
-        if (!content.stateId || !content.id) {
-          throw new Error("Did not find key or ID.");
-        }
-        let position = {
-          line: lineIndex + 1,
-          pos: match.index - offset,
-          id: content.id,
-        };
-        if (inputs[content.stateId]) {
-          inputs[content.stateId].positions.push(position);
-        } else {
-          inputs[content.stateId] = {
-            stateId: content.stateId!,
-            positions: [position],
-            default: content.default || "",
-            value: getKeyValue(content.stateId!, content.default || ""),
-            language,
-            width: (content.width as unknown as number) || 10,
+  code
+    .replace("// @ts-nocheck\n", "")
+    .split("\n")
+    .forEach((line, lineIndex) => {
+      let match;
+      let replacements: { start: number; stop: number; spaces: number }[] = [];
+      let offset = 0;
+      while ((match = regex.exec(line)) !== null) {
+        const fullMatch = match[0];
+        try {
+          let content: {
+            options?: string[];
+            id: string;
+            stateId: string;
+            default?: string;
+            width?: number;
           };
-        }
+          try {
+            content = JSON.parse(`{${match[1]}}`);
+          } catch (e) {
+            throw new Error(`Could not parse JSON: ${`{${match[1]}}`}`);
+          }
 
-        // Replace in line with blank of appropriate width
-        replacements.push({
-          start: match.index - offset,
-          stop: match.index + fullMatch.length - offset,
-          spaces: inputs[content.stateId].width,
-        });
-        offset += fullMatch.length - inputs[content.stateId].width;
-        // Reset regex.lastIndex to account for changed line
-        regex.lastIndex = match.index + fullMatch.length;
-      } catch (e) {
-        console.error(`Could not parse ${fullMatch}`);
+          if (!content.stateId) {
+            throw new Error("stateId missing");
+          }
+          let position = {
+            line: lineIndex + 1,
+            pos: match.index - offset,
+          };
+          if (inputs[content.stateId]) {
+            inputs[content.stateId].positions.push(position);
+          } else {
+            inputs[content.stateId] = {
+              stateId: content.stateId!,
+              positions: [position],
+              default: content.default || "",
+              options:
+                content.options && content.options.length > 0
+                  ? content.options
+                  : undefined,
+              value: getKeyValue(content.stateId!, content.default || ""),
+              language,
+              width:
+                content.width ||
+                (content.options && content.options.length > 0
+                  ? Math.max(...content.options.map((o) => o.length))
+                  : content.default
+                    ? content.default.length
+                    : 10),
+            };
+          }
+
+          // Replace in line with blank of appropriate width
+          replacements.push({
+            start: match.index - offset,
+            stop: match.index + fullMatch.length - offset,
+            spaces: inputs[content.stateId].width,
+          });
+          offset += fullMatch.length - inputs[content.stateId].width;
+          // Reset regex.lastIndex to account for changed line
+          regex.lastIndex = match.index + fullMatch.length;
+        } catch (e) {
+          console.error(`Could not parse ${fullMatch}: ${e}`);
+        }
       }
-    }
-    replacements.forEach((r) => {
-      line = line.slice(0, r.start) + "".padEnd(r.spaces) + line.slice(r.stop);
+      replacements.forEach((r) => {
+        line =
+          line.slice(0, r.start) + "".padEnd(r.spaces) + line.slice(r.stop);
+      });
+      formatted += line + "\n";
     });
-    formatted += line + "\n";
-  });
 
   return {
     formatted,
     inputs,
+  };
+};
+
+export const parseInteractiveSnippets = (content: {
+  js?: string;
+  html?: string;
+  css?: string;
+}) => {
+  const transformed = {
+    js: parseInteractiveSnippet(content.js || "", "js"),
+    html: parseInteractiveSnippet(content.html || "", "html"),
+    css: parseInteractiveSnippet(content.css || "", "css"),
+  };
+  return {
+    inputs: {
+      ...transformed.js.inputs,
+      ...transformed.css.inputs,
+      ...transformed.html.inputs,
+    },
+    parsed: {
+      js: transformed.js.formatted,
+      html: transformed.html.formatted,
+      css: transformed.css.formatted,
+    },
   };
 };

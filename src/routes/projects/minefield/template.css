@@ -1,0 +1,14 @@
+/*{{ "stateId": "minefield/css/direction/selector", "default": "", "options": ["","#direction", ".direction", "direction"] }}*/ {
+  border: /*{{ "stateId": "minefield/css/direction/border", "default": "", "width": 20 }}*/;
+  padding: /*{{ "stateId": "minefield/css/direction/padding", "default": "", "width": 20 }}*/;
+  border-radius: /*{{ "stateId": "minefield/css/border-radius", "default": "", "width": 20 }}*/;
+}
+
+.on-off {
+  background-color: green;
+}
+
+.on.on-off, .on.on-off:hover {
+  background-color: red;
+}
+

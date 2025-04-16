@@ -27,24 +27,24 @@
     initial = defaultPrependedCode,
     iframe = $bindable(),
     iframeVisibility = "visible",
+    onIframeLoad = () => {},
     tabs = ["html", "css", "js"],
     readonly = false,
     tooltips = [],
-    inputs = $bindable([]),
-    height = null,
+    inputs = $bindable({}),
     ...props
   }: {
     stateId?: string;
+    onIframeLoad?: (iframe: HTMLIFrameElement) => void;
     iframe?: HTMLIFrameElement;
     iframeVisibility?: "visible" | "hidden" | "disabled";
     prepend?: PrependedCode;
     initial?: PrependedCode;
     readonly?: boolean;
-    height?: number | null;
     tabs?: ("html" | "css" | "js")[];
     class?: ClassValue;
     tooltips?: Tooltip[];
-    inputs?: CodeInput[];
+    inputs?: { [key: string]: CodeInput };
   } = $props();
   let theme: typeof githubDark | typeof githubLight | undefined =
     $state(undefined);
@@ -79,7 +79,7 @@
         content: getKeyValue(t.key, initial[t.language]),
         settings: languageSettings[t.language],
         tooltips: tooltips.filter((tip) => t.language == tip.language),
-        inputs: inputs.filter((i) => t.language == i.language),
+        inputs: Object.values(inputs).filter((i) => i.language === t.language),
       }))
       .map((tab) => ({
         ...tab,
@@ -100,14 +100,18 @@
     },
   );
   const reset = () => {
-    inputs.map((input) => setKeyValue(input.stateId, input.default));
+    Object.keys(inputs).map((k) =>
+      setKeyValue(inputs[k].stateId, inputs[k].default),
+    );
     components = components.map((tab) => {
       return {
         ...tab,
         ...createAnnotations(
           initial[tab.language] || "",
           tab.tooltips,
-          inputs.filter((input) => input.language === tab.language),
+          Object.values(inputs).filter(
+            (input) => input.language === tab.language,
+          ),
           initial[tab.language],
         ),
       };
@@ -163,7 +167,11 @@
         ) {
           javascriptError = `Error on line ${message.data.lineno - javascriptStart}. ${message.data.message}`;
           if (typeof iframe === "object") {
-            iframe!.onload = () => (javascriptError = "");
+            let clearError = () => {
+              javascriptError = "";
+              iframe!.removeEventListener("load", clearError);
+            };
+            iframe!.addEventListener("load", clearError);
           }
         }
       },
@@ -178,11 +186,14 @@
     title="output"
     frameborder="0"
     bind:this={iframe}
+    onload={() => {
+      onIframeLoad(iframe!);
+    }}
     class={`border-solid border-1 border-gray-200 dark:border-gray-700 mb-2 ${iframeVisibility === "hidden" ? "hidden" : "visible"}`}
   ></iframe>
 {/if}
 
-<div style={`--editor-height: ${height}px;`} class={props.class}>
+<div class={props.class}>
   {#if theme}
     <Tabs
       contentClass={`${readonly ? "readonly" : ""} bg-gray-50 dark:bg-gray-800 border-b-solid border-b-1 border-r-1 border-l-1 border-gray-200 dark:border-gray-700`}
@@ -219,22 +230,22 @@
       {/each}
     </Tabs>
   {/if}
-  {#if initial.js || initial.css || initial.html}
-    <div class="mt-2"><Button onclick={reset} text="Reset" /></div>
+  {#if Object.keys(inputs).length > 0}
+    <div class="mt-2"><Button onclick={reset} text="Reset" color="red" /></div>
   {/if}
 </div>
 
 <style>
   iframe {
     width: 100%;
-    height: 240px;
+    height: var(--iframe-height, 240px);
   }
   :global(.cm-editor),
   :global(.codemirror-wrapper) {
     height: 100%;
   }
   .pane {
-    height: var(--editor-height);
+    height: var(--editor-height, 240px);
   }
   :global(.readonly .cm-scroller .cm-layer .cm-cursor.cm-cursor-primary) {
     visibility: hidden;

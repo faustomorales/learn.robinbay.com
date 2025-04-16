@@ -2,9 +2,10 @@
   let {
     hint,
     className = "p-2",
-  }: { hint: string; className?: string } = $props();
+    prefix = "Hint:",
+  }: { hint?: string; className?: string; prefix?: string } = $props();
 </script>
 
 {#if hint}
-  <div class={className}>Hint: {@html hint}</div>
+  <div class={className}>{prefix} {@html hint || ""}</div>
 {/if}

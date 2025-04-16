@@ -94,120 +94,120 @@ var loadTasks = () => {
 loadTasks();`,
   });
   var tooltips: Tooltip[] = $state([]);
-  var inputs: CodeInput[] = $state(
-    [
-      {
-        language: "html",
-        options: ["h1", "h2", "h3", "p"],
-        stateId: "todo/heading-tag",
-        default: "h1",
-        width: 2,
-        positions: [
-          {
-            line: 1,
-            pos: 1,
-            id: "heading-tag-open",
-          },
-          {
-            line: 1,
-            pos: 19,
-            id: "heading-tag-close",
-          },
-        ],
-      },
-      {
-        language: "css",
-        stateId: "todo/span-selector",
-        options: ["ul#list", "ol#list span", "ul#list span"],
-        default: "",
-        width: 12,
-        positions: [
-          {
-            line: 16,
-            pos: 0,
-          },
-        ],
-      },
-      {
-        language: "css",
-        stateId: "todo/span-rule",
-        default: "",
-        width: 17,
-        positions: [
-          {
-            line: 17,
-            pos: 2,
-          },
-        ],
-      },
-      {
-        language: "js",
-        stateId: "todo/span-margin",
-        default: "span.style.marginLeft = '8px';",
-        options: ["span.style.marginLeft = '8px';", ""],
-        width: 40,
-        positions: [{ line: 11, pos: 2 }],
-      },
-      {
-        language: "js",
-        stateId: "todo/clear-input",
-        default: "",
-        options: [
-          "",
-          "document.getElementById('task');",
-          "document.getElementById('task').value = '';",
-          "document.getElementById('list').value = '';",
-        ],
-        width: 43,
-        positions: [{ line: 22, pos: 2 }],
-      },
-      {
-        language: "html",
-        stateId: "todo/heading-text",
-        default: "Todo List",
-        width: 13,
-        positions: [{ line: 1, pos: 4, id: "heading-text" }],
-      },
-      {
-        language: "js",
-        stateId: "todo/append-child",
-        default: "document.getElementById('list').appendChild(li);",
-        options: ["", "document.getElementById('list').appendChild(li);"],
-        width: 48,
-        positions: [{ line: 21, pos: 2, id: "append-child" }],
-      },
-      {
-        language: "css",
-        stateId: "todo/text-decoration",
-        default: "line-through;",
-        width: 23,
-        positions: [{ line: 10, pos: 19, id: "text-decoration" }],
-      },
-      {
-        language: "js",
-        stateId: "todo/addDelBtn",
-        default: "",
-        width: 23,
-        positions: [{ line: 20, pos: 2, id: "addDelBtn" }],
-      },
-      {
-        language: "js",
-        stateId: "todo/confetti",
-        default: "",
-        width: 80,
-        positions: [{ line: 36, pos: 4, id: "confetti" }],
-      },
-    ].map(
-      (i) =>
-        ({
-          ...i,
-          value: getKeyValue(i.stateId, i.default),
-        }) as CodeInput,
+  var inputs: { [key: string]: CodeInput } = $state(
+    Object.fromEntries(
+      Object.entries({
+        "todo/heading-tag": {
+          language: "html",
+          options: ["h1", "h2", "h3", "p"],
+          stateId: "todo/heading-tag",
+          default: "h1",
+          width: 2,
+          positions: [
+            {
+              line: 1,
+              pos: 1,
+              id: "heading-tag-open",
+            },
+            {
+              line: 1,
+              pos: 19,
+              id: "heading-tag-close",
+            },
+          ],
+        },
+        "todo/span-selector": {
+          language: "css",
+          stateId: "todo/span-selector",
+          options: ["ul#list", "ol#list span", "ul#list span"],
+          default: "",
+          width: 12,
+          positions: [
+            {
+              line: 16,
+              pos: 0,
+            },
+          ],
+        },
+        "todo/span-rule": {
+          language: "css",
+          stateId: "todo/span-rule",
+          default: "",
+          width: 17,
+          positions: [
+            {
+              line: 17,
+              pos: 2,
+            },
+          ],
+        },
+        "todo/span-margin": {
+          language: "js",
+          stateId: "todo/span-margin",
+          default: "span.style.marginLeft = '8px';",
+          options: ["span.style.marginLeft = '8px';", ""],
+          width: 40,
+          positions: [{ line: 11, pos: 2 }],
+        },
+        "todo/clear-input": {
+          language: "js",
+          stateId: "todo/clear-input",
+          default: "",
+          options: [
+            "",
+            "document.getElementById('task');",
+            "document.getElementById('task').value = '';",
+            "document.getElementById('list').value = '';",
+          ],
+          width: 43,
+          positions: [{ line: 22, pos: 2 }],
+        },
+        "todo/heading-text": {
+          language: "html",
+          stateId: "todo/heading-text",
+          default: "Todo List",
+          width: 13,
+          positions: [{ line: 1, pos: 4, id: "heading-text" }],
+        },
+        "todo/append-child": {
+          language: "js",
+          stateId: "todo/append-child",
+          default: "document.getElementById('list').appendChild(li);",
+          options: ["", "document.getElementById('list').appendChild(li);"],
+          width: 48,
+          positions: [{ line: 21, pos: 2, id: "append-child" }],
+        },
+        "todo/text-decoration": {
+          language: "css",
+          stateId: "todo/text-decoration",
+          default: "line-through;",
+          width: 23,
+          positions: [{ line: 10, pos: 19, id: "text-decoration" }],
+        },
+        "todo/addDelBtn": {
+          language: "js",
+          stateId: "todo/addDelBtn",
+          default: "",
+          width: 23,
+          positions: [{ line: 20, pos: 2, id: "addDelBtn" }],
+        },
+        "todo/confetti": {
+          language: "js",
+          stateId: "todo/confetti",
+          default: "",
+          width: 80,
+          positions: [{ line: 36, pos: 4, id: "confetti" }],
+        },
+      }).map(([key, value]) => [
+        key,
+        {
+          ...value,
+          value: getKeyValue(value.stateId, value.default),
+        } as CodeInput,
+      ]),
     ),
   );
   let iframe: HTMLIFrameElement | undefined = $state();
-  const getCodeValue = (key: string) =>
-    inputs.find((c) => c.stateId === key)!.value;
   const questions: (
     | {
         type: "mc";
@@ -229,7 +229,7 @@ loadTasks();`,
       heading options to see how they change the look of the page.
       When you're done, please set it to <code>h3</code>.`,
       validate: () => {
-        if (getCodeValue("todo/heading-tag") !== "h3") {
+        if (inputs["todo/heading-tag"].value !== "h3") {
           throw new Error(
             "Make sure you switched to the correct tag for the heading.",
           );
@@ -255,7 +255,7 @@ loadTasks();`,
       in the <b>JavaScript</b> code to something that will clear the contents of the input box.`,
       validate: () => {
         if (
-          getCodeValue("todo/clear-input") !==
+          inputs["todo/clear-input"].value !==
           "document.getElementById('task').value = '';"
         ) {
           throw new Error(
@@ -277,9 +277,9 @@ loadTasks();`,
       </ul>
       `,
       validate: () => {
-        let rule = getCodeValue("todo/span-rule");
-        let selector = getCodeValue("todo/span-selector");
-        let jsRule = getCodeValue("todo/span-margin");
+        let rule = inputs["todo/span-rule"].value;
+        let selector = inputs["todo/span-selector"].value;
+        let jsRule = inputs["todo/span-margin"].value;
         if (jsRule) {
           fail(
             "Make sure to remove the JavaScript code currently setting margin.",
@@ -300,7 +300,7 @@ loadTasks();`,
           li.querySelector("span")!,
         );
         // li.remove();
-        console.log("style", style.marginLeft)
+        console.log("style", style.marginLeft);
         if (!(style.marginLeft == "8px")) {
           fail(
             "Your selector is correct but your CSS rule does not seem to work properly.",
@@ -313,7 +313,7 @@ loadTasks();`,
       text: `Let's spruce up what happens when the user completes a task. On <b>Line 36</b> of the <b>JavaScript</b>, add a call to <code>confetti()</code>.
       Try passing different <a target="_blank" href="https://www.kirilv.com/canvas-confetti/" class="external">settings</a> from the library.`,
       validate: () => {
-        if (!getCodeValue("todo/confetti").includes("confetti(")) {
+        if (!inputs["todo/confetti"].value.includes("confetti(")) {
           throw new Error("Please make sure you call the confetti function ");
         }
       },
@@ -322,8 +322,8 @@ loadTasks();`,
       type: "code",
       text: `Try a different styling for the completed items. Use the documentation on the <a class="external" target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration">text-decoration</a> CSS property to choose a new way for completed items to look.`,
       validate: () => {
-        console.log("line-through", getCodeValue("todo/text-decoration"));
-        if (getCodeValue("todo/text-decoration") === "line-through;") {
+        console.log("line-through", inputs["todo/text-decoration"].value);
+        if (inputs["todo/text-decoration"].value === "line-through;") {
           throw new Error(
             "It doesn't look like you've changed the styling. Please try something other than <code>line-through;</code>.",
           );
@@ -389,7 +389,7 @@ loadTasks();`,
         {/if}
       {/each}
     </div>
-    <div class="w-2/3 h-full max-h-screen">
+    <div class="w-2/3 h-full max-h-screen editor">
       <Editor
         {prepend}
         class="pb-4"
@@ -398,9 +398,14 @@ loadTasks();`,
         tabs={["html", "js", "css"]}
         bind:inputs
         bind:iframe
-        height={480}
         {tooltips}
       />
     </div>
   </div>
 </div>
+
+<style>
+  .editor {
+    --editor-height: 480px;
+  }
+</style>
