@@ -144,7 +144,7 @@
         if (
           ["border", "border-radius", "padding"]
             .map((v) => template.inputs[`minefield/css/direction/${v}`].value)
-            .every((v) => v !== "")
+            .some((v) => v === "")
         ) {
           fail(
             "Please make sure to set the border, padding, and border-radius properties.",
