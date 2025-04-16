@@ -207,7 +207,7 @@
       type: "code",
       text: `<b>JavaScript</b>: When driving the robot, the speed is currently fixed. Please modify <b>Line 40</b> of the JavaScript code to set the speed using the range slider input in the HTML.`,
       solution: `You can get the value of the range slider using
-      <code>document.querySelector("#speed").value</code> or <code>document.getElementById("#speed").value</code>.
+      <code>document.querySelector("#speed").value</code> or <code>document.getElementById("speed").value</code>.
       Then convert it to an integer using <code>parseInt()</code>. So the final code is <code>parseInt(document.querySelector("#speed").value</code>)`,
       validate: () => {
         let input = iframe!.contentDocument!.querySelector(
