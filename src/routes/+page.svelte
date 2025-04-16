@@ -79,6 +79,12 @@
           icon: "📋",
           description: "Fix bugs and add features to a todo list app.",
         },
+        {
+          link: "/projects/minefield",
+          title: "Minefield Clearance",
+          icon: "💣",
+          description: "Navigate a robot to clear a minefield.",
+        },
       ],
     },
     {
