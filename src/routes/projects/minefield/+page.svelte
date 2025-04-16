@@ -58,7 +58,7 @@
       stateId: "minefield-clearance/question/driving",
       options: [
         {
-          text: "The Sphero in the given direction.",
+          text: "The Sphero drives in the given direction.",
           correct: false,
           hint: "",
         },
