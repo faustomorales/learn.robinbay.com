@@ -25,7 +25,6 @@
           type: "mc";
           text: string;
           stateId: string;
-          solution?: string;
           options: { text: string; correct: boolean; hint: string }[];
         }
       | {
@@ -66,7 +65,6 @@
             stateId={question.stateId}
             width="w-full"
             class="mt-4 mb-4"
-            solution={question.solution}
             options={question.options}><p>{@html question.text}</p></Question
           >
         {:else}
