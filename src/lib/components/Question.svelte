@@ -25,7 +25,7 @@
     showButton?: boolean;
     solution?: string;
     multiple?: boolean;
-    options: { id?: string; text: string; hint: string; correct: boolean }[];
+    options: { id?: string; text: string; hint?: string; correct?: boolean }[];
   } = $props();
 
   $effect(() => setKeyValue(stateId, JSON.stringify(selected)));
@@ -44,11 +44,16 @@
   export const verify = (initial: boolean = false) => {
     let snapshot = $state.snapshot(selected);
     let incorrect = options.filter(
-      (o) => snapshot.includes(o.id || o.text) != o.correct,
+      (o) => snapshot.includes(o.id || o.text) !== !!o.correct,
     );
     if (incorrect.length) {
       if (!initial) {
-        fail(incorrect.map((option) => option.hint).join(" "));
+        fail(
+          incorrect
+            .map((option) => option.hint)
+            .filter((v) => v)
+            .join(" "),
+        );
       }
     }
   };

@@ -10,13 +10,13 @@
         steps,
         stateId,
         title,
-        initial = defaultPrependedCode,
+        base = defaultPrependedCode,
         prepend = defaultPrependedCode,
     }: {
         steps: Component<{ step: Step }>[];
         stateId: string;
         title: string;
-        initial?: PrependedCode;
+        base?: PrependedCode;
         prepend?: PrependedCode;
     } = $props();
     let iframe: HTMLIFrameElement | undefined = $state();
@@ -40,11 +40,11 @@
                 <state.component bind:step={state.step}></state.component>
             {/each}
         </div>
-        <div class="w-1/2 h-full max-h-screen">
+        <div class="w-1/2 max-h-screen">
             <Editor
                 {stateId}
                 {prepend}
-                {initial}
+                {base}
                 bind:this={editor}
                 bind:iframe
             />

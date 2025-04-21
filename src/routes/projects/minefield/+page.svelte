@@ -26,11 +26,15 @@
   });
 </script>
 
+<svelte:head>
+  <title>Minefield Clearance</title>
+</svelte:head>
+
 <ProjectV2
   stateId="minefield-clearance"
   title="Minefield Clearance"
   onIframeLoad={(iframe) => ((iframe.contentWindow! as any).sphero = sphero)}
-  initial={{
+  base={{
     js: javascriptTemplate,
     html: htmlTemplate,
     css: cssTemplate,

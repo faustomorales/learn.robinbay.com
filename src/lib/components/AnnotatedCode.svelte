@@ -17,7 +17,7 @@
         inputs?: CodeInput[];
     } = $props();
 
-    let initial = {
+    let base = {
         html: language === "html" ? code : "",
         css: language === "css" ? code : "",
         js: language === "js" ? code : "",
@@ -26,7 +26,7 @@
 </script>
 
 <Editor
-    {initial}
+    {base}
     {tabs}
     class={props.class}
     {tooltips}

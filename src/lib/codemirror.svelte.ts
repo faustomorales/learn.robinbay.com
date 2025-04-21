@@ -8,7 +8,6 @@ import {
 import { EditorState, Transaction } from "@codemirror/state";
 import { RangeSet } from "@codemirror/state";
 import { getKeyValue, setKeyValue } from "./common";
-import { js } from "three/tsl";
 
 export type Language = "html" | "css" | "js";
 export type CodeInput = {
@@ -35,6 +34,25 @@ type NormalizedItem = {
   width: number;
   height: number;
 };
+
+export type MultipleChoiceQuestion = {
+  type: "mc";
+  text: string;
+  stateId: string;
+  options: { id?: string; text: string; correct?: boolean; hint?: string }[];
+};
+
+export type Problem =
+  | MultipleChoiceQuestion
+  | {
+      type: "code";
+      text: string;
+      solution?: string;
+      validate: (
+        inputs: { [key: string]: CodeInput },
+        iframe: HTMLIFrameElement,
+      ) => void;
+    };
 
 type NormalizedCodeInput = CodeInput & { normalized: NormalizedItem[] };
 
@@ -90,7 +108,7 @@ const createInputElement = (params: NormalizedCodeInput) => {
       "border",
       "border-slate-200",
       "rounded-md",
-      "text-center",
+      "px-1",
       "p-0",
       "transition",
       "duration-300",
@@ -210,7 +228,7 @@ export const createAnnotations = (
   content: string,
   tips: Tooltip[],
   inputs: CodeInput[],
-  initial?: string,
+  base?: string,
 ) => {
   let lineStartIndexes = content
     .split("\n")
@@ -249,15 +267,9 @@ export const createAnnotations = (
       });
     });
   };
-  let readonly = Math.max(
-    ...processed.tips
-      .map((t) => t.normalized.to)
-      .concat(
-        processed.inputs.map((i) => i.normalized.map((p) => p.to)).flat(),
-      ),
-  );
-  if (initial) {
-    content = initial.slice(0, readonly).concat(content.slice(readonly));
+  let readonly = base?.length || 0;
+  if (base) {
+    content = base.slice(0, readonly).concat(content.slice(readonly));
   }
   let extensions = [
     preventModifyTargetRanges(() => [{ from: 0, to: readonly }]),
@@ -461,7 +473,7 @@ export const parseInteractiveSnippet = (code: string, language: Language) => {
     });
 
   return {
-    formatted,
+    formatted: formatted,
     inputs,
     tooltips: Object.values(tooltips),
   };

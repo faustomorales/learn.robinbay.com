@@ -389,12 +389,12 @@ loadTasks();`,
         {/if}
       {/each}
     </div>
-    <div class="w-2/3 h-full max-h-screen editor">
+    <div class="w-2/3 max-h-screen editor">
       <Editor
         {prepend}
         class="pb-4"
         stateId="todolist"
-        initial={template}
+        base={template}
         tabs={["html", "js", "css"]}
         bind:inputs
         bind:iframe

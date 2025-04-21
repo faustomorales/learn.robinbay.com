@@ -14,6 +14,7 @@
 	},
 	"devDependencies": {
 		"@iconify/json": "^2.2.300",
+		"@splidejs/svelte-splide": "^0.2.9",
 		"@sveltejs/adapter-cloudflare": "^5.0.0",
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",

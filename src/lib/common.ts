@@ -10,6 +10,7 @@ export type ProjectContext = {
   check: () => void;
 };
 
+
 export const defaultPrependedCode = { html: "", js: "", css: "" };
 
 export const fail = (message: string) => {

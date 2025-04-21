@@ -17,13 +17,13 @@
   let lastClickEvent: MouseEvent | undefined = $state(undefined);
 </script>
 
-<Modal title="Terms of Service" bind:open={showConformation} autoclose>
+<Modal title="Confirmation" bind:open={showConformation} autoclose>
   <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
     {confirm}
   </p>
   <svelte:fragment slot="footer">
-    <Button on:click={() => onclick(lastClickEvent!)}>Yes</Button>
-    <Button color="alternative">No</Button>
+    <Button color="green" on:click={() => onclick(lastClickEvent!)}>Yes</Button>
+    <Button color="red">No</Button>
   </svelte:fragment>
 </Modal>
 

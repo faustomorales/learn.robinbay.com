@@ -24,9 +24,10 @@
   let {
     stateId = "",
     prepend = defaultPrependedCode,
-    initial = defaultPrependedCode,
+    base = defaultPrependedCode,
     iframe = $bindable(),
     iframeVisibility = "visible",
+    showConsole = false,
     onIframeLoad = () => {},
     tabs = ["html", "css", "js"],
     readonly = false,
@@ -35,11 +36,12 @@
     ...props
   }: {
     stateId?: string;
+    showConsole?: boolean;
     onIframeLoad?: (iframe: HTMLIFrameElement) => void;
     iframe?: HTMLIFrameElement;
     iframeVisibility?: "visible" | "hidden" | "disabled";
     prepend?: PrependedCode;
-    initial?: PrependedCode;
+    base?: PrependedCode;
     readonly?: boolean;
     tabs?: ("html" | "css" | "js")[];
     class?: ClassValue;
@@ -76,7 +78,7 @@
       .map((t) => ({ key: stateId ? `${stateId}:${t}` : null, language: t }))
       .map((t) => ({
         ...t,
-        content: getKeyValue(t.key, initial[t.language]),
+        content: getKeyValue(t.key, base[t.language]),
         settings: languageSettings[t.language],
         tooltips: tooltips.filter((tip) => t.language == tip.language),
         inputs: Object.values(inputs).filter((i) => i.language === t.language),
@@ -87,7 +89,7 @@
           tab.content,
           tab.tooltips,
           tab.inputs,
-          initial[tab.language],
+          base[tab.language],
         ),
       })),
   );
@@ -107,12 +109,12 @@
       return {
         ...tab,
         ...createAnnotations(
-          initial[tab.language] || "",
+          base[tab.language] || "",
           tab.tooltips,
           Object.values(inputs).filter(
             (input) => input.language === tab.language,
           ),
-          initial[tab.language],
+          base[tab.language],
         ),
       };
     });
@@ -128,10 +130,16 @@
 		<script>
 			window.onerror = (message, source, lineno, colno, error) => parent.window.postMessage(
 			{ type: 'javascript-error', message, source, lineno, colno, error, uid: "${uid}" }, '*');
+      var originalConsoleLog = console.log;
+      window.console.log = (...args) => {
+        originalConsoleLog(...args);
+        parent.window.postMessage(
+          { type: 'console-log', args, uid: "${uid}" });
+    };
 		<\/script>
 		<body>
 			${prepend.html}
-			${keyedComponents.html}
+			${keyedComponents.html || ""}
 		</body>
 		<style onerror="parent.window.postMessage({ type: 'error', message: 'CSS Error' }, '*')">
 			${prepend.css}
@@ -149,22 +157,24 @@
     source.slice(0, source.indexOf(`"start-marker";`)).split("\n").length,
   );
   let javascriptError = $state("");
+  let javascriptConsole = $state("");
   onMount(() => {
     window.addEventListener(
       "message",
       (message: {
-        data: {
-          type: "javascript-error";
-          lineno: number;
-          source: string;
-          message: string;
-          uid: string;
-        };
+        data:
+          | {
+              type: "javascript-error";
+              lineno: number;
+              source: string;
+              message: string;
+              uid: string;
+            }
+          | { type: "console-log"; args: any[]; uid: string };
       }) => {
-        if (
-          message.data.type === "javascript-error" &&
-          message.data.uid === uid
-        ) {
+        if (message.data.uid !== uid) return;
+
+        if (message.data.type === "javascript-error") {
           javascriptError = `Error on line ${message.data.lineno - javascriptStart}. ${message.data.message}`;
           if (typeof iframe === "object") {
             let clearError = () => {
@@ -173,6 +183,16 @@
             };
             iframe!.addEventListener("load", clearError);
           }
+        } else if (message.data.type === "console-log") {
+          javascriptConsole +=
+            message.data.args
+              .map((arg: any) => {
+                if (typeof arg === "object") {
+                  return JSON.stringify(arg);
+                }
+                return arg;
+              })
+              .join(" ") + "\n";
         }
       },
     );
@@ -187,6 +207,7 @@
     frameborder="0"
     bind:this={iframe}
     onload={() => {
+      javascriptConsole = "";
       onIframeLoad(iframe!);
     }}
     class={`border-solid border-1 border-gray-200 dark:border-gray-700 mb-2 ${iframeVisibility === "hidden" ? "hidden" : "visible"}`}
@@ -229,6 +250,24 @@
         </TabItem>
       {/each}
     </Tabs>
+  {/if}
+  {#if showConsole}
+    <div class="space-y-2 mb-2 mt-2">
+      <h2
+        class="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide"
+      >
+        Console Output
+      </h2>
+      <div
+        class="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 p-4 rounded-lg font-mono text-sm whitespace-pre-wrap break-words shadow-md"
+      >
+        {#if javascriptConsole}
+          {javascriptConsole}
+        {:else}
+          <span class="text-gray-400">No console output detected yet.</span>
+        {/if}
+      </div>
+    </div>
   {/if}
   {#if Object.keys(inputs).length > 0}
     <div class="mt-2">
