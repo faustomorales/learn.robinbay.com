@@ -1,14 +1,14 @@
 // @ts-nocheck
-var directions = { up: 270, right: 0, down: 90, left: 180 };
+var [[ "id": "directions", "text": "Define a variable to store the four directions, for convenience and to avoid magic numbers." ]]directions[[ "id": "directions" ]] = { up: 270, right: 0, down: 90, left: 180 };
 var driveAuto = async () => {
   await sphero.wake();
-  await sphero.setColor(/*{{ "stateId": "minefield/color", "default": "\"red\"", "width": 15 }}*/);
+  await sphero.setColor({{ "id": "minefield/color", "default": "\"red\"", "width": 15 }});
   // Drive the Sphero out to a fixed distance.
-  var count = /*{{ "stateId": "minefield/count", "default": "0", "width": 2 }}*/;
-  var limit = /*{{ "stateId": "minefield/limit", "default": "5", "width": 2 }}*/;
-  var speed = /*{{ "stateId": "minefield/speed", "default": "150", "width": 4 }}*/;
-  var short = /*{{ "stateId": "minefield/short", "default": "250", "width": 4 }}*/;
-  var long = /*{{ "stateId": "minefield/long", "default": "1000", "width": 4 }}*/;
+  var count = {{ "id": "minefield/count", "default": "0", "width": 2 }};
+  var limit = {{ "id": "minefield/limit", "default": "5", "width": 2 }};
+  var speed = {{ "id": "minefield/speed", "default": "150", "width": 4 }};
+  var short = {{ "id": "minefield/short", "default": "250", "width": 4 }};
+  var long = {{ "id": "minefield/long", "default": "1000", "width": 4 }};
   while (count < limit) {
     // Drive up
     await sphero.roll(speed, directions.up);
@@ -38,7 +38,7 @@ var toggleOnOff = async (event) => {
 };
 
 var getSpeed = () => {
-  return /*{{ "stateId": "minefield/manual-speed", "default": "100", "width": 50 }}*/
+  return {{ "id": "minefield/manual-speed", "default": "100", "width": 50 }}
 }
 
 var move = async (direction) => {

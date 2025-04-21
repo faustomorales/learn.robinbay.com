@@ -20,7 +20,7 @@ export type CodeInput = {
   width: number;
   positions: {
     line: number;
-    pos: number;
+    character: number;
   }[];
 };
 export type Tooltip = {
@@ -194,12 +194,12 @@ const normalizeCodeInputs = (
         linePositionToNormalized(
           lineStartIndexes,
           {
-            character: p.pos,
+            character: p.character,
             line: p.line,
           },
           {
             line: p.line,
-            character: p.pos + t.width,
+            character: p.character + t.width,
           },
         ),
       ),
@@ -359,12 +359,8 @@ export const createAnnotations = (
 
 export const parseInteractiveSnippet = (code: string, language: Language) => {
   const inputs: { [key: string]: CodeInput } = {};
-  if (language === "js" || language === "css") {
-  }
-  const regex =
-    language === "html"
-      ? /\<\!\-\-\{\{(.*?)\}\}\-\-\>/g
-      : /\/\*\{\{(.*?)\}\}\*\//g;
+  let tooltips: { [key: string]: Tooltip } = {};
+  const regex = /(\{\{(.*?)\}\}|\[\[(.*?)\]\])/g;
   let formatted: string = "";
 
   code
@@ -375,66 +371,86 @@ export const parseInteractiveSnippet = (code: string, language: Language) => {
       let replacements: { start: number; stop: number; spaces: number }[] = [];
       let offset = 0;
       while ((match = regex.exec(line)) !== null) {
-        const fullMatch = match[0];
+        const rawText = match[0];
+        let inner = rawText.slice(2, -2);
+        let spaces: number;
+        let position = {
+          line: lineIndex + 1,
+          character: match.index - offset,
+        };
+        let parsed: any;
         try {
-          let content: {
-            options?: string[];
-            id: string;
-            stateId: string;
-            default?: string;
-            width?: number;
-          };
-          try {
-            content = JSON.parse(`{${match[1]}}`);
-          } catch (e) {
-            throw new Error(`Could not parse JSON: ${`{${match[1]}}`}`);
-          }
-
-          if (!content.stateId) {
-            throw new Error("stateId missing");
-          }
-          let position = {
-            line: lineIndex + 1,
-            pos: match.index - offset,
-          };
-          if (inputs[content.stateId]) {
-            inputs[content.stateId].positions.push(position);
-          } else {
-            inputs[content.stateId] = {
-              stateId: content.stateId!,
-              positions: [position],
-              default: content.default || "",
-              options:
-                content.options && content.options.length > 0
-                  ? content.options
-                  : undefined,
-              value: getKeyValue(content.stateId!, content.default || ""),
-              language,
-              width:
-                content.width ||
-                (content.options && content.options.length > 0
-                  ? Math.max(
-                      ...content.options
-                        .concat(content.default ? [content.default] : [])
-                        .map((o) => o.length),
-                    )
-                  : content.default
-                    ? content.default.length
-                    : 10),
+          parsed = JSON.parse(`{${inner}}`);
+        } catch (e) {
+          throw new Error(`Could not parse JSON: ${`{${inner}}`}`);
+        }
+        try {
+          if (rawText.startsWith("[[")) {
+            let content = parsed as { id: string; text?: string };
+            if (tooltips[content.id]) {
+              tooltips[content.id].to = position;
+            } else {
+              tooltips[content.id] = {
+                language,
+                from: position,
+                to: position,
+                text: content.text || "",
+              };
+            }
+            spaces = 0;
+          } else if (rawText.startsWith("{{")) {
+            let content = parsed as {
+              options?: string[];
+              id: string;
+              default?: string;
+              width?: number;
             };
+
+            if (!content.id) {
+              throw new Error("stateId missing");
+            }
+            if (inputs[content.id]) {
+              inputs[content.id].positions.push(position);
+            } else {
+              inputs[content.id] = {
+                stateId: content.id!,
+                positions: [position],
+                default: content.default || "",
+                options:
+                  content.options && content.options.length > 0
+                    ? content.options
+                    : undefined,
+                value: getKeyValue(content.id!, content.default || ""),
+                language,
+                width:
+                  content.width ||
+                  (content.options && content.options.length > 0
+                    ? Math.max(
+                        ...content.options
+                          .concat(content.default ? [content.default] : [])
+                          .map((o) => o.length),
+                      )
+                    : content.default
+                      ? content.default.length
+                      : 10),
+              };
+            }
+            spaces = inputs[content.id].width;
+          } else {
+            throw new Error("Invalid syntax detected by regular expression.");
           }
 
           // Replace in line with blank of appropriate width
           replacements.push({
             start: match.index - offset,
-            stop: match.index + fullMatch.length - offset,
-            spaces: inputs[content.stateId].width,
+            stop: match.index + rawText.length - offset,
+            spaces: spaces,
           });
-          offset += fullMatch.length - inputs[content.stateId].width;
+          offset += rawText.length - spaces;
           // Reset regex.lastIndex to account for changed line
-          regex.lastIndex = match.index + fullMatch.length;
+          regex.lastIndex = match.index + rawText.length;
         } catch (e) {
-          console.error(`Could not parse ${fullMatch}: ${e}`);
+          console.error(`Could not parse ${rawText}: ${e}`);
         }
       }
       replacements.forEach((r) => {
@@ -447,6 +463,7 @@ export const parseInteractiveSnippet = (code: string, language: Language) => {
   return {
     formatted,
     inputs,
+    tooltips: Object.values(tooltips),
   };
 };
 
@@ -466,6 +483,9 @@ export const parseInteractiveSnippets = (content: {
       ...transformed.css.inputs,
       ...transformed.html.inputs,
     },
+    tooltips: transformed.js.tooltips
+      .concat(transformed.css.tooltips)
+      .concat(transformed.html.tooltips),
     parsed: {
       js: transformed.js.formatted,
       html: transformed.html.formatted,

@@ -255,7 +255,7 @@
         below to complete the project.
       </p>
       <hr class="mb-4 border-gray-200" />
-      {#each questions as question, i}
+      {#each questions as question}
         {#if question.type === "mc"}
           <Question
             stateId={question.stateId}
@@ -282,6 +282,7 @@
         stateId="minefield-clearance"
         initial={template.parsed}
         bind:inputs={template.inputs}
+        tooltips={template.tooltips}
         onIframeLoad={(iframe) =>
           ((iframe.contentWindow! as any).sphero = sphero)}
       />

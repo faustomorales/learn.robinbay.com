@@ -1,7 +1,7 @@
-/*{{ "stateId": "minefield/css/direction/selector", "default": "", "options": ["","#direction", ".direction", "direction"] }}*/ {
-  border: /*{{ "stateId": "minefield/css/direction/border", "default": "", "width": 20 }}*/;
-  padding: /*{{ "stateId": "minefield/css/direction/padding", "default": "", "width": 20 }}*/;
-  border-radius: /*{{ "stateId": "minefield/css/direction/border-radius", "default": "", "width": 20 }}*/;
+{{ "id": "minefield/css/direction/selector", "default": "", "options": ["","#direction", ".direction", "direction"] }} {
+  border: {{ "id": "minefield/css/direction/border", "default": "", "width": 20 }};
+  padding: {{ "id": "minefield/css/direction/padding", "default": "", "width": 20 }};
+  border-radius: {{ "id": "minefield/css/direction/border-radius", "default": "", "width": 20 }};
 }
 
 .on-off {
