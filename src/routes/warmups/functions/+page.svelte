@@ -185,7 +185,7 @@ var greetFullName = (firstName, lastName) => {
         },
         {
           type: "code",
-          text: "On <b>Line 7</b>, please change the <code>multiply</code> function to return the product of <code>a</code> and <code>b</code> instead of the sum.",
+          text: "On <b>Line 6</b>, please change the <code>multiply</code> function to return the product of <code>a</code> and <code>b</code> instead of the sum.",
           validate: (inputs) => {
             let value = inputs["warmup-function-3-multiply"].value;
             switch (value) {
@@ -208,7 +208,7 @@ var greetFullName = (firstName, lastName) => {
         },
         {
           type: "code",
-          text: "On <b>Line 9</b>, please finish implementing the <code>subtract</code> function by finishing the function signature on <code>Line 9</code> and the operation on <code>Line 10</code>. The function should return the difference of <code>a</code> and <code>b</code>.",
+          text: "Please finish implementing the <code>subtract</code> function by finishing the function signature on <b>Line 9</b> and the operation on <b>Line 10</b>. The function should return the difference of <code>a</code> and <code>b</code>.",
           solution:
             'You should have entered "<code>a, b</code>" on <b>Line 9</b> and "<code>a - b</code>" on <b>Line 10</b>.',
           validate: (inputs) => {
