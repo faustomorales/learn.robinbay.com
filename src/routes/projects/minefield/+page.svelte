@@ -1,24 +1,13 @@
 <script lang="ts">
-  import { parseInteractiveSnippets } from "$lib/codemirror.svelte";
   import { fail } from "$lib/common";
-  import Question from "$lib/components/Question.svelte";
-  import BaseQuestion from "$lib/components/BaseQuestion.svelte";
+  import ProjectV2 from "$lib/components/ProjectV2.svelte";
   import javascriptTemplate from "./template.js?raw";
   import htmlTemplate from "./template.html?raw";
   import cssTemplate from "./template.css?raw";
-  import Editor from "$lib/components/Editor.svelte";
   import { onMount } from "svelte";
   import SpheroMiniSimulator from "$lib/sphero/simulator";
-  let iframe = $state(undefined as HTMLIFrameElement | undefined);
   let sphero = $state(undefined as SpheroMiniSimulator | undefined);
   let simulator: HTMLDivElement;
-  let template = $state(
-    parseInteractiveSnippets({
-      js: javascriptTemplate,
-      html: htmlTemplate,
-      css: cssTemplate,
-    }),
-  );
   onMount(() => {
     sphero = new SpheroMiniSimulator(
       simulator!,
@@ -35,22 +24,18 @@
       })),
     );
   });
+</script>
 
-  const questions: (
-    | {
-        type: "mc";
-        text: string;
-        stateId: string;
-        solution?: string;
-        options: { text: string; correct: boolean; hint: string }[];
-      }
-    | {
-        type: "code";
-        text: string;
-        solution?: string;
-        validate: () => void;
-      }
-  )[] = [
+<ProjectV2
+  stateId="minefield-clearance"
+  title="Minefield Clearance"
+  onIframeLoad={(iframe) => ((iframe.contentWindow! as any).sphero = sphero)}
+  initial={{
+    js: javascriptTemplate,
+    html: htmlTemplate,
+    css: cssTemplate,
+  }}
+  questions={[
     {
       type: "mc",
       text: "When driving, what happens when you press and release one of the driving keys?",
@@ -74,12 +59,9 @@
       <b>HTML:</b> As part of your design, you want to try different indicators for left, right, up, and down. Initially,
       they are just the text "left", "right", "up", and "down". You can change the text by modifying the content
       of the direction buttons in the HTML. Please change them to something else. In Chrome, you can use the tool under "Edit > Emoji and Symbols" to find emoji that might be suitable (e.g., ↑, ←, →, ↓).`,
-      validate: () => {
+      validate: (inputs) => {
         ["Left", "Right", "Up", "Down"].forEach((dir) => {
-          if (
-            template.inputs[`minefield/arrow-${dir.toLowerCase()}`].value ===
-            dir
-          ) {
+          if (inputs[`minefield/arrow-${dir.toLowerCase()}`].value === dir) {
             throw new Error(
               `The ${dir} button should not have the text "${dir}".`,
             );
@@ -90,11 +72,11 @@
     {
       type: "code",
       text: `<b>HTML:</b> Initially, the direction buttons only have a direction-specific class. But we might want to style all the buttons using some common rules. Please add a class called <code>direction</code> to each of the buttons using the blank input box.`,
-      validate: () => {
+      validate: (inputs) => {
         var values = [
           ...new Set(
             [1, 2, 3, 4].map(
-              (i) => template.inputs[`minefield/direction-class-${i}`].value,
+              (i) => inputs[`minefield/direction-class-${i}`].value,
             ),
           ),
         ];
@@ -119,9 +101,8 @@
       text: `
       <b>CSS:</b> Now that we have a way of referring to all the buttons, let's make them a little more attractive. In the CSS code,
       please edit <b>Lines 1-5</b> to style the direction buttons. First, you'll choose the correct selector for the buttons. Then use valid CSS to set the <code>border</code>, <code>padding</code>, and <code>border-radius</code> properties. `,
-      validate: () => {
-        let selector =
-          template.inputs["minefield/css/direction/selector"].value;
+      validate: (inputs) => {
+        let selector = inputs["minefield/css/direction/selector"].value;
         if (selector === "") {
           fail("Please make sure to choose a selector for the buttons.");
         }
@@ -142,7 +123,7 @@
         }
         if (
           ["border", "border-radius", "padding"]
-            .map((v) => template.inputs[`minefield/css/direction/${v}`].value)
+            .map((v) => inputs[`minefield/css/direction/${v}`].value)
             .some((v) => v === "")
         ) {
           fail(
@@ -154,8 +135,8 @@
     {
       type: "code",
       text: `<b>HTML:</b> The <code>onclick</code> handler on the Auto button is currently not set! That's why the button doesn't do anything. Please set the <code>onclick</code> handler to <b>call</b> the <code>driveAuto</code> function.`,
-      validate: () => {
-        let value = template.inputs["minefield/html/auto/onclick"].value;
+      validate: (inputs) => {
+        let value = inputs["minefield/html/auto/onclick"].value;
         if (value === "") {
           fail("Please make sure to set the onclick handler.");
         }
@@ -176,7 +157,7 @@
       text: `<b>JavaScript</b>: When you push the <b>Auto</b> button, the robot doesn't manage to hit all of the mines.
       It leaves big gaps. Please modify <b>Lines 6-10</b> (you may not need to change all of them) to make the robot path
       cover all of the mines.`,
-      validate: () => {
+      validate: (inputs) => {
         var keys = [
           "minefield/count",
           "minefield/limit",
@@ -186,7 +167,7 @@
         ];
         if (
           keys
-            .map((k) => template.inputs[k])
+            .map((k) => inputs[k])
             .every((input) => input.value === input.default)
         ) {
           fail(
@@ -194,8 +175,8 @@
           );
         }
         let reducedShortLength =
-          parseInt(template.inputs["minefield/short"].value) <
-          parseInt(template.inputs["minefield/short"].default);
+          parseInt(inputs["minefield/short"].value) <
+          parseInt(inputs["minefield/short"].default);
         if (!reducedShortLength) {
           fail(
             "Please make changes that improve the coverage of the robot (how do you make the robot path travel for less distance in the short direction?).",
@@ -209,11 +190,11 @@
       solution: `You can get the value of the range slider using
       <code>document.querySelector("#speed").value</code> or <code>document.getElementById("speed").value</code>.
       Then convert it to an integer using <code>parseInt()</code>. So the final code is <code>parseInt(document.querySelector("#speed").value</code>)`,
-      validate: () => {
-        let input = iframe!.contentDocument!.querySelector(
+      validate: (inputs, iframe) => {
+        let input = iframe.contentDocument!.querySelector(
           "#speed",
         ) as HTMLInputElement;
-        let getSpeed = (iframe!.contentWindow! as any).getSpeed as () =>
+        let getSpeed = (iframe.contentWindow! as any).getSpeed as () =>
           | number
           | string;
         let initialValue = input.value;
@@ -235,63 +216,25 @@
         }
       },
     },
-  ];
-</script>
-
-<svelte:head>
-  <title>Minefield Clearance</title>
-</svelte:head>
-
-<div class="p-4 h-screen">
-  <div class="flex gap-3">
-    <div class="w-1/3 max-h-screen overflow-y-auto pb-6">
-      <h2 class="text-xl font-bold mb-2 mt-3">Minefield Clearance</h2>
-      <p class="mb-4">
-        In this project, you will implement a user interface and automated
-        algorithm that will navigate a robot to successfully trigger all the
-        mines in a minefield. The mines are represented by red platforms in the
-        simulator. Start by manually driving the robot to trigger the mines.
-        Once you've done that, start addressing the questions and exercises
-        below to complete the project.
-      </p>
-      <hr class="mb-4 border-gray-200" />
-      {#each questions as question}
-        {#if question.type === "mc"}
-          <Question
-            stateId={question.stateId}
-            width="w-full"
-            class="mt-4 mb-4"
-            solution={question.solution}
-            options={question.options}><p>{@html question.text}</p></Question
-          >
-        {:else}
-          <BaseQuestion
-            solution={question.solution}
-            class="mt-4 mb-4"
-            validate={question.validate}
-            ><p>{@html question.text}</p></BaseQuestion
-          >
-        {/if}
-      {/each}
-    </div>
-    <div class="w-2/3 h-full max-h-screen editor">
-      <div bind:this={simulator} class="simulator mt-4 mb-4"></div>
-      <Editor
-        bind:iframe
-        class="pb-4"
-        stateId="minefield-clearance"
-        initial={template.parsed}
-        bind:inputs={template.inputs}
-        tooltips={template.tooltips}
-        onIframeLoad={(iframe) =>
-          ((iframe.contentWindow! as any).sphero = sphero)}
-      />
-    </div>
-  </div>
-</div>
+  ]}
+>
+  {#snippet introduction()}
+    <p class="mb-4">
+      In this project, you will implement a user interface and automated
+      algorithm that will navigate a robot to successfully trigger all the mines
+      in a minefield. The mines are represented by red platforms in the
+      simulator. Start by manually driving the robot to trigger the mines. Once
+      you've done that, start addressing the questions and exercises below to
+      complete the project.
+    </p>
+  {/snippet}
+  {#snippet secondary()}
+    <div bind:this={simulator} class="simulator mt-4 mb-4"></div>
+  {/snippet}
+</ProjectV2>
 
 <style>
-  .editor {
+  :global(.editor) {
     --editor-height: 240px;
     --iframe-height: 120px;
   }
