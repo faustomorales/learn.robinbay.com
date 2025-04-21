@@ -231,7 +231,14 @@
     </Tabs>
   {/if}
   {#if Object.keys(inputs).length > 0}
-    <div class="mt-2"><Button onclick={reset} text="Reset" color="red" /></div>
+    <div class="mt-2">
+      <Button
+        confirm="Are you sure you want to clear all of your work?"
+        onclick={reset}
+        text="Reset"
+        color="red"
+      />
+    </div>
   {/if}
 </div>
 
