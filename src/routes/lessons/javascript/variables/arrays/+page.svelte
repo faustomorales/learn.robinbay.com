@@ -1,7 +1,7 @@
 <script lang="ts">
     import SpheroExercise from "$lib/components/SpheroExercise.svelte";
     import CodeText from "$lib/components/CodeText.svelte";
-    import AnnotatedCode from "$lib/components/AnnotatedCode.svelte";
+    import AnnotatedCodeV2 from "$lib/components/AnnotatedCodeV2.svelte";
     import { ensureVariableExists } from "$lib/verifications.svelte";
     import Link from "$lib/components/Link.svelte";
     import { stringToColor } from "$lib/sphero/packets";
@@ -67,7 +67,7 @@ await sphero.delay(1000);
         Here’s an example of an array in JavaScript. This code contains a series
         of strings that could refer to people's names.
 
-        <AnnotatedCode
+        <AnnotatedCodeV2
             code={`var names = ["Alice", "Bob", "Sally"];`}
             language="js"
         />

@@ -8,6 +8,7 @@
   import { type PrependedCode, defaultPrependedCode } from "$lib/common";
   import type { Snippet } from "svelte";
   import Editor from "./Editor.svelte";
+  import type { Component } from "svelte";
   let {
     stateId,
     title,
@@ -20,6 +21,7 @@
     introduction,
     secondary,
     onIframeLoad = () => {},
+    ...props
   }: {
     stateId: string;
     title: string;
@@ -31,6 +33,7 @@
     prepend?: PrependedCode;
     onIframeLoad?: (iframe: HTMLIFrameElement) => void;
     introduction?: Snippet;
+    introductionComponent?: Component;
     secondary?: Snippet;
   } = $props();
   let iframe: HTMLIFrameElement | undefined = $state(undefined);
@@ -49,6 +52,8 @@
       <h2 class="text-xl font-bold mb-2 mt-3">{title}</h2>
       {#if introduction}
         {@render introduction()}
+      {:else if props.introductionComponent}
+        <props.introductionComponent />
       {/if}
       <hr class="mb-4 border-gray-200" />
       {#each questions as question}

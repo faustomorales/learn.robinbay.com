@@ -7,14 +7,12 @@
         language,
         code,
         tooltips,
-        inputs = $bindable([]),
         ...props
     }: {
         language: "html" | "css" | "js";
         code: string;
         class?: ClassValue;
         tooltips?: Tooltip[];
-        inputs?: CodeInput[];
     } = $props();
 
     let base = {
@@ -30,7 +28,6 @@
     {tabs}
     class={props.class}
     {tooltips}
-    bind:inputs
     iframeVisibility="disabled"
     readonly
 />

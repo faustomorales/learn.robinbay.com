@@ -3,6 +3,7 @@
   import { type Problem } from "$lib/codemirror.svelte";
   import type { PrependedCode } from "$lib/common";
   import ProjectV2 from "./ProjectV2.svelte";
+  import type { Component, Snippet } from "svelte";
 
   let {
     stages,
@@ -16,6 +17,8 @@
       showConsole?: boolean;
       questions: Problem[];
       base: PrependedCode;
+      introductionComponent?: Component;
+      introduction?: Snippet;
     }[];
   } = $props();
 </script>

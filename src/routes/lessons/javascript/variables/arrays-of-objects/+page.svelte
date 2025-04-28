@@ -2,7 +2,7 @@
     import SpheroExercise from "$lib/components/SpheroExercise.svelte";
     import CodeText from "$lib/components/CodeText.svelte";
     import List from "$lib/components/List.svelte";
-    import AnnotatedCode from "$lib/components/AnnotatedCode.svelte";
+    import AnnotatedCodeV2 from "$lib/components/AnnotatedCode.svelte";
     import { ensureVariableExists, ensureVariableType } from "$lib/verifications.svelte";
 </script>
 
@@ -73,7 +73,7 @@ var drive = async (sphero) => {
             This array would likely be used by a programmer to represent an
             array of people.
         </p>
-        <AnnotatedCode
+        <AnnotatedCodeV2
             code={`var people = [
     { name: "Alice", age: 20 },
     { name: "Bob", age: 25 },
