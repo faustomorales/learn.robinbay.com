@@ -30,11 +30,7 @@ var drive = async (sphero) => {
         async function called <span class="font-mono font-bold">drive</span> which
         will be called with a single argument that represents the Sphero ball.
       </p>
-      <AnnotatedCode
-        class="mt-2"
-        language="js"
-        code={sampleCode.trim()}
-      />
+      <AnnotatedCode class="mt-2" language="js" code={sampleCode.trim()} />
       <p class="mt-2">
         When connecting to the Sphero, you will be prompted to select a
         Bluetooth device. For this to work, you must make sure that you are
@@ -47,12 +43,13 @@ var drive = async (sphero) => {
         The <span class="font-mono font-bold">sphero</span> object has the following
         methods.
       </p>
-
-      {#each documentation as { title, description, code }}
-        <h3 class="text-2xl font-bold mt-6 font-mono">{title}</h3>
-        <p class="mt-2">{description}</p>
-        <AnnotatedCode class="mt-2" language="js" code={code.trim()} />
-      {/each}
+      <div class="documentation">
+        {#each documentation as { title, description, code }}
+          <h3 class="text-2xl font-bold mt-6 font-mono">{title}</h3>
+          <p class="mt-2">{description}</p>
+          <AnnotatedCode class="mt-2" language="js" code={code.trim()} />
+        {/each}
+      </div>
     </div>
 
     <div class="w-1/2 h-full max-h-screen print:hidden">
@@ -60,3 +57,4 @@ var drive = async (sphero) => {
     </div>
   </div>
 </div>
+

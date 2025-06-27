@@ -366,7 +366,13 @@ export const createAnnotations = (
         .concat(content.slice(p.to));
     });
   });
-  return { content, extensions, onReady, readonly };
+  return {
+    content,
+    extensions,
+    onReady,
+    readonly,
+    readonlyLines: content.slice(0, readonly).split("\n").length,
+  };
 };
 
 export const parseInteractiveSnippet = (code: string, language: Language) => {

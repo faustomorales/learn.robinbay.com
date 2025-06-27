@@ -217,7 +217,7 @@
 <div class={props.class}>
   {#if theme}
     <Tabs
-      contentClass={`${readonly ? "readonly" : ""} bg-gray-50 dark:bg-gray-800 border-b-solid border-b-1 border-r-1 border-l-1 border-gray-200 dark:border-gray-700`}
+      contentClass={`${readonly ? "readonly" : "editable"} bg-gray-50 dark:bg-gray-800 border-b-solid border-b-1 border-r-1 border-l-1 border-gray-200 dark:border-gray-700`}
       activeClasses={`${tabs.length > 1 ? "visible" : "hidden"} p-2 text-primary-600 bg-gray-100 rounded-t-lg dark:bg-gray-800 dark:text-primary-500`}
       inactiveClasses="p-2 text-gray-500 rounded-t-lg hover:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300"
     >
@@ -229,7 +229,7 @@
                 component.language.toUpperCase()}</span
             >
           </div>
-          <div class="pane">
+          <div class="pane" style={`--readonly-height: ${component.readonlyLines * 20 + 2}px;`}>
             <CodeMirror
               bind:value={component.content}
               {theme}
@@ -290,8 +290,11 @@
   :global(.codemirror-wrapper) {
     height: 100%;
   }
-  .pane {
+  .editable .pane {
     height: var(--editor-height, 240px);
+  }
+  .readonly .pane {
+    height: var(--readonly-height, var(--editor-height, 240px));
   }
   :global(.readonly .cm-scroller .cm-layer .cm-cursor.cm-cursor-primary) {
     visibility: hidden;
